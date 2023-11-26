@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/next_favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/next_favicon.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"dxprogramer.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"width":280},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="项目思考由于项目发起了一个抽奖活动，发起活动之前给所有用户发短信提示他们购买了我们的产品有抽奖权益。然后用户上来进入抽奖页面点击爆增，过了一会儿页面就打不开了。后面查看了下各种日志，发现了瓶颈在数据库，由于读写冲突严重，导致响应变慢，有不少连接都超时了。后面看到监控和日志留下的数据，发现负责抽奖的微服务集群qps暴涨12倍，db的qps也涨了10倍。这很明显是一个高并发下如何摆脱数据库读写，I&amp;#">
+<meta property="og:type" content="article">
+<meta property="og:title" content="高并发下的抽奖优化">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/11/12/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8B%E7%9A%84%E6%8A%BD%E5%A5%96%E4%BC%98%E5%8C%96/index.html">
+<meta property="og:site_name" content="Xiangger">
+<meta property="og:description" content="项目思考由于项目发起了一个抽奖活动，发起活动之前给所有用户发短信提示他们购买了我们的产品有抽奖权益。然后用户上来进入抽奖页面点击爆增，过了一会儿页面就打不开了。后面查看了下各种日志，发现了瓶颈在数据库，由于读写冲突严重，导致响应变慢，有不少连接都超时了。后面看到监控和日志留下的数据，发现负责抽奖的微服务集群qps暴涨12倍，db的qps也涨了10倍。这很明显是一个高并发下如何摆脱数据库读写，I&amp;#">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/12/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8B%E7%9A%84%E6%8A%BD%E5%A5%96%E4%BC%98%E5%8C%96/1.png">
+<meta property="article:published_time" content="2023-11-12T13:53:41.000Z">
+<meta property="article:modified_time" content="2023-11-12T14:09:20.462Z">
+<meta property="article:author" content="Xiangger">
+<meta property="article:tag" content="系统优化">
+<meta property="article:tag" content="高并发">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dxprogramer.github.io/2023/11/12/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8B%E7%9A%84%E6%8A%BD%E5%A5%96%E4%BC%98%E5%8C%96/1.png">
+
+
+<link rel="canonical" href="https://dxprogramer.github.io/2023/11/12/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8B%E7%9A%84%E6%8A%BD%E5%A5%96%E4%BC%98%E5%8C%96/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/11/12/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8B%E7%9A%84%E6%8A%BD%E5%A5%96%E4%BC%98%E5%8C%96/","path":"2023/11/12/高并发下的抽奖优化/","title":"高并发下的抽奖优化"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>高并发下的抽奖优化 | Xiangger</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Xiangger</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">业精于勤，荒于嬉；行成于思，毁于随</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E6%80%9D%E8%80%83"><span class="nav-number">1.</span> <span class="nav-text">项目思考</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E6%80%9D%E8%B7%AF"><span class="nav-number">2.</span> <span class="nav-text">优化思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E7%BB%86%E8%8A%82"><span class="nav-number">3.</span> <span class="nav-text">优化细节</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8A%BD%E5%A5%96%E8%AF%A6%E6%83%85%E9%A1%B5"><span class="nav-number">3.1.</span> <span class="nav-text">抽奖详情页</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8A%BD%E5%A5%96%E9%80%BB%E8%BE%91"><span class="nav-number">3.2.</span> <span class="nav-text">抽奖逻辑</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A2%9D%E5%A4%96%E8%80%83%E8%99%91"><span class="nav-number">3.3.</span> <span class="nav-text">额外考虑</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xiangger"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xiangger</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DXProgramer" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DXProgramer" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:13554742813@163.com" title="E-Mail → mailto:13554742813@163.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/your_weibo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;your_weibo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/11/12/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8B%E7%9A%84%E6%8A%BD%E5%A5%96%E4%BC%98%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Xiangger">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="高并发下的抽奖优化 | Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          高并发下的抽奖优化
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-11-12 21:53:41 / 修改时间：22:09:20" itemprop="dateCreated datePublished" datetime="2023-11-12T21:53:41+08:00">2023-11-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">系统架构</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="项目思考"><a href="#项目思考" class="headerlink" title="项目思考"></a>项目思考</h3><p>由于项目发起了一个抽奖活动，发起活动之前给所有用户发短信提示他们购买了我们的产品有抽奖权益。然后用户上来进入抽奖页面点击爆增，过了一会儿页面就打不开了。后面查看了下各种日志，发现了瓶颈在数据库，由于读写冲突严重，导致响应变慢，有不少连接都超时了。后面看到监控和日志留下的数据，发现负责抽奖的微服务集群qps暴涨12倍，db的qps也涨了10倍。这很明显是一个高并发下如何摆脱数据库读写，I&#x2F;O瓶颈的问题。</p>
+<span id="more"></span>
+
+<p>整点开抢后瞬时巨量的请求同时涌入，即使我们Nginx端做过初步限流，整个业务逻辑校验阶段运作良好，但是系统的瓶颈就转移到其他环节：大量的读写请求，导致后面的请求全部排队等待，等前面一个update完成释放行锁后才能处理下一个请求，大量请求等待，占用了数据库的连接。一旦数据库同一时间片内的连接数被打满，就会导致这个时间片内其他后来的全部请求因拿不到连接而超时，导致访问此数据库的其他环节也出现问题，所以RT就会异常飙高。</p>
+<h3 id="优化思路"><a href="#优化思路" class="headerlink" title="优化思路"></a>优化思路</h3><p>借鉴网上的一些通用思路，能采用的有效措施主要是:降级，限流，缓存，消息队列。主要原则是:尽量不暴露db,把大部分请求在服务的系统上层处理了。</p>
+<h3 id="优化细节"><a href="#优化细节" class="headerlink" title="优化细节"></a>优化细节</h3><h4 id="抽奖详情页"><a href="#抽奖详情页" class="headerlink" title="抽奖详情页"></a>抽奖详情页</h4><p><strong>a. 线上开启缓存</strong></p>
+<p>线上已写缓存逻辑，但是没有用switch开启。开启后可以减少数据库的并发IO压力，减少锁冲突。</p>
+<p><strong>b. 关于本地缓存淘汰策略的细节处理</strong></p>
+<p>缓存超过或等于限制大小全部清空。建议等于时不清空，而使用缓存淘汰算法:比如LRU,LFU,NRU等,这样不会出现缓存过大清空后，从数据库更新数据到缓存，缓存里数据依旧很大。导致缓存清空频率过高，反而降低系统的吞吐量。例如guava cache中的参数是</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//设置缓存容器的初始容量为10</span><br><span class="line">initialCapacity(10)</span><br><span class="line">//设置缓存最大容量为100，超过100之后就会按照LRU最近虽少使用算法来移除缓存项</span><br><span class="line">maximumSize(100)</span><br></pre></td></tr></table></figure>
+
+<h4 id="抽奖逻辑"><a href="#抽奖逻辑" class="headerlink" title="抽奖逻辑"></a>抽奖逻辑</h4><p><strong>a.队列削峰</strong></p>
+<p>用额外的单进程处理一个队列，下单请求放到队列里，一个个处理，就不会有qps的高并发问题了。场景中抽奖用户会在到点的时间涌入，DB瞬间就接受暴击压力，hold不住就会宕机，然后影响整个业务。队列的长度保持固定，对于如果请求排队在队伍中靠后，比如奖品100个的情况下，中奖率10%，队列里请求任务超过1000时，就直接将后续的抽奖请求返回不中奖。用tair记录排队数，如果奖品没发完，再请空tair,允许请求继续入队列。这样队列起到了降级和削峰的作用。</p>
+<p><strong>b.将事务和行级悲观锁改成乐观锁</strong></p>
+<p>原来的代码是通过悲观锁来控制超发的情况。（比如一共有100个商品，在最后一刻，我们已经消耗了99个商品，仅剩最后一个。这个时候，系统发来多个并发请求，这批请求读取到的商品余量都是99个，然后都通过了这一个余量判断，最终导致超发。）</p>
+<p>在原来的代码中用的是for update行锁，在高并发的情况下会很多这样的修改请求，每个请求都需要等待锁，某些线程可能永远都没有机会抢到这个锁，这种请求就会死在那里。同时，这种请求会很多，瞬间增大系统的平均响应时间，结果是可用连接数被耗尽，系统陷入异常。</p>
+<p>可以采用乐观锁，是相对于“悲观锁”采用更为宽松的加锁机制，大都是采用带版本号（Version）更新。实现就是，这个数据所有请求都有资格去修改，但会获得一个该数据的版本号，只有版本号符合的才能更新成功，其他的返回抢购失败。</p>
+<p><strong>c.对于与抽奖无直接关系的流程采用异步</strong></p>
+<p>比如抽奖成功之后的发短信功能另起一个线程池专门处理。这样可以提高请求的处理速率，提高qps上升后的乘载能力。</p>
+<p><strong>d.数据库的读写分离</strong></p>
+<p>现在的数据库查询都是读的主库。将数据库的大量查询改为从库，减轻主库的读写压力。主服务器进行写操作时，不影响查询应用服务器的查询性能，降低阻塞，提高并发。</p>
+<p><strong>e.同一时间片内，采用信号量机制</strong></p>
+<p>确保进来的人数不会过多导致系统响应超时： 信号量的采用，能够使得抽奖高峰期内，同一时间片内不会进入过多的用户，从底层实现上规避了系统处理大数据量的风险。这个可以配合队列进行限流处理。</p>
+<p><strong>f. 消息存储机制</strong></p>
+<p>将数据请求先添加到信息队列中（比如Tair存储的数据结构中），然后再写工具启动定时任务从Tair中取出数据去入库，这样对于db的并发度大大降低到了定时任务的频率。但是问题可能会出在保持数据的一致性和完整性上。</p>
+<p><strong>g.必要时候采用限流降级的测流</strong></p>
+<p>当并发过多时为了保证系统整体可用性，抛弃一些请求。对于被限流的请求视为抽不到奖。</p>
+<h4 id="额外考虑"><a href="#额外考虑" class="headerlink" title="额外考虑"></a>额外考虑</h4><p><strong>a.防止黑客刷奖</strong></p>
+<p>防止黑客恶意攻击（比如cc攻击）导致qps过高，可以考虑策略在服务入口为相同uid的账户请求限制每秒钟的最高访问数。</p>
+<p><strong>b. 中奖数据预热</strong></p>
+<p>中奖只是少数，大部分人并不会中奖，所以可以在第一步便限制只有少数用户的请求能够打到真正抽奖逻辑上。是否可以考虑在抽奖之前先用随机算法生成一批中奖候选人。然后当用户请求过来时如果其中绝大多数请求都非中奖候选人，则直接返回抽奖失败，不走抽奖拿奖品的流程。少部分用户请求是中奖候选人，则进入队列，排在队列前面的获得奖品，发完为止，先到先得。</p>
+<p>举个例子：10万个用户抽奖，奖品100个，先随机选出中奖候选人500个。用户请求过来时，不走抽奖查库逻辑的用户过滤掉99500个，剩余的候选人的请求用队列处理,先到先得。这样可以把绝大多数的请求拦截在服务上游不用查库，但是缺点是不能保证奖品一定会被抽完（可能抽奖候选人只有不到100人参与抽奖）。</p>
+<p><strong>四.设计架构图</strong></p>
+<p><img src="/2023/11/12/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8B%E7%9A%84%E6%8A%BD%E5%A5%96%E4%BC%98%E5%8C%96/1.png" alt="图片"></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%B3%BB%E7%BB%9F%E4%BC%98%E5%8C%96/" rel="tag"><i class="fa fa-tag"></i> 系统优化</a>
+              <a href="/tags/%E9%AB%98%E5%B9%B6%E5%8F%91/" rel="tag"><i class="fa fa-tag"></i> 高并发</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/11/12/java%E9%9B%86%E5%90%88%E5%AF%B9%E8%B1%A1%E6%8E%92%E5%BA%8F/" rel="prev" title="java集合对象排序">
+                  <i class="fa fa-angle-left"></i> java集合对象排序
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/11/15/%E7%94%9F%E4%BA%A7%E8%80%85%E5%92%8C%E6%B6%88%E8%B4%B9%E8%80%85%E6%A8%A1%E5%9E%8B/" rel="next" title="生产者和消费者模型">
+                  生产者和消费者模型 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  
+  <div class="comments">
+  <script src="https://utteranc.es/client.js" repo="DXProgramer/hexo-comments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script>
+  </div>
+  
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Xiangger</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">234k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:33</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<!-- 樱花特效 -->
+  
+      <script async src="/js/fairyDustCursor.js"></script>
+  
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/next_favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/next_favicon.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"dxprogramer.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"width":280},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="缓存是什么其实缓存的思想在生活中处处可见，比如说我们的书架上摆满了各种书籍，但是我最近想集中精力攻克数据结构这门课，因次为了方便，我将与数据结构有关的书先从书架取下来，放在我们的书桌上，这样我们取书的时候就快很多了，伸手可得，而不用跑到书架旁取书了，在这个例子里，书桌所扮演的就是缓存的角色。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LRU缓存">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/index.html">
+<meta property="og:site_name" content="Xiangger">
+<meta property="og:description" content="缓存是什么其实缓存的思想在生活中处处可见，比如说我们的书架上摆满了各种书籍，但是我最近想集中精力攻克数据结构这门课，因次为了方便，我将与数据结构有关的书先从书架取下来，放在我们的书桌上，这样我们取书的时候就快很多了，伸手可得，而不用跑到书架旁取书了，在这个例子里，书桌所扮演的就是缓存的角色。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/1.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/2.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/3.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/4.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/5.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/6.jpg">
+<meta property="article:published_time" content="2023-10-29T02:33:05.000Z">
+<meta property="article:modified_time" content="2023-10-29T02:55:01.106Z">
+<meta property="article:author" content="Xiangger">
+<meta property="article:tag" content="LRU">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/1.png">
+
+
+<link rel="canonical" href="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/","path":"2023/10/29/LRU缓存/","title":"LRU缓存"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>LRU缓存 | Xiangger</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Xiangger</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">业精于勤，荒于嬉；行成于思，毁于随</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.</span> <span class="nav-text">缓存是什么</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFLRU%E7%BC%93%E5%AD%98"><span class="nav-number">1.1.</span> <span class="nav-text">什么是LRU缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LRU%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.2.</span> <span class="nav-text">LRU缓存设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LRU%E7%BC%93%E5%AD%98%E6%8E%A5%E5%8F%A3%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.3.</span> <span class="nav-text">LRU缓存接口设计</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xiangger"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xiangger</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DXProgramer" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DXProgramer" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:13554742813@163.com" title="E-Mail → mailto:13554742813@163.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/your_weibo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;your_weibo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Xiangger">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="LRU缓存 | Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LRU缓存
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-10-29 10:33:05 / 修改时间：10:55:01" itemprop="dateCreated datePublished" datetime="2023-10-29T10:33:05+08:00">2023-10-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%93%E5%AD%98/" itemprop="url" rel="index"><span itemprop="name">缓存</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="缓存是什么"><a href="#缓存是什么" class="headerlink" title="缓存是什么"></a>缓存是什么</h1><p>其实缓存的思想在生活中处处可见，比如说我们的书架上摆满了各种书籍，但是我最近想集中精力攻克数据结构这门课，因次为了方便，我将与数据结构有关的书先从书架取下来，放在我们的书桌上，这样我们取书的时候就快很多了，伸手可得，而不用跑到书架旁取书了，在这个例子里，书桌所扮演的就是缓存的角色。</p>
+<span id="more"></span>
+
+<p>在计算机中，我们知道，访问磁盘的效率比访问内存的效率低得多，低多少了，大概是10W级别吧，如下图所示。</p>
+<p><img src="/2023/10/29/LRU%E7%BC%93%E5%AD%98/1.png" alt="图片"></p>
+<p>我们知道有个很著名的二八定律。其实计算机世界中也有很多情况遵守这个定律，比如说网站访问的特点：80% 的业务访问集中在20% 的数据上。那么很自然就想到：既然大部分业务访问集中在一小部分数据上，那么如果通过设计合理的数据结构把这一小部分数据存放在内存中，是不是极大的提高了系统的性能呢，这就是缓存。</p>
+<p>从上面可以看出，无论是生活中还是计算机世界中的缓存，主要有以下两个特点：</p>
+<ul>
+<li>提高系统效率，</li>
+<li>容量小于外部存储容量，如书桌容量小于书架容量，内存容量小于硬盘容量</li>
+</ul>
+<h2 id="什么是LRU缓存"><a href="#什么是LRU缓存" class="headerlink" title="什么是LRU缓存"></a>什么是LRU缓存</h2><p>由于内存是有限的，因此缓存总有满的时候，那么当缓存满了的时候，这时候又有新的数据需要加入到缓存中时，我们该怎么办了？没什么别的办法，只有从缓存中删除旧数据为新数据腾出空间，那么究竟删除原来缓存的哪些数据了？这就涉及到缓存的替换策略，LRU就是一种缓存策略。</p>
+<p>LRU，Least Recently Used的简写，翻译过来就是“最近最少使用”。该算法依据于程序的局部性原理， 其淘汰旧数据的策略是，<strong>距离当前最久没有被访问过的数据</strong>应该被淘汰。</p>
+<p>举个例子：现在有一个能存放5个数据的缓存，刚开始中缓存中存放了3个数据A-&gt;B-&gt;C，如下所示：</p>
+<p><img src="/2023/10/29/LRU%E7%BC%93%E5%AD%98/2.png" alt="图片"></p>
+<p>接着又在缓存中插入2个数据D-&gt;E，此时缓存已经满了。如下：</p>
+<p><img src="/2023/10/29/LRU%E7%BC%93%E5%AD%98/3.png" alt="图片"></p>
+<p>好了，现在我们来访问数据A，现在A成为了最近访问的数据，B成了最久没有访问过的数据:</p>
+<p><img src="/2023/10/29/LRU%E7%BC%93%E5%AD%98/4.png" alt="图片"></p>
+<p>现在我们又有一个数据F想要插入到缓存中，由于缓存已经满了，需要从缓存中淘汰旧数据，此时缓存中的数据B是距离当前时间最久没有被访问过的数据，根据LRU算法，我们会淘汰掉数据B：将F插入到当前B的位置。</p>
+<p><img src="/2023/10/29/LRU%E7%BC%93%E5%AD%98/5.jpg" alt="图片"></p>
+<p>此时数据C成为了距离当前时间最久没有被访问过的数据，因此如果再来一个数据的话，就应该插入到C当前的位置，依次类推。</p>
+<h2 id="LRU缓存设计"><a href="#LRU缓存设计" class="headerlink" title="LRU缓存设计"></a>LRU缓存设计</h2><p>理解LRU缓存的思想其实挺简单，但是要自己动手设计一个LRU缓存就并不那么简单了，这节主要讲讲LRU缓存的设计思路。</p>
+<p>首先从前面的分析可以看出，LRU缓存主要的操作是插入删除以及查找，因此我们可以考虑用双链表来维护缓存，该链表将缓存数据按访问时间从新到旧排列起来。</p>
+<p>如果我们只是单将缓存中的数据维护在一个双向链表中， 那么当我们需要从缓存中查找数据时，需要遍历链表，其时间复杂度为O(n)。 这样的设计， 是一种比较低效率的做法。 因此， 我们除了将数据维护在双向链表中， 我们同时还将数据维护在一个哈希表中。 哈希表访问数据的时间复杂度为O(1)。</p>
+<p>依据上述设计， 一个LRU缓存包含了一个双向链表和一个哈希表， 双向链表以及哈希表的一个节点代表缓存中的一个缓存单元， 因此我们可以这样定义我们缓存单元的数据结构：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//LRU缓存的缓存单元 </span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">cacheEntryS</span></span><br><span class="line">&#123;  </span><br><span class="line">    <span class="type">char</span> key;   <span class="comment">//数据的key </span></span><br><span class="line">    <span class="type">char</span> data;  <span class="comment">// 数据的data</span></span><br><span class="line">      </span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">cacheEntryS</span> *hashListPrev; <span class="comment">//指向哈希链表的前一个元素</span></span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">cacheEntryS</span> *hashListNext; <span class="comment">//指向哈希链表的后一个元素</span></span><br><span class="line">      </span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">cacheEntryS</span> *lruListPrev;  <span class="comment">//指向链表的前一个元素</span></span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">cacheEntryS</span> *lruListNext;  <span class="comment">//指向链表后一个元素</span></span><br><span class="line">&#125;cacheEntryS; </span><br></pre></td></tr></table></figure>
+
+<p>LRU缓存的数据结构如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//定义LRU缓存</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">LRUCacheS</span></span><br><span class="line">&#123;  </span><br><span class="line">    <span class="type">int</span> cacheCapacity;  <span class="comment">//缓存的容量</span></span><br><span class="line">    cacheEntryS **hashMap;  <span class="comment">//缓存的哈希表</span></span><br><span class="line">      </span><br><span class="line">    cacheEntryS *lruListHead;<span class="comment">//缓存的双向链表表头</span></span><br><span class="line">    cacheEntryS *lruListTail;<span class="comment">//缓存的双向链表表尾</span></span><br><span class="line">    <span class="type">int</span> lruListSize;    <span class="comment">//缓存的双向链表节点个数</span></span><br><span class="line">&#125;LRUCacheS;</span><br></pre></td></tr></table></figure>
+
+<p>如果一大坨代码看的比较晕，那么对着下面的结构关系图应该能理解的比较透彻，注意下图中没有指向的指针都是NULL：</p>
+<p><img src="/2023/10/29/LRU%E7%BC%93%E5%AD%98/6.jpg" alt="图片"></p>
+<h2 id="LRU缓存接口设计"><a href="#LRU缓存接口设计" class="headerlink" title="LRU缓存接口设计"></a>LRU缓存接口设计</h2><p>通过前面的分析不难看出，对一个LRU缓存的最重要的操作无外乎是创建、销毁、插入数据、查找数据。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*********************************************</span></span><br><span class="line"><span class="comment">函数名：LRUCacheCreate</span></span><br><span class="line"><span class="comment">功能:创建LRU缓存</span></span><br><span class="line"><span class="comment">输入参数：capacity，缓存的数据容量</span></span><br><span class="line"><span class="comment">输出参数：lruCache，指向新建缓存的指针</span></span><br><span class="line"><span class="comment">针返回值：0---成功     -1---失败</span></span><br><span class="line"><span class="comment">*********************************************/</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">LRUCacheCreate</span><span class="params">(<span class="type">int</span> capacity, <span class="type">void</span> **lruCache)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*********************************************</span></span><br><span class="line"><span class="comment">函数名：LRUCacheDestory</span></span><br><span class="line"><span class="comment">功能:销毁LRU缓存</span></span><br><span class="line"><span class="comment">输入参数：lruCache指向新建缓存的指针</span></span><br><span class="line"><span class="comment">输出参数：无</span></span><br><span class="line"><span class="comment">针返回值：0---成功     -1---失败</span></span><br><span class="line"><span class="comment">*********************************************/</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">LRUCacheDestory</span><span class="params">(<span class="type">void</span> *lruCache)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*********************************************</span></span><br><span class="line"><span class="comment">函数名：LRUCacheSet</span></span><br><span class="line"><span class="comment">功能:将数据插入到LRU缓存中</span></span><br><span class="line"><span class="comment">输入参数：key:数据索引   data:数据内容</span></span><br><span class="line"><span class="comment">输出参数：无</span></span><br><span class="line"><span class="comment">针返回值：0---成功     -1---失败</span></span><br><span class="line"><span class="comment">*********************************************/</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">LRUCacheSet</span><span class="params">(<span class="type">void</span> *lruCache, <span class="type">char</span> key, <span class="type">char</span> data)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*********************************************</span></span><br><span class="line"><span class="comment">函数名：LRUCacheGet</span></span><br><span class="line"><span class="comment">功能:将从LRU缓存中获取数据</span></span><br><span class="line"><span class="comment">输入参数：key:数据索引</span></span><br><span class="line"><span class="comment">输出参数：无</span></span><br><span class="line"><span class="comment">针返回值：缓存中存在key对应的data,返回</span></span><br><span class="line"><span class="comment">        缓存中不存在key对应的data，返回&#x27;\0&#x27;</span></span><br><span class="line"><span class="comment">*********************************************/</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">LRUCacheGet</span><span class="params">(<span class="type">void</span> *lruCache, <span class="type">char</span> key)</span></span>;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LRU/" rel="tag"><i class="fa fa-tag"></i> LRU</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/10/28/%E9%93%BE%E8%A1%A8/" rel="prev" title="链表">
+                  <i class="fa fa-angle-left"></i> 链表
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/10/29/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F-%E5%B0%86%E8%AF%B7%E6%B1%82%E5%B0%81%E8%A3%85%E4%B8%BA%E5%AF%B9%E8%B1%A1/" rel="next" title="命令模式:将请求封装为对象">
+                  命令模式:将请求封装为对象 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  
+  <div class="comments">
+  <script src="https://utteranc.es/client.js" repo="DXProgramer/hexo-comments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script>
+  </div>
+  
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Xiangger</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">234k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:33</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<!-- 樱花特效 -->
+  
+      <script async src="/js/fairyDustCursor.js"></script>
+  
+</body>
+</html>

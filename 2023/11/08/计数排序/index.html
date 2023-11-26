@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/next_favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/next_favicon.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"dxprogramer.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"width":280},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="算法原理计数排序（Counting Sort）是一种针对于特定范围之间的整数进行排序的算法。它通过统计给定数组中不同元素的数量（类似于哈希映射），然后对映射后的数组进行排序输出即可。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计数排序">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/index.html">
+<meta property="og:site_name" content="Xiangger">
+<meta property="og:description" content="算法原理计数排序（Counting Sort）是一种针对于特定范围之间的整数进行排序的算法。它通过统计给定数组中不同元素的数量（类似于哈希映射），然后对映射后的数组进行排序输出即可。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/1.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/2.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/3.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/4.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/5.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/6.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/7.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/8.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/9.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/10.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/11.png">
+<meta property="article:published_time" content="2023-11-08T15:22:48.000Z">
+<meta property="article:modified_time" content="2023-11-12T08:54:43.047Z">
+<meta property="article:author" content="Xiangger">
+<meta property="article:tag" content="排序">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/1.png">
+
+
+<link rel="canonical" href="https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/","path":"2023/11/08/计数排序/","title":"计数排序"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>计数排序 | Xiangger</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Xiangger</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">业精于勤，荒于嬉；行成于思，毁于随</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">算法原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81"><span class="nav-number">2.</span> <span class="nav-text">代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90"><span class="nav-number">3.</span> <span class="nav-text">复杂度分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">4.</span> <span class="nav-text">优缺点</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xiangger"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xiangger</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DXProgramer" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DXProgramer" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:13554742813@163.com" title="E-Mail → mailto:13554742813@163.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/your_weibo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;your_weibo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Xiangger">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="计数排序 | Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计数排序
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-11-08 23:22:48" itemprop="dateCreated datePublished" datetime="2023-11-08T23:22:48+08:00">2023-11-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-11-12 16:54:43" itemprop="dateModified" datetime="2023-11-12T16:54:43+08:00">2023-11-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.5k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h3 id="算法原理"><a href="#算法原理" class="headerlink" title="算法原理"></a>算法原理</h3><p>计数排序（Counting Sort）是一种针对于特定范围之间的整数进行排序的算法。它通过统计给定数组中不同元素的数量（类似于哈希映射），然后对映射后的数组进行排序输出即可。</p>
+<span id="more"></span>
+
+<p>我们以数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 为例进行说明。</p>
+<p><img src="/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/1.png" alt="图片"></p>
+<p>第一步：建立一个初始化为 <strong>0</strong> ，长度为 <strong>9</strong> (原始数组中的最大值 <strong>8</strong> 加 <strong>1</strong>) 的数组 <strong><code>count[]</code></strong> :</p>
+<p><img src="/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/2.png" alt="图片"></p>
+<p>第二步：遍历数组  <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> ，访问第一个元素 <strong>1</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>1</strong> 的元素加 1，表示当前 <strong>1</strong> 出现了一次，即 <strong><code>count[1] = 1</code></strong> ;</p>
+<p><img src="/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/3.png" alt="图片"></p>
+<p>第三步：访问数组  <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第二个元素 <strong>4</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>4</strong> 的元素加 <strong>1</strong> ，表示当前访问的元素 <strong>4</strong> 当前出现了 <strong>1</strong> 次，即  <strong><code>count[4] = 1</code></strong> ;</p>
+<p><img src="/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/4.png" alt="图片"></p>
+<p>第四步：访问数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第三个元素 <strong>1</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>1</strong> 的元素加 1，即 <strong><code>count[1] = 2</code></strong> ，表示当前 <strong>1</strong> 出现了 <strong>2</strong> 次：</p>
+<p><img src="/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/5.png" alt="图片"></p>
+<p>第五步：访问数组  <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第四个元素 <strong>2</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>2</strong> 的元素加 1，即 <strong><code>count[2] = 1</code></strong> ，表示当前 <strong>2</strong> 出现了 <strong>1</strong> 次：</p>
+<p><img src="/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/6.png" alt="图片"></p>
+<p>第六步：访问数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第五个元素 <strong>5</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>5</strong> 的元素加 1，即 <strong><code>count[5] = 1</code></strong> ，表示当前 <strong>5</strong> 出现了 <strong>1</strong> 次：</p>
+<p><img src="/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/7.png" alt="图片"></p>
+<p>第七步：访问数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第六个元素 <strong>2</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>2</strong> 的元素加 1，即 <strong><code>count[2] = 2</code></strong> ，表示当前 <strong>2</strong> 出现了 <strong>2</strong> 次：</p>
+<p><img src="/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/8.png" alt="图片"></p>
+<p>第八步：访问数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第七个元素 <strong>4</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>4</strong> 的元素加 1，即 <strong><code>count[4] = 2</code></strong> ，表示当前 <strong>4</strong> 出现了 <strong>2</strong> 次：</p>
+<p><img src="/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/9.png" alt="图片"></p>
+<p>第九步：访问数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第八个元素 <strong>1</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>1</strong> 的元素加 1，即 <strong><code>count[1] = 3</code></strong> ，表示当前 <strong>1</strong> 出现了 <strong>3</strong> 次：</p>
+<p><img src="/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/10.png" alt="图片"></p>
+<p>第十步：访问数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第九个元素 <strong>8</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>8</strong> 的元素加 1，即 <strong><code>count[8] = 1</code></strong> ，表示当前 <strong>8</strong> 出现了 <strong>1</strong> 次：</p>
+<p><img src="/2023/11/08/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/11.png" alt="图片"></p>
+<p>此时遍历数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 结束，我们得到了一个 <strong><code>count[]</code></strong> 数组，而只要得到了这个**<code>count[] </code>**数组，我们的排序算法就相当于结束了，接下来的就只是输出了。</p>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><p>如果不考虑计数排序的稳定性，我们按照数组 <strong><code>count[]</code></strong> 中对应下标的出现次数直接输出即可：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; count.length; i++)&#123;</span><br><span class="line">    <span class="keyword">if</span> (count[i] != <span class="number">0</span>)&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; count[i]; j++)&#123;</span><br><span class="line">            System.out.print(i + <span class="string">&quot; &quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>优化后（考虑稳定性）：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.*; </span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CountingSort</span>  </span><br><span class="line">&#123; </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">countSort</span><span class="params">(<span class="type">int</span>[] arr)</span>  </span><br><span class="line">    &#123; </span><br><span class="line">        <span class="type">int</span> <span class="variable">max</span> <span class="operator">=</span> Arrays.stream(arr).max().getAsInt(); </span><br><span class="line">        <span class="type">int</span> <span class="variable">min</span> <span class="operator">=</span> Arrays.stream(arr).min().getAsInt(); </span><br><span class="line">        <span class="type">int</span> <span class="variable">range</span> <span class="operator">=</span> max - min + <span class="number">1</span>; </span><br><span class="line">        <span class="type">int</span> count[] = <span class="keyword">new</span> <span class="title class_">int</span>[range]; </span><br><span class="line">        <span class="type">int</span> output[] = <span class="keyword">new</span> <span class="title class_">int</span>[arr.length]; </span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; arr.length; i++)  </span><br><span class="line">        &#123; </span><br><span class="line">            count[arr[i] - min]++; </span><br><span class="line">        &#125; </span><br><span class="line">  </span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt; count.length; i++)  </span><br><span class="line">        &#123; </span><br><span class="line">            count[i] += count[i - <span class="number">1</span>]; </span><br><span class="line">        &#125; </span><br><span class="line">  </span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> arr.length - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--)  </span><br><span class="line">        &#123; </span><br><span class="line">            output[count[arr[i] - min] - <span class="number">1</span>] = arr[i]; </span><br><span class="line">            count[arr[i] - min]--; </span><br><span class="line">        &#125; </span><br><span class="line">  </span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; arr.length; i++) </span><br><span class="line">        &#123; </span><br><span class="line">            arr[i] = output[i]; </span><br><span class="line">        &#125; </span><br><span class="line">    &#125; </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">printArray</span><span class="params">(<span class="type">int</span>[] arr)</span>  </span><br><span class="line">    &#123; </span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; arr.length; i++)  </span><br><span class="line">        &#123; </span><br><span class="line">            System.out.print(arr[i] + <span class="string">&quot; &quot;</span>); </span><br><span class="line">        &#125; </span><br><span class="line">        System.out.println(<span class="string">&quot;&quot;</span>); </span><br><span class="line">    &#125; </span><br><span class="line">   </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> </span><br><span class="line">    &#123; </span><br><span class="line">        <span class="type">int</span>[] arr = &#123;-<span class="number">1</span>,<span class="number">4</span>,<span class="number">1</span>,-<span class="number">2</span>,<span class="number">5</span>,-<span class="number">2</span>,<span class="number">4</span>,-<span class="number">1</span>,<span class="number">8</span>&#125;; </span><br><span class="line">        countSort(arr); </span><br><span class="line">        printArray(arr); </span><br><span class="line">    &#125; </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<h3 id="复杂度分析"><a href="#复杂度分析" class="headerlink" title="复杂度分析"></a>复杂度分析</h3><p><strong>时间复杂度</strong></p>
+<p>在整个代码实现过程中，我们仅仅出现了一层的 for 循环，没有出现任何 for 循环的嵌套，所以计数排序的时间复杂度为 量级。</p>
+<p><strong>空间复杂度</strong></p>
+<p>由于计数排序过程中，我们使用到了一个 <strong><code>max - min + 1</code></strong> 大小的 <strong>count[]</strong> 数组，所以计数排序的空间复杂度为 量级。</p>
+<h3 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h3><ol>
+<li>如果输入数据的范围  <strong><code>range = max - min + 1</code></strong> 不明显大于要待排序数组的长度 **<code>n = arr.length</code>**，则计数排序是相当高效的，比时间复杂度为 的快速和归并排序都优秀。</li>
+<li>计数排序不是基于比较的排序算法，时间复杂度为   ，空间复杂度与数据范围成正比。</li>
+<li>计数排序通常用作另一个排序算法（例如基数排序）的子过程。</li>
+<li>计数排序可以使用部分哈希（partial Hashing）在 的时间内统计数据的频率。</li>
+<li>计数排序适用于负输入。</li>
+<li>计数排序不适用于小数的情况。</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/eIegGzddx4DuqjvKELlAZA">阅读原文</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%8E%92%E5%BA%8F/" rel="tag"><i class="fa fa-tag"></i> 排序</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/11/08/%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F/" rel="prev" title="基数排序">
+                  <i class="fa fa-angle-left"></i> 基数排序
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/11/12/Optional%E5%BA%94%E7%94%A8/" rel="next" title="Optional应用">
+                  Optional应用 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  
+  <div class="comments">
+  <script src="https://utteranc.es/client.js" repo="DXProgramer/hexo-comments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script>
+  </div>
+  
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Xiangger</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">234k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:33</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<!-- 樱花特效 -->
+  
+      <script async src="/js/fairyDustCursor.js"></script>
+  
+</body>
+</html>

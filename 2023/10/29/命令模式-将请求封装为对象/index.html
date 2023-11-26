@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/next_favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/next_favicon.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"dxprogramer.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"width":280},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="命令模式是一种行为型设计模式，它允许您将请求封装成对象，从而允许您根据不同的请求、队列或者日志来参数化其他对象，并支持可撤销的操作。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="命令模式:将请求封装为对象">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/10/29/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F-%E5%B0%86%E8%AF%B7%E6%B1%82%E5%B0%81%E8%A3%85%E4%B8%BA%E5%AF%B9%E8%B1%A1/index.html">
+<meta property="og:site_name" content="Xiangger">
+<meta property="og:description" content="命令模式是一种行为型设计模式，它允许您将请求封装成对象，从而允许您根据不同的请求、队列或者日志来参数化其他对象，并支持可撤销的操作。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-10-29T07:15:15.000Z">
+<meta property="article:modified_time" content="2023-10-29T07:50:26.728Z">
+<meta property="article:author" content="Xiangger">
+<meta property="article:tag" content="命令设计模式">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://dxprogramer.github.io/2023/10/29/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F-%E5%B0%86%E8%AF%B7%E6%B1%82%E5%B0%81%E8%A3%85%E4%B8%BA%E5%AF%B9%E8%B1%A1/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/10/29/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F-%E5%B0%86%E8%AF%B7%E6%B1%82%E5%B0%81%E8%A3%85%E4%B8%BA%E5%AF%B9%E8%B1%A1/","path":"2023/10/29/命令模式-将请求封装为对象/","title":"命令模式:将请求封装为对象"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>命令模式:将请求封装为对象 | Xiangger</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Xiangger</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">业精于勤，荒于嬉；行成于思，毁于随</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">什么是命令模式？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">为什么需要命令模式？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">命令模式的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%8F%E5%91%BD%E4%BB%A4"><span class="nav-number">4.</span> <span class="nav-text">宏命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%92%A4%E9%94%80%E5%92%8C%E9%87%8D%E5%81%9A"><span class="nav-number">5.</span> <span class="nav-text">撤销和重做</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xiangger"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xiangger</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DXProgramer" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DXProgramer" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:13554742813@163.com" title="E-Mail → mailto:13554742813@163.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/your_weibo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;your_weibo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/10/29/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F-%E5%B0%86%E8%AF%B7%E6%B1%82%E5%B0%81%E8%A3%85%E4%B8%BA%E5%AF%B9%E8%B1%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Xiangger">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="命令模式:将请求封装为对象 | Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          命令模式:将请求封装为对象
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-10-29 15:15:15 / 修改时间：15:50:26" itemprop="dateCreated datePublished" datetime="2023-10-29T15:15:15+08:00">2023-10-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5.4k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>5 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>命令模式是一种行为型设计模式，它允许您将请求封装成对象，从而允许您根据不同的请求、队列或者日志来参数化其他对象，并支持可撤销的操作。</p>
+<span id="more"></span>
+
+<h2 id="什么是命令模式？"><a href="#什么是命令模式？" class="headerlink" title="什么是命令模式？"></a>什么是命令模式？</h2><p>命令模式是一种行为型设计模式，它将请求或操作封装成独立的命令对象。这些命令对象包括了执行操作所需的所有信息，例如操作方法、参数和接收者。命令模式允许您将命令发送者（客户端）和命令执行者（接收者）解耦，使得发送者无需知道接收者的具体类别。</p>
+<p>在命令模式中，通常包含以下关键角色：</p>
+<ol>
+<li><strong>命令（Command）</strong>：声明了执行操作的接口，通常包括一个 <strong><code>execute</code></strong> 方法。</li>
+<li><strong>具体命令（Concrete Command）</strong>：实现了命令接口，包含了实际的操作逻辑。每个具体命令对象都与一个接收者相关联。</li>
+<li><strong>接收者（Receiver）</strong>：执行命令实际操作的对象。</li>
+<li><strong>调用者（Invoker）</strong>：负责调用命令对象来执行请求。</li>
+<li><strong>客户端（Client）</strong>：创建命令对象并设置其接收者，然后将命令对象传递给调用者。</li>
+</ol>
+<h2 id="为什么需要命令模式？"><a href="#为什么需要命令模式？" class="headerlink" title="为什么需要命令模式？"></a>为什么需要命令模式？</h2><p>命令模式有以下几个优点：</p>
+<ol>
+<li><strong>解耦</strong>：命令模式可以将发送者和接收者解耦，发送者无需知道接收者的具体实现，从而提高了系统的灵活性。</li>
+<li><strong>可扩展性</strong>：您可以轻松地添加新的命令类，而无需修改已有的代码。</li>
+<li><strong>撤销操作</strong>：命令对象通常会保存操作的状态，从而支持撤销操作。</li>
+<li><strong>日志记录和事务管理</strong>：您可以使用命令模式来记录所有执行的命令，以便进行事务管理或撤销。</li>
+</ol>
+<h2 id="命令模式的实现"><a href="#命令模式的实现" class="headerlink" title="命令模式的实现"></a>命令模式的实现</h2><p>让我们通过一个简单的示例来演示命令模式的实现。假设我们正在构建一个遥控器应用，用户可以通过遥控器执行不同的操作，例如打开电视、切换频道和调整音量。</p>
+<p>首先，我们定义一个命令接口 **<code>Command</code>**，它包括了一个 <strong><code>execute</code></strong> 方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Command</span> &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">execute</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来，我们创建具体的命令类，例如 <strong><code>TurnOnCommand</code><strong>、</strong><code>ChangeChannelCommand</code></strong> 和 **<code>AdjustVolumeCommand</code>**，它们实现了 <strong><code>Command</code></strong> 接口，并分别执行相应的操作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TurnOnCommand</span> <span class="keyword">implements</span> <span class="title class_">Command</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> Television television;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">TurnOnCommand</span><span class="params">(Television television)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.television = television;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">execute</span><span class="params">()</span> &#123;</span><br><span class="line">        television.turnOn();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 类似地实现 ChangeChannelCommand 和 AdjustVolumeCommand</span></span><br></pre></td></tr></table></figure>
+
+<p>然后，我们创建接收者类 **<code>Television</code>**，它包含了实际的操作逻辑：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Television</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">turnOn</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;电视已打开&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">changeChannel</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;切换频道&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">adjustVolume</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;调整音量&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后，我们创建调用者类 **<code>RemoteControl</code>**，它接收并执行命令：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RemoteControl</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> Command command;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setCommand</span><span class="params">(Command command)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.command = command;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">pressButton</span><span class="params">()</span> &#123;</span><br><span class="line">        command.execute();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>客户端代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Client</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">Television</span> <span class="variable">television</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Television</span>();</span><br><span class="line"></span><br><span class="line">        <span class="type">Command</span> <span class="variable">turnOnCommand</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TurnOnCommand</span>(television);</span><br><span class="line">        <span class="type">Command</span> <span class="variable">changeChannelCommand</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ChangeChannelCommand</span>(television);</span><br><span class="line">        <span class="type">Command</span> <span class="variable">adjustVolumeCommand</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">AdjustVolumeCommand</span>(television);</span><br><span class="line"></span><br><span class="line">        <span class="type">RemoteControl</span> <span class="variable">remoteControl</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">RemoteControl</span>();</span><br><span class="line"></span><br><span class="line">        remoteControl.setCommand(turnOnCommand);</span><br><span class="line">        remoteControl.pressButton();</span><br><span class="line"></span><br><span class="line">        remoteControl.setCommand(changeChannelCommand);</span><br><span class="line">        remoteControl.pressButton();</span><br><span class="line"></span><br><span class="line">        remoteControl.setCommand(adjustVolumeCommand);</span><br><span class="line">        remoteControl.pressButton();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个示例中，我们将不同的操作（打开电视、切换频道、调整音量）封装成了命令对象，通过遥控器执行这些命令，而不需要直接调用接收者的方法。</p>
+<h2 id="宏命令"><a href="#宏命令" class="headerlink" title="宏命令"></a>宏命令</h2><p>宏命令是一种命令模式的扩展，它允许您将多个命令组合成一个更大的命令。宏命令本身也是一个命令，可以执行一系列子命令。这对于执行复杂的操作或者创建多级撤销机制非常有用。</p>
+<p>让我们通过一个示例来了解宏命令。假设我们有一个文本编辑器，需要实现一个宏命令来执行以下操作：</p>
+<ol>
+<li>打开文件</li>
+<li>编辑文件</li>
+<li>保存文件</li>
+</ol>
+<p>首先，我们定义一个宏命令接口 <strong><code>MacroCommand</code></strong> ，它包含了 <strong><code>add</code></strong> 和 <strong><code>execute</code></strong> 方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">MacroCommand</span> &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(Command command)</span>;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">execute</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来，我们创建一个具体的宏命令类 <strong><code>TextEditorMacro</code></strong> ，它可以添加和执行多个子命令：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TextEditorMacro</span> <span class="keyword">implements</span> <span class="title class_">MacroCommand</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> List&lt;Command&gt; commands = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">add</span><span class="params">(Command command)</span> &#123;</span><br><span class="line">        commands.add(command);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">execute</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (Command command : commands) &#123;</span><br><span class="line">            command.execute();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后，我们可以创建多个子命令，例如 <strong><code>OpenFileCommand</code><strong>、</strong><code>EditFileCommand</code></strong> 和 <strong><code>SaveFileCommand</code></strong>  ，它们分别执行打开、编辑和保存文件的操作。最后，我们可以使用宏命令将这些子命令组合成一个宏命令：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Client</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">OpenFileCommand</span> <span class="variable">openFile</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">OpenFileCommand</span>();</span><br><span class="line">        <span class="type">EditFileCommand</span> <span class="variable">editFile</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">EditFileCommand</span>();</span><br><span class="line">        <span class="type">SaveFileCommand</span> <span class="variable">saveFile</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SaveFileCommand</span>();</span><br><span class="line"></span><br><span class="line">        <span class="type">TextEditorMacro</span> <span class="variable">macro</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TextEditorMacro</span>();</span><br><span class="line">        macro.add(openFile);</span><br><span class="line">        macro.add(editFile);</span><br><span class="line">        macro.add(saveFile);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 执行宏命令，依次执行子命令</span></span><br><span class="line">        macro.execute();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样，我们就实现了一个宏命令，可以一次性执行多个子命令，从而打开、编辑和保存文件。</p>
+<h2 id="撤销和重做"><a href="#撤销和重做" class="headerlink" title="撤销和重做"></a>撤销和重做</h2><p>命令模式还支持撤销和重做操作。</p>
+<p>为了实现撤销，我们需要在命令对象中保存执行前的状态，并提供一个 <strong><code>undo</code></strong> 方法来恢复到之前的状态。</p>
+<p>让我们通过一个简单的示例来演示撤销和重做。假设我们有一个文本编辑器，可以执行添加文本、删除文本和撤销操作。</p>
+<p>首先，我们定义一个命令接口 <strong><code>Command</code></strong> ，包括了 <strong><code>execute</code></strong> 和 <strong><code>undo</code></strong> 方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">Command</span> &#123;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">execute</span><span class="params">()</span>;</span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">undo</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接下来，我们创建具体的命令类，例如 <strong><code>AddTextCommand</code></strong> 和 <strong><code>DeleteTextCommand</code></strong> ，它们分别执行添加文本和删除文本的操作，并实现了 <strong><code>undo</code></strong> 方法来撤销操作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AddTextCommand</span> <span class="keyword">implements</span> <span class="title class_">Command</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> TextEditor textEditor;</span><br><span class="line">    <span class="keyword">private</span> String addedText;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">AddTextCommand</span><span class="params">(TextEditor textEditor, String addedText)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.textEditor = textEditor;</span><br><span class="line">        <span class="built_in">this</span>.addedText = addedText;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">execute</span><span class="params">()</span> &#123;</span><br><span class="line">        textEditor.addText(addedText);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">undo</span><span class="params">()</span> &#123;</span><br><span class="line">        textEditor.deleteText(addedText);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 类似地实现 DeleteTextCommand</span></span><br></pre></td></tr></table></figure>
+
+<p>然后，我们创建接收者类 <strong><code>TextEditor</code></strong> ，它包含了实际的文本编辑逻辑，包括添加文本、删除文本和显示文本。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TextEditor</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">StringBuilder</span> <span class="variable">text</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addText</span><span class="params">(String addedText)</span> &#123;</span><br><span class="line">        text.append(addedText);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">deleteText</span><span class="params">(String deletedText)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">start</span> <span class="operator">=</span> text.lastIndexOf(deletedText);</span><br><span class="line">        <span class="keyword">if</span> (start != -<span class="number">1</span>) &#123;</span><br><span class="line">            text.delete(start, start + deletedText.length());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">displayText</span><span class="params">()</span> &#123;</span><br><span class="line">        System.out.println(text.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后，我们可以创建一个客户端来测试撤销和重做操作：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Client</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">TextEditor</span> <span class="variable">textEditor</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TextEditor</span>();</span><br><span class="line"></span><br><span class="line">        <span class="type">Command</span> <span class="variable">addCommand1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">AddTextCommand</span>(textEditor, <span class="string">&quot;Hello, &quot;</span>);</span><br><span class="line">        <span class="type">Command</span> <span class="variable">addCommand2</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">AddTextCommand</span>(textEditor, <span class="string">&quot;Design Patterns!&quot;</span>);</span><br><span class="line">        <span class="type">Command</span> <span class="variable">deleteCommand</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DeleteTextCommand</span>(textEditor, <span class="string">&quot;Patterns!&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 执行添加和删除操作</span></span><br><span class="line">        addCommand1.execute();</span><br><span class="line">        addCommand2.execute();</span><br><span class="line">        deleteCommand.execute();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 显示当前文本</span></span><br><span class="line">        textEditor.displayText(); <span class="comment">// 输出: Hello, Design!</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 撤销删除操作</span></span><br><span class="line">        deleteCommand.undo();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 显示当前文本</span></span><br><span class="line">        textEditor.displayText(); <span class="comment">// 输出: Hello, Design Patterns!</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过上述代码，我们实现了撤销和重做操作，可以在执行操作后撤销到之前的状态，然后再重做。这在需要保留操作历史的应用程序中非常有用。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>命令模式是一种行为型设计模式，它将请求和操作解耦，允许将操作封装成独立的命令对象。这使得我们能够实现撤销、重做、宏命令等高级功能，并且更容易扩展新的命令。在设计软件系统时，考虑使用命令模式来提高代码的可维护性和灵活性，特别是需要支持撤销和重做功能的应用程序。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%91%BD%E4%BB%A4%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="tag"><i class="fa fa-tag"></i> 命令设计模式</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/10/29/LRU%E7%BC%93%E5%AD%98/" rel="prev" title="LRU缓存">
+                  <i class="fa fa-angle-left"></i> LRU缓存
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/10/29/%E4%B8%80%E6%96%87%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/" rel="next" title="一文彻底搞懂线程安全">
+                  一文彻底搞懂线程安全 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  
+  <div class="comments">
+  <script src="https://utteranc.es/client.js" repo="DXProgramer/hexo-comments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script>
+  </div>
+  
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Xiangger</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">234k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:33</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<!-- 樱花特效 -->
+  
+      <script async src="/js/fairyDustCursor.js"></script>
+  
+</body>
+</html>

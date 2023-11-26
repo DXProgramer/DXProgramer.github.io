@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/next_favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/next_favicon.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"dxprogramer.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"width":280},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="当我们采用多数据源的时候，同时也会出现一个这样的特殊场景：我们希望对 A 数据源的更新和 B 数据源的更新具备事务性。这样的例子很常见，比如：在订单库中创建一条订单记录，同时还需要在商品库中扣减商品库存。如果库存扣减失败，那么我们希望订单创建也能够回滚。如果这两条数据在一个数据库中，那么通过之前介绍的事务管理就能轻松解决了。但是，当这两个操作位于不同的数据库中，那么就无法实现了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot多数据源事务管理">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/11/07/SpringBoot%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:site_name" content="Xiangger">
+<meta property="og:description" content="当我们采用多数据源的时候，同时也会出现一个这样的特殊场景：我们希望对 A 数据源的更新和 B 数据源的更新具备事务性。这样的例子很常见，比如：在订单库中创建一条订单记录，同时还需要在商品库中扣减商品库存。如果库存扣减失败，那么我们希望订单创建也能够回滚。如果这两条数据在一个数据库中，那么通过之前介绍的事务管理就能轻松解决了。但是，当这两个操作位于不同的数据库中，那么就无法实现了。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-11-07T14:01:29.000Z">
+<meta property="article:modified_time" content="2023-11-07T14:17:48.003Z">
+<meta property="article:author" content="Xiangger">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="事务">
+<meta property="article:tag" content="JTA">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://dxprogramer.github.io/2023/11/07/SpringBoot%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/11/07/SpringBoot%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/","path":"2023/11/07/SpringBoot多数据源事务管理/","title":"SpringBoot多数据源事务管理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SpringBoot多数据源事务管理 | Xiangger</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Xiangger</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">业精于勤，荒于嬉；行成于思，毁于随</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-JTA"><span class="nav-number">1.</span> <span class="nav-text">什么是 JTA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E8%B7%B5"><span class="nav-number">2.</span> <span class="nav-text">实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%86%E5%A4%87"><span class="nav-number">2.1.</span> <span class="nav-text">准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E6%A8%A1%E6%8B%9F"><span class="nav-number">2.2.</span> <span class="nav-text">场景模拟</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xiangger"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xiangger</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DXProgramer" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DXProgramer" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:13554742813@163.com" title="E-Mail → mailto:13554742813@163.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/your_weibo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;your_weibo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/11/07/SpringBoot%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Xiangger">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="SpringBoot多数据源事务管理 | Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SpringBoot多数据源事务管理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-11-07 22:01:29 / 修改时间：22:17:48" itemprop="dateCreated datePublished" datetime="2023-11-07T22:01:29+08:00">2023-11-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/springboot/" itemprop="url" rel="index"><span itemprop="name">springboot</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>5 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>当我们采用多数据源的时候，同时也会出现一个这样的特殊场景：我们希望对 A 数据源的更新和 B 数据源的更新具备事务性。这样的例子很常见，比如：在订单库中创建一条订单记录，同时还需要在商品库中扣减商品库存。如果库存扣减失败，那么我们希望订单创建也能够回滚。如果这两条数据在一个数据库中，那么通过之前介绍的事务管理就能轻松解决了。但是，当这两个操作位于不同的数据库中，那么就无法实现了。</p>
+<span id="more"></span>
+
+<h2 id="什么是-JTA"><a href="#什么是-JTA" class="headerlink" title="什么是 JTA"></a>什么是 JTA</h2><p>JTA，全称：Java Transaction API。JTA 事务比 JDBC 事务更强大。一个 JTA 事务可以有多个参与者，而一个 JDBC 事务则被限定在一个单一的数据库连接。所以，当我们在同时操作多个数据库的时候，使用 JTA 事务就可以弥补 JDBC 事务的不足。</p>
+<p>在 Spring Boot 2.x 中，整合了这两个 JTA 的实现：</p>
+<ul>
+<li>Atomikos：可以通过引入<code>spring-boot-starter-jta-atomikos</code>依赖来使用</li>
+<li>Bitronix：可以通过引入<code>spring-boot-starter-jta-bitronix</code>依赖来使用</li>
+</ul>
+<h2 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h2><h3 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h3><ol>
+<li><p>这里我们将使用最基础的 JdbcTemplate 来实现数据访问。</p>
+</li>
+<li><p>场景设定：</p>
+</li>
+<li><ul>
+<li>假设我们有两个库，分别为：test1 和 test2</li>
+<li>这两个库中都有一张 User 表，我们希望这两张表中的数据是一致的</li>
+<li>假设这两张表中都已经有一条数据：name&#x3D;aaa，age&#x3D;30；因为这两张表中数据是一致的，所以要 update 的时候，就必须两个库中的 User 表更新时候，要么都成功，要么都失败。</li>
+</ul>
+</li>
+</ol>
+<p>引入pom</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-jta-atomikos<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>application.properties配置数据源</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring.jta.enabled</span>=<span class="string">true</span></span><br><span class="line"></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.primary.xa-properties.url</span>=<span class="string">jdbc:mysql://localhost:3306/test1</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.primary.xa-properties.user</span>=<span class="string">root</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.primary.xa-properties.password</span>=<span class="string">12345678</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.primary.xa-data-source-class-name</span>=<span class="string">com.mysql.cj.jdbc.MysqlXADataSource</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.primary.unique-resource-name</span>=<span class="string">test1</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.primary.max-pool-size</span>=<span class="string">25</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.primary.min-pool-size</span>=<span class="string">3</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.primary.max-lifetime</span>=<span class="string">20000</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.primary.borrow-connection-timeout</span>=<span class="string">10000</span></span><br><span class="line"></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.secondary.xa-properties.url</span>=<span class="string">jdbc:mysql://localhost:3306/test2</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.secondary.xa-properties.user</span>=<span class="string">root</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.secondary.xa-properties.password</span>=<span class="string">12345678</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.secondary.xa-data-source-class-name</span>=<span class="string">com.mysql.cj.jdbc.MysqlXADataSource</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.secondary.unique-resource-name</span>=<span class="string">test2</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.secondary.max-pool-size</span>=<span class="string">25</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.secondary.min-pool-size</span>=<span class="string">3</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.secondary.max-lifetime</span>=<span class="string">20000</span></span><br><span class="line"><span class="attr">spring.jta.atomikos.datasource.secondary.borrow-connection-timeout</span>=<span class="string">10000</span></span><br></pre></td></tr></table></figure>
+
+<p>数据源配置类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DataSourceConfiguration</span> &#123;</span><br><span class="line">    <span class="meta">@Primary</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="meta">@ConfigurationProperties(prefix = &quot;spring.jta.atomikos.datasource.primary&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> DataSource <span class="title function_">primaryDataSource</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">AtomikosDataSourceBean</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="meta">@ConfigurationProperties(prefix = &quot;spring.jta.atomikos.datasource.secondary&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> DataSource <span class="title function_">secondaryDataSource</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">AtomikosDataSourceBean</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> JdbcTemplate <span class="title function_">primaryJdbcTemplate</span><span class="params">(<span class="meta">@Qualifier(&quot;primaryDataSource&quot;)</span> DataSource primaryDataSource)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">JdbcTemplate</span>(primaryDataSource);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> JdbcTemplate <span class="title function_">secondaryJdbcTemplate</span><span class="params">(<span class="meta">@Qualifier(&quot;secondaryDataSource&quot;)</span> DataSource secondaryDataSource)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">JdbcTemplate</span>(secondaryDataSource);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="场景模拟"><a href="#场景模拟" class="headerlink" title="场景模拟"></a>场景模拟</h3><ol>
+<li><p>创建一个 Service 实现，模拟两种不同的情况。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TestService</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> JdbcTemplate primaryJdbcTemplate;</span><br><span class="line">    <span class="keyword">private</span> JdbcTemplate secondaryJdbcTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">TestService</span><span class="params">(JdbcTemplate primaryJdbcTemplate, JdbcTemplate secondaryJdbcTemplate)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.primaryJdbcTemplate = primaryJdbcTemplate;</span><br><span class="line">        <span class="built_in">this</span>.secondaryJdbcTemplate = secondaryJdbcTemplate;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transactional</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">tx</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// 修改test1库中的数据</span></span><br><span class="line">        primaryJdbcTemplate.update(<span class="string">&quot;update user set age = ? where name = ?&quot;</span>, <span class="number">30</span>, <span class="string">&quot;aaa&quot;</span>);</span><br><span class="line">        <span class="comment">// 修改test2库中的数据</span></span><br><span class="line">        secondaryJdbcTemplate.update(<span class="string">&quot;update user set age = ? where name = ?&quot;</span>, <span class="number">30</span>, <span class="string">&quot;aaa&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transactional</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">tx2</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// 修改test1库中的数据</span></span><br><span class="line">        primaryJdbcTemplate.update(<span class="string">&quot;update user set age = ? where name = ?&quot;</span>, <span class="number">40</span>, <span class="string">&quot;aaa&quot;</span>);</span><br><span class="line">        <span class="comment">// 模拟：修改test2库之前抛出异常</span></span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里 tx 函数，是两句 update 操作，一般都会成功；而 tx2 函数中，我们人为的制造了一个异常，这个异常是在 test1 库中的数据更新后才产生的，这样就可以测试一下 test1 更新成功，之后是否还能在 JTA 的帮助下实现回滚。</p>
+</li>
+</ol>
+<p>编写测试类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootTest(classes = Chapter312Application.class)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Chapter312ApplicationTests</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">protected</span> JdbcTemplate primaryJdbcTemplate;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">protected</span> JdbcTemplate secondaryJdbcTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> TestService testService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test1</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="comment">// 正确更新的情况</span></span><br><span class="line">        testService.tx();</span><br><span class="line">        Assertions.assertEquals(<span class="number">30</span>, primaryJdbcTemplate.queryForObject(<span class="string">&quot;select age from user where name=?&quot;</span>, Integer.class, <span class="string">&quot;aaa&quot;</span>));</span><br><span class="line">        Assertions.assertEquals(<span class="number">30</span>, secondaryJdbcTemplate.queryForObject(<span class="string">&quot;select age from user where name=?&quot;</span>, Integer.class, <span class="string">&quot;aaa&quot;</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">test2</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="comment">// 更新失败的情况</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            testService.tx2();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="comment">// 部分更新失败，test1中的更新应该回滚</span></span><br><span class="line">            Assertions.assertEquals(<span class="number">30</span>, primaryJdbcTemplate.queryForObject(<span class="string">&quot;select age from user where name=?&quot;</span>, Integer.class, <span class="string">&quot;aaa&quot;</span>));</span><br><span class="line">            Assertions.assertEquals(<span class="number">30</span>, secondaryJdbcTemplate.queryForObject(<span class="string">&quot;select age from user where name=?&quot;</span>, Integer.class, <span class="string">&quot;aaa&quot;</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里有两个测试用例：</p>
+<ul>
+<li><p>test1：因为没有故意制造的异常，不出意外两个库的 update 都会成功，所以根据 name&#x3D;aaa 去把两个数据查出来，看 age 是否都被更新到了 30。</p>
+</li>
+<li><p>test2：tx2 函数会把 test1 中 name&#x3D;aaa 的用户 age 更新为 40，然后抛出异常，JTA 事务生效的话，会把 age 回滚回 30，所以这里的检查也是两个库的 aaa 用户的 age 应该都为 30，这样就意味着 JTA 事务生效，保证了 test1 和 test2 两个库中的 User 表数据更新一致，没有制造出脏数据。</p>
+</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/-98KaQD4EeCVVDMvXzYFUQ">阅读原文</a></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"><i class="fa fa-tag"></i> 分布式</a>
+              <a href="/tags/%E4%BA%8B%E5%8A%A1/" rel="tag"><i class="fa fa-tag"></i> 事务</a>
+              <a href="/tags/JTA/" rel="tag"><i class="fa fa-tag"></i> JTA</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/11/05/%E4%BA%8C%E5%8F%89%E5%A0%86/" rel="prev" title="二叉堆">
+                  <i class="fa fa-angle-left"></i> 二叉堆
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/11/08/java8%E9%9B%86%E5%90%88%E6%93%8D%E4%BD%9C/" rel="next" title="java8集合操作">
+                  java8集合操作 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  
+  <div class="comments">
+  <script src="https://utteranc.es/client.js" repo="DXProgramer/hexo-comments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script>
+  </div>
+  
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Xiangger</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">234k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:33</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<!-- 樱花特效 -->
+  
+      <script async src="/js/fairyDustCursor.js"></script>
+  
+</body>
+</html>

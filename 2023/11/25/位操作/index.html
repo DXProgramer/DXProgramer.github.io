@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/next_favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/next_favicon.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"dxprogramer.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"width":280},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="在计算机世界里，再复杂，再美的程序，到最后都会变成0与1。也就是我们常说的：二进制。二进制位中的一些常用运算。例如：**&amp; (位与)，| (位或)** ，^(异或)，&lt;&lt;(左移)**，**&gt;&gt;(右移) 等等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="位操作">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/11/25/%E4%BD%8D%E6%93%8D%E4%BD%9C/index.html">
+<meta property="og:site_name" content="Xiangger">
+<meta property="og:description" content="在计算机世界里，再复杂，再美的程序，到最后都会变成0与1。也就是我们常说的：二进制。二进制位中的一些常用运算。例如：**&amp; (位与)，| (位或)** ，^(异或)，&lt;&lt;(左移)**，**&gt;&gt;(右移) 等等。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-11-25T15:46:38.000Z">
+<meta property="article:modified_time" content="2023-11-25T15:57:06.457Z">
+<meta property="article:author" content="Xiangger">
+<meta property="article:tag" content="位操作">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://dxprogramer.github.io/2023/11/25/%E4%BD%8D%E6%93%8D%E4%BD%9C/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/11/25/%E4%BD%8D%E6%93%8D%E4%BD%9C/","path":"2023/11/25/位操作/","title":"位操作"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>位操作 | Xiangger</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Xiangger</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">业精于勤，荒于嬉；行成于思，毁于随</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9C%9F%E4%B8%8E%E5%81%87"><span class="nav-number">1.</span> <span class="nav-text">真与假</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%8D%E4%B8%8E"><span class="nav-number">2.</span> <span class="nav-text">&amp; (位与)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%8D%E6%88%96"><span class="nav-number">3.</span> <span class="nav-text">| (位或)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%82%E6%88%96"><span class="nav-number">4.</span> <span class="nav-text">^(异或)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link"><span class="nav-number">5.</span> <span class="nav-text">&lt;&lt;(左移)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%B3%E7%A7%BB"><span class="nav-number">6.</span> <span class="nav-text">&gt;&gt; 右移</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xiangger"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xiangger</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DXProgramer" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DXProgramer" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:13554742813@163.com" title="E-Mail → mailto:13554742813@163.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/your_weibo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;your_weibo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/11/25/%E4%BD%8D%E6%93%8D%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Xiangger">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="位操作 | Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          位操作
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-11-25 23:46:38 / 修改时间：23:57:06" itemprop="dateCreated datePublished" datetime="2023-11-25T23:46:38+08:00">2023-11-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>在计算机世界里，再复杂，再美的程序，到最后都会变成0与1。也就是我们常说的：<strong>二进制</strong>。二进制位中的一些常用运算。例如：**&amp; (位与)<strong>，</strong>| (位或)** ，<strong>^(异或)<strong>，</strong>&lt;&lt;(左移)**，**&gt;&gt;(右移)</strong> 等等。</p>
+<span id="more"></span>
+
+<h4 id="真与假"><a href="#真与假" class="headerlink" title="真与假"></a>真与假</h4><p> 在Java中，用 true 值表示真，false 值表示假。其实在计算机中，通常使用 1 表示真，0表示假。</p>
+<h4 id="位与"><a href="#位与" class="headerlink" title="&amp; (位与)"></a>&amp; (位与)</h4><p>在说位与之前，我们先来说说我们熟悉的 <strong>&amp;&amp;</strong> 逻辑与操作。简单来说： A&amp;&amp;B  也就是：A且B同时成立时为真，否则为假。也有人称之为：“一假必假”。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">testBit</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> <span class="number">8</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">b</span> <span class="operator">=</span> <span class="number">9</span>;</span><br><span class="line">    System.out.println(<span class="string">&quot;a binary: &quot;</span>+Integer.toBinaryString(a));</span><br><span class="line">    System.out.println(<span class="string">&quot;b binary: &quot;</span>+Integer.toBinaryString(b));</span><br><span class="line">    System.out.println(<span class="string">&quot;a &amp; b binary: &quot;</span>+Integer.toBinaryString(a&amp;b));</span><br><span class="line">    System.out.println(<span class="string">&quot;a &amp; b result: &quot;</span>+(a&amp;b));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>代码解释</strong>：</p>
+<p>位与：我们从字面意思上来理解，也是二进制位的与操作。</p>
+<ol>
+<li>数字 8 的十进制是： 1000 。</li>
+<li>数字 9 的十进制是： 1001。</li>
+</ol>
+<p>我们再来进行位于操作：</p>
+<p>如下所示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">8：1000</span><br><span class="line">9：1001</span><br><span class="line">&amp;</span><br><span class="line">8  1000</span><br></pre></td></tr></table></figure>
+
+<p>最左边的 1&amp;1 &#x3D; 1，中间的 0&amp;0 &#x3D; 0，最右边的0&amp;1 &#x3D; 0。</p>
+<p>二进制的结果为：1000，转换为10进制后为 8。</p>
+<p>程序运行结果如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a binary: 1000</span><br><span class="line">b binary: 1001</span><br><span class="line">a &amp; b binary: 1000</span><br><span class="line">a &amp; b result: 8</span><br></pre></td></tr></table></figure>
+
+<h4 id="位或"><a href="#位或" class="headerlink" title="| (位或)"></a>| (位或)</h4><p>上面说 <strong>&amp; (位与)</strong> 操作，现在我们来看看位或操作，继续使用上面的例子：如下所示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">@Test</span><br><span class="line">public void testBit()&#123;</span><br><span class="line">    int a = 8;</span><br><span class="line">    int b = 9;</span><br><span class="line">    System.out.println(&quot;a binary: &quot;+Integer.toBinaryString(a));</span><br><span class="line">    System.out.println(&quot;b binary: &quot;+Integer.toBinaryString(b));</span><br><span class="line">    System.out.println(&quot;a &amp; b binary: &quot;+Integer.toBinaryString(a|b));</span><br><span class="line">    System.out.println(&quot;a &amp; b result: &quot;+(a|b));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再看看二进制：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">8：1000</span><br><span class="line">9：1001</span><br><span class="line">|</span><br><span class="line">9  1001</span><br></pre></td></tr></table></figure>
+
+<p>最左边的 1|1 &#x3D; 1，中间的0|0 &#x3D; 0 ，最右边的 0|1 &#x3D; 1。</p>
+<p>结果二进制为： 1001 对应的10进制为 9。</p>
+<p>运算结果如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a binary: 1000</span><br><span class="line">b binary: 1001</span><br><span class="line">a &amp; b binary: 1001</span><br><span class="line">a &amp; b result: 9</span><br></pre></td></tr></table></figure>
+
+<h4 id="异或"><a href="#异或" class="headerlink" title="^(异或)"></a>^(异或)</h4><p> 这个运算符比较有意思，异从字面上来理解是：不同的。放在位操作里也是一样的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">testBit</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> <span class="number">8</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">b</span> <span class="operator">=</span> <span class="number">9</span>;</span><br><span class="line">    System.out.println(<span class="string">&quot;a binary: &quot;</span>+Integer.toBinaryString(a));</span><br><span class="line">    System.out.println(<span class="string">&quot;b binary: &quot;</span>+Integer.toBinaryString(b));</span><br><span class="line">    System.out.println(<span class="string">&quot;a &amp; b binary: &quot;</span>+Integer.toBinaryString(a^b));</span><br><span class="line">    System.out.println(<span class="string">&quot;a &amp; b result: &quot;</span>+(a^b));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>继续看二进制：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">8:1000</span><br><span class="line">9:1001</span><br><span class="line">^</span><br><span class="line">1  0001</span><br></pre></td></tr></table></figure>
+
+<p>位相同时取假，不同时取真。左边的 1&#x3D;1 相同取假，也就是0。中间的0&#x3D;0 也为假为0。最右边的0不等于1，为真。结果也就为1。</p>
+<h4 id=""><a href="#" class="headerlink" title="&lt;&lt;(左移)"></a>&lt;&lt;(左移)</h4><p>在现实世界里，我们经常使用乘法。&lt;&lt; 则表示二进制中的左移操作，低位补0。例如：8&lt;&lt;1。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">testCode</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span><span class="number">8</span>;</span><br><span class="line">    System.out.println(<span class="string">&quot;a toBinaryString: &quot;</span>+Integer.toBinaryString(a));</span><br><span class="line">    System.out.println(<span class="string">&quot;a&lt;&lt;1 toBinaryString: &quot;</span>+Integer.toBinaryString(a&lt;&lt;<span class="number">1</span>));</span><br><span class="line">    System.out.println(<span class="string">&quot;result: &quot;</span>+(a&lt;&lt;<span class="number">1</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>二进制如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">8  1000</span><br><span class="line">8&lt;&lt;1</span><br><span class="line">16 10000</span><br></pre></td></tr></table></figure>
+
+<p>结果为： 2^4  &#x3D; 16。  &lt;&lt; 左边 a 表示基数， 右边 1 则表示需要位移动的位数。 箭头指向哪边，则向哪边位移。程序运行结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a toBiryString: 1000</span><br><span class="line">a&lt;&lt;1 toBinaryString: 10000</span><br><span class="line">result: 16</span><br></pre></td></tr></table></figure>
+
+<h4 id="右移"><a href="#右移" class="headerlink" title="&gt;&gt; 右移"></a>&gt;&gt; 右移</h4><p> &gt;&gt;(右移) 与左移 &lt;&lt;  则是相反的，高位补0 。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">testCode</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span><span class="number">8</span>;</span><br><span class="line">    System.out.println(<span class="string">&quot;a toBinaryString: &quot;</span>+Integer.toBinaryString(a));</span><br><span class="line">    System.out.println(<span class="string">&quot;1&gt;&gt;a toBinaryString: &quot;</span>+Integer.toBinaryString(a&gt;&gt;<span class="number">1</span>));</span><br><span class="line">    System.out.println(<span class="string">&quot;result: &quot;</span>+(a&gt;&gt;<span class="number">1</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>二进制：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">8 : 1000</span><br><span class="line">8&gt;&gt;1</span><br><span class="line">4 : 0100</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a toBinaryString: 1000</span><br><span class="line">a&gt;&gt;1 toBinaryString: 100</span><br><span class="line">result: 4</span><br></pre></td></tr></table></figure>
+
+<p>其实这里还有一个比较好记的口诀：</p>
+<p>a&gt;&gt;n 则表示： a &#x2F; (2^n) 次方。  (取整)</p>
+<p>a&lt;&lt;n 则结果为： a * (2^n) 次方。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%BD%8D%E6%93%8D%E4%BD%9C/" rel="tag"><i class="fa fa-tag"></i> 位操作</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/11/25/%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86%E9%87%8D%E5%A4%8D%E8%AF%B7%E6%B1%82/" rel="prev" title="如何处理重复请求">
+                  <i class="fa fa-angle-left"></i> 如何处理重复请求
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/11/26/%E4%B8%AD%E9%97%B4%E4%BB%B6/redis/" rel="next" title="Redis延时任务">
+                  Redis延时任务 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  
+  <div class="comments">
+  <script src="https://utteranc.es/client.js" repo="DXProgramer/hexo-comments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script>
+  </div>
+  
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Xiangger</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">234k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:33</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<!-- 樱花特效 -->
+  
+      <script async src="/js/fairyDustCursor.js"></script>
+  
+</body>
+</html>

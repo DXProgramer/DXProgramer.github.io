@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/next_favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/next_favicon.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"dxprogramer.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"width":280},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="使用过滤器、拦截器与切片实现每个请求耗时的统计，并比较三者的区别与联系">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot实现过滤器、拦截器与AOP">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/10/28/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/index.html">
+<meta property="og:site_name" content="Xiangger">
+<meta property="og:description" content="使用过滤器、拦截器与切片实现每个请求耗时的统计，并比较三者的区别与联系">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/1.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/2.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/3.jpg">
+<meta property="article:published_time" content="2023-10-28T13:15:30.000Z">
+<meta property="article:modified_time" content="2023-10-28T13:32:32.937Z">
+<meta property="article:author" content="Xiangger">
+<meta property="article:tag" content="过滤器">
+<meta property="article:tag" content="拦截器">
+<meta property="article:tag" content="AOP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dxprogramer.github.io/2023/10/28/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/1.jpg">
+
+
+<link rel="canonical" href="https://dxprogramer.github.io/2023/10/28/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/10/28/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/","path":"2023/10/28/SpringBoot实现过滤器、拦截器与AOP/","title":"SpringBoot实现过滤器、拦截器与AOP"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>SpringBoot实现过滤器、拦截器与AOP | Xiangger</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Xiangger</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">业精于勤，荒于嬉；行成于思，毁于随</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%87%E6%BB%A4%E5%99%A8Filter"><span class="nav-number">1.</span> <span class="nav-text">过滤器Filter</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%87%E6%BB%A4%E5%99%A8%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">过滤器概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%87%E6%BB%A4%E5%99%A8%E4%BD%9C%E7%94%A8"><span class="nav-number">1.2.</span> <span class="nav-text">过滤器作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%87%E6%BB%A4%E5%99%A8%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="nav-number">1.3.</span> <span class="nav-text">过滤器实现方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8SpringBoot%E4%B8%AD%E6%B3%A8%E5%86%8C%E7%AC%AC%E4%B8%89%E6%96%B9%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-number">1.4.</span> <span class="nav-text">在SpringBoot中注册第三方过滤器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%A6%E6%88%AA%E5%99%A8Interceptor"><span class="nav-number">2.</span> <span class="nav-text">拦截器Interceptor</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%A6%E6%88%AA%E5%99%A8%E6%A6%82%E5%BF%B5"><span class="nav-number">2.1.</span> <span class="nav-text">拦截器概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%A6%E6%88%AA%E5%99%A8%E4%BD%9C%E7%94%A8"><span class="nav-number">2.2.</span> <span class="nav-text">拦截器作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%A6%E6%88%AA%E5%99%A8%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.3.</span> <span class="nav-text">拦截器实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%87%E7%89%87Aspect"><span class="nav-number">3.</span> <span class="nav-text">切片Aspect</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%87%E7%89%87%E6%A6%82%E8%BF%B0"><span class="nav-number">3.1.</span> <span class="nav-text">切片概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%87%E7%89%87%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.2.</span> <span class="nav-text">切片实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%BB%A5%E5%8F%8A%E5%88%87%E7%89%87%E7%9A%84%E8%B0%83%E7%94%A8%E9%A1%BA%E5%BA%8F"><span class="nav-number">4.</span> <span class="nav-text">过滤器、拦截器以及切片的调用顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%87%E6%BB%A4%E5%99%A8%E5%92%8C%E6%8B%A6%E6%88%AA%E5%99%A8%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">5.</span> <span class="nav-text">过滤器和拦截器的区别</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xiangger"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xiangger</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DXProgramer" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DXProgramer" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:13554742813@163.com" title="E-Mail → mailto:13554742813@163.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/your_weibo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;your_weibo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/10/28/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Xiangger">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="SpringBoot实现过滤器、拦截器与AOP | Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SpringBoot实现过滤器、拦截器与AOP
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-10-28 21:15:30 / 修改时间：21:32:32" itemprop="dateCreated datePublished" datetime="2023-10-28T21:15:30+08:00">2023-10-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/springboot/" itemprop="url" rel="index"><span itemprop="name">springboot</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>7.5k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>7 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>使用过滤器、拦截器与切片实现每个请求耗时的统计，并比较三者的区别与联系</p>
+<span id="more"></span>
+
+<h2 id="过滤器Filter"><a href="#过滤器Filter" class="headerlink" title="过滤器Filter"></a>过滤器Filter</h2><h3 id="过滤器概念"><a href="#过滤器概念" class="headerlink" title="过滤器概念"></a>过滤器概念</h3><p>Filter是J2E中来的，可以看做是Servlet的一种“加强版”，它主要用于对用户请求进行预处理和后处理，拥有一个典型的处理链。Filter也可以对用户请求生成响应，这一点与Servlet相同，但实际上很少会使用Filter向用户请求生成响应。</p>
+<p>使用Filter完整的流程是：Filter对用户请求进行预处理，接着将请求交给Servlet进行处理并生成响应，最后Filter再对服务器响应进行后处理。</p>
+<h3 id="过滤器作用"><a href="#过滤器作用" class="headerlink" title="过滤器作用"></a>过滤器作用</h3><ul>
+<li><p>Examples that have been identified for this design are</p>
+<ol>
+<li><p>Authentication Filters, 即用户访问权限过滤</p>
+</li>
+<li><p>Logging and Auditing Filters, 日志过滤，可以记录特殊用户的特殊请求的记录等</p>
+</li>
+<li><p>Image conversion Filters</p>
+</li>
+<li><p>Data compression Filters</p>
+</li>
+<li><p>Encryption Filters</p>
+</li>
+<li><p>Tokenizing Filters</p>
+</li>
+<li><p>Filters that trigger resource access events</p>
+</li>
+<li><p>XSL&#x2F;T filters</p>
+</li>
+<li><p>Mime-type chain Filter</p>
+</li>
+</ol>
+</li>
+</ul>
+<p>对于第一条，即使用Filter作权限过滤，其可以这么实现：定义一个Filter，获取每个客户端发起的请求URL，与当前用户无权限访问的URL列表（可以是从DB中取出）作对比，起到权限过滤的作用。</p>
+<h3 id="过滤器实现方式"><a href="#过滤器实现方式" class="headerlink" title="过滤器实现方式"></a>过滤器实现方式</h3><p>自定义的过滤器都必须实现javax.Servlet.Filter接口，并重写接口中定义的三个方法：</p>
+<p><strong>1.void init(FilterConfig config)</strong></p>
+<p>用于完成Filter的初始化。</p>
+<p><strong>2.void destory()</strong></p>
+<p>用于Filter销毁前，完成某些资源的回收。</p>
+<p><strong>3.void doFilter(ServletRequest request,ServletResponse response,FilterChain chain)</strong></p>
+<p>实现过滤功能，即对每个请求及响应增加的额外的预处理和后处理。,执行该方法之前，即对用户请求进行预处理；执行该方法之后，即对服务器响应进行后处理。</p>
+<p>值得注意的是，chain.doFilter()方法执行之前为预处理阶段，该方法执行结束即代表用户的请求已经得到控制器处理。因此，如果在doFilter中忘记调用chain.doFilter()方法，则用户的请求将得不到处理。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.slf4j.Logger;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.*;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 必须添加注解，springmvc通过web.xml配置</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TimeFilter</span> <span class="keyword">implements</span> <span class="title class_">Filter</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Logger</span> <span class="variable">LOG</span> <span class="operator">=</span> LoggerFactory.getLogger(TimeFilter.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">init</span><span class="params">(FilterConfig filterConfig)</span> <span class="keyword">throws</span> ServletException &#123;</span><br><span class="line">        LOG.info(<span class="string">&quot;初始化过滤器：&#123;&#125;&quot;</span>, filterConfig.getFilterName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">doFilter</span><span class="params">(ServletRequest request, ServletResponse response, FilterChain chain)</span> <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line">        LOG.info(<span class="string">&quot;start to doFilter&quot;</span>);</span><br><span class="line">        <span class="type">long</span> <span class="variable">startTime</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">        chain.doFilter(request, response);</span><br><span class="line">        <span class="type">long</span> <span class="variable">endTime</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">        LOG.info(<span class="string">&quot;the request of &#123;&#125; consumes &#123;&#125;ms.&quot;</span>, getUrlFrom(request), (endTime - startTime));</span><br><span class="line">        LOG.info(<span class="string">&quot;end to doFilter&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">destroy</span><span class="params">()</span> &#123;</span><br><span class="line">        LOG.info(<span class="string">&quot;销毁过滤器&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String <span class="title function_">getUrlFrom</span><span class="params">(ServletRequest servletRequest)</span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (servletRequest <span class="keyword">instanceof</span> HttpServletRequest)&#123;</span><br><span class="line">            <span class="keyword">return</span> ((HttpServletRequest) servletRequest).getRequestURL().toString();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从代码中可看出，类Filter是在javax.servlet.*中，因此可以看出，过滤器的一个很大的局限性在于，其不能够知道当前用户的请求是被哪个控制器(Controller)处理的，因为后者是spring框架中定义的。</p>
+<h3 id="在SpringBoot中注册第三方过滤器"><a href="#在SpringBoot中注册第三方过滤器" class="headerlink" title="在SpringBoot中注册第三方过滤器"></a>在SpringBoot中注册第三方过滤器</h3><p>对于SpringMvc，可以通过在web.xml中注册过滤器。但在SpringBoot中不存在web.xml，此时如果引用的某个jar包中的过滤器，且这个过滤器在实现时没有使用@Component标识为Spring Bean，则这个过滤器将不会生效。</p>
+<p>此时需要通过java代码去注册这个过滤器。以上面定义的TimeFilter为例，当去掉类注解@Component时，注册方式为：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">WebConfig</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 注册第三方过滤器</span></span><br><span class="line"><span class="comment">     * 功能与spring mvc中通过配置web.xml相同</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> FilterRegistrationBean <span class="title function_">thirdFilter</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="type">ThirdPartFilter</span> <span class="variable">thirdPartFilter</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ThirdPartFilter</span>();</span><br><span class="line">        <span class="type">FilterRegistrationBean</span> <span class="variable">filterRegistrationBean</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FilterRegistrationBean</span>() ;</span><br><span class="line"></span><br><span class="line">        filterRegistrationBean.setFilter(thirdPartFilter);</span><br><span class="line">        List&lt;String &gt; urls = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">        <span class="comment">// 匹配所有请求路径</span></span><br><span class="line">        urls.add(<span class="string">&quot;/*&quot;</span>);</span><br><span class="line">        filterRegistrationBean.setUrlPatterns(urls);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> filterRegistrationBean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>相比使用@Component注解，这种配置方式有个优点，即可以自由配置拦截的URL。</p>
+<h2 id="拦截器Interceptor"><a href="#拦截器Interceptor" class="headerlink" title="拦截器Interceptor"></a>拦截器Interceptor</h2><h3 id="拦截器概念"><a href="#拦截器概念" class="headerlink" title="拦截器概念"></a>拦截器概念</h3><p>拦截器，在AOP(Aspect-Oriented Programming)中用于在某个方法或字段被访问之前，进行拦截，然后在之前或之后加入某些操作。拦截是AOP的一种实现策略。</p>
+<h3 id="拦截器作用"><a href="#拦截器作用" class="headerlink" title="拦截器作用"></a>拦截器作用</h3><ul>
+<li><strong>日志记录：</strong>记录请求信息的日志，以便进行信息监控、信息统计、计算PV（Page View）等</li>
+<li><strong>权限检查：</strong>如登录检测，进入处理器检测检测是否登录</li>
+<li><strong>性能监控：</strong>通过拦截器在进入处理器之前记录开始时间，在处理完后记录结束时间，从而得到该请求的处理时间。（反向代理，如apache也可以自动记录）；</li>
+<li><strong>通用行为：</strong>读取cookie得到用户信息并将用户对象放入请求，从而方便后续流程使用，还有如提取Locale、Theme信息等，只要是多个处理器都需要的即可使用拦截器实现。</li>
+</ul>
+<h3 id="拦截器实现"><a href="#拦截器实现" class="headerlink" title="拦截器实现"></a>拦截器实现</h3><p>通过实现HandlerInterceptor接口，并重写该接口的三个方法来实现拦截器的自定义:</p>
+<p><strong>1.preHandler(HttpServletRequest request, HttpServletResponse response, Object handler)</strong></p>
+<p>方法将在请求处理之前进行调用。SpringMVC中的Interceptor同Filter一样都是链式调用。每个Interceptor的调用会依据它的声明顺序依次执行，而且最先执行的都是Interceptor中的preHandle方法，所以可以在这个方法中进行一些前置初始化操作或者是对当前请求的一个预处理，也可以在这个方法中进行一些判断来决定请求是否要继续进行下去。</p>
+<p>该方法的返回值是布尔值Boolean 类型的，当它返回为false时，表示请求结束，后续的Interceptor和Controller都不会再执行；当返回值为true时就会继续调用下一个Interceptor 的preHandle 方法，如果已经是最后一个Interceptor 的时候就会是调用当前请求的Controller 方法。</p>
+<p><strong>2.postHandler(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)</strong></p>
+<p>在当前请求进行处理之后，也就是Controller 方法调用之后执行，但是它会在DispatcherServlet 进行视图返回渲染之前被调用，所以我们可以在这个方法中对Controller 处理之后的ModelAndView 对象进行操作。</p>
+<p><strong>3.afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handle, Exception ex)</strong></p>
+<p>该方法也是需要当前对应的Interceptor的preHandle方法的返回值为true时才会执行。顾名思义，该方法将在整个请求结束之后，也就是在DispatcherServlet 渲染了对应的视图之后执行。这个方法的主要作用是用于进行资源清理工作的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TimeInterceptor</span> <span class="keyword">implements</span> <span class="title class_">HandlerInterceptor</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Logger</span> <span class="variable">LOG</span> <span class="operator">=</span> LoggerFactory.getLogger(TimeInterceptor.class);</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        LOG.info(<span class="string">&quot;在请求处理之前进行调用（Controller方法调用之前）&quot;</span>);</span><br><span class="line">        request.setAttribute(<span class="string">&quot;startTime&quot;</span>, System.currentTimeMillis());</span><br><span class="line">        <span class="type">HandlerMethod</span> <span class="variable">handlerMethod</span> <span class="operator">=</span> (HandlerMethod) handler;</span><br><span class="line">        LOG.info(<span class="string">&quot;controller object is &#123;&#125;&quot;</span>, handlerMethod.getBean().getClass().getName());</span><br><span class="line">        LOG.info(<span class="string">&quot;controller method is &#123;&#125;&quot;</span>, handlerMethod.getMethod());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 需要返回true，否则请求不会被控制器处理</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">postHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        LOG.info(<span class="string">&quot;请求处理之后进行调用，但是在视图被渲染之前（Controller方法调用之后），如果异常发生，则该方法不会被调用&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">afterCompletion</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        LOG.info(<span class="string">&quot;在整个请求结束之后被调用，也就是在DispatcherServlet 渲染了对应的视图之后执行（主要是用于进行资源清理工作）&quot;</span>);</span><br><span class="line">        <span class="type">long</span> <span class="variable">startTime</span> <span class="operator">=</span> (<span class="type">long</span>) request.getAttribute(<span class="string">&quot;startTime&quot;</span>);</span><br><span class="line">        LOG.info(<span class="string">&quot;time consume is &#123;&#125;&quot;</span>, System.currentTimeMillis() - startTime);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>与过滤器不同的是，拦截器使用@Component修饰后，在SpringBoot中还需要通过实现WebMvcConfigurer手动注册：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// java配置类</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">WebConfig</span> <span class="keyword">implements</span> <span class="title class_">WebMvcConfigurer</span> &#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> TimeInterceptor timeInterceptor;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addInterceptors</span><span class="params">(InterceptorRegistry registry)</span>&#123;</span><br><span class="line">        registry.addInterceptor(timeInterceptor);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果是在SpringMVC中，则需要通过xml文件配置&lt; mvc:interceptors &gt;节点信息。</p>
+<h2 id="切片Aspect"><a href="#切片Aspect" class="headerlink" title="切片Aspect"></a>切片Aspect</h2><h3 id="切片概述"><a href="#切片概述" class="headerlink" title="切片概述"></a>切片概述</h3><p>相比过滤器，拦截器能够知道用户发出的请求最终被哪个控制器处理，但是拦截器还有一个明显的不足，即不能够获取request的参数以及控制器处理之后的response。所以就有了切片的用武之地了。</p>
+<h3 id="切片实现"><a href="#切片实现" class="headerlink" title="切片实现"></a>切片实现</h3><p>切片的实现需要注意@Aspect,@Component以及@Around这三个注解的使用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TimeAspect</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Logger</span> <span class="variable">LOG</span> <span class="operator">=</span> LoggerFactory.getLogger(TimeAspect.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Around(&quot;execution(* me.ifight.controller.*.*(..))&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">handleControllerMethod</span><span class="params">(ProceedingJoinPoint proceedingJoinPoint)</span> <span class="keyword">throws</span> Throwable&#123;</span><br><span class="line">        LOG.info(<span class="string">&quot;切片开始。。。&quot;</span>);</span><br><span class="line">        <span class="type">long</span> <span class="variable">startTime</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 获取请求入参</span></span><br><span class="line">        Object[] args = proceedingJoinPoint.getArgs();</span><br><span class="line">        Arrays.stream(args).forEach(arg -&gt; LOG.info(<span class="string">&quot;arg is &#123;&#125;&quot;</span>, arg));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 获取相应</span></span><br><span class="line">        <span class="type">Object</span> <span class="variable">response</span> <span class="operator">=</span> proceedingJoinPoint.proceed();</span><br><span class="line"></span><br><span class="line">        <span class="type">long</span> <span class="variable">endTime</span> <span class="operator">=</span> System.currentTimeMillis();</span><br><span class="line">        LOG.info(<span class="string">&quot;请求:&#123;&#125;, 耗时&#123;&#125;ms&quot;</span>, proceedingJoinPoint.getSignature(), (endTime - startTime));</span><br><span class="line">        LOG.info(<span class="string">&quot;切片结束。。。&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="过滤器、拦截器以及切片的调用顺序"><a href="#过滤器、拦截器以及切片的调用顺序" class="headerlink" title="过滤器、拦截器以及切片的调用顺序"></a>过滤器、拦截器以及切片的调用顺序</h2><p>如下图，展示了三者的调用顺序Filter-&gt;Intercepto-&gt;Aspect-&gt;Controller。相反的是，当Controller抛出的异常的处理顺序则是从内到外的。因此我们总是定义一个注解@ControllerAdvice去统一处理控制器抛出的异常。</p>
+<p>如果一旦异常被@ControllerAdvice处理了，则调用拦截器的afterCompletion方法的参数Exception ex就为空了。</p>
+<p><img src="/2023/10/28/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/1.jpg" alt="图片"></p>
+<p>实际执行的调用栈也说明了这一点：</p>
+<p><img src="/2023/10/28/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/2.jpg" alt="图片"></p>
+<p>而对于过滤器和拦截器详细的调用顺序如下图：</p>
+<p><img src="/2023/10/28/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/3.jpg" alt="图片"></p>
+<h2 id="过滤器和拦截器的区别"><a href="#过滤器和拦截器的区别" class="headerlink" title="过滤器和拦截器的区别"></a>过滤器和拦截器的区别</h2><p>最后有必要再说说过滤器和拦截器二者之间的区别：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Filter</th>
+<th>Interceptor</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>实现方式</td>
+<td>基于函数回调</td>
+<td>基于Java的反射机制</td>
+</tr>
+<tr>
+<td>规范</td>
+<td>Servlet规范</td>
+<td>Spring规范</td>
+</tr>
+<tr>
+<td>作用范围</td>
+<td>几乎所有web请求</td>
+<td>对action请求</td>
+</tr>
+</tbody></table>
+<p>除此之外，相比过滤器，拦截器能够“看到”用户的请求具体是被Spring框架的哪个控制器所处理。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BF%87%E6%BB%A4%E5%99%A8/" rel="tag"><i class="fa fa-tag"></i> 过滤器</a>
+              <a href="/tags/%E6%8B%A6%E6%88%AA%E5%99%A8/" rel="tag"><i class="fa fa-tag"></i> 拦截器</a>
+              <a href="/tags/AOP/" rel="tag"><i class="fa fa-tag"></i> AOP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/" rel="prev" title="Java中的锁[原理、锁优化、CAS、AQS]">
+                  <i class="fa fa-angle-left"></i> Java中的锁[原理、锁优化、CAS、AQS]
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/10/28/%E9%93%BE%E8%A1%A8/" rel="next" title="链表">
+                  链表 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  
+  <div class="comments">
+  <script src="https://utteranc.es/client.js" repo="DXProgramer/hexo-comments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script>
+  </div>
+  
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Xiangger</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">234k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:33</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<!-- 樱花特效 -->
+  
+      <script async src="/js/fairyDustCursor.js"></script>
+  
+</body>
+</html>

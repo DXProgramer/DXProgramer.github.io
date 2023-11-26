@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/next_favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/next_favicon.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"dxprogramer.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"width":280},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="所谓高性能、高并发，其实都是在指高并发的I&#x2F;O。经典的C10K问题，其实最终也是在谈I&#x2F;O。如果你是一个服务端开发人员，没研究过经典的C10K问题，这里进，值得你好好研究一番。当然，现在大家已经在谈C100K、C1000K的问题了，不用着急，等你熟悉了C10K的问题，C100K也不是大问题。 但是，能真正理解C10K里的讨论的基础，你需要至少懂一点I&#x2F;O的基本概念。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="高性能网络I&#x2F;O">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/11/04/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9CI-O/index.html">
+<meta property="og:site_name" content="Xiangger">
+<meta property="og:description" content="所谓高性能、高并发，其实都是在指高并发的I&#x2F;O。经典的C10K问题，其实最终也是在谈I&#x2F;O。如果你是一个服务端开发人员，没研究过经典的C10K问题，这里进，值得你好好研究一番。当然，现在大家已经在谈C100K、C1000K的问题了，不用着急，等你熟悉了C10K的问题，C100K也不是大问题。 但是，能真正理解C10K里的讨论的基础，你需要至少懂一点I&#x2F;O的基本概念。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-11-04T03:10:01.000Z">
+<meta property="article:modified_time" content="2023-11-04T03:15:13.978Z">
+<meta property="article:author" content="Xiangger">
+<meta property="article:tag" content="高性能">
+<meta property="article:tag" content="高并发">
+<meta property="article:tag" content="I&#x2F;O">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://dxprogramer.github.io/2023/11/04/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9CI-O/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/11/04/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9CI-O/","path":"2023/11/04/高性能网络I-O/","title":"高性能网络I/O"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>高性能网络I/O | Xiangger</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Xiangger</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">业精于勤，荒于嬉；行成于思，毁于随</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%98%BB%E5%A1%9EIO-blocking-I-O"><span class="nav-number">1.1.</span> <span class="nav-text">阻塞IO(blocking I&#x2F;O)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9D%9E%E9%98%BB%E5%A1%9EIO-noblocking-I-O"><span class="nav-number">1.2.</span> <span class="nav-text">非阻塞IO(noblocking I&#x2F;O)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E5%92%8C%E5%BC%82%E6%AD%A5"><span class="nav-number">1.3.</span> <span class="nav-text">同步和异步</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xiangger"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xiangger</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">39</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DXProgramer" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DXProgramer" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:13554742813@163.com" title="E-Mail → mailto:13554742813@163.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/your_weibo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;your_weibo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/11/04/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9CI-O/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Xiangger">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="高性能网络I/O | Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          高性能网络I/O
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-11-04 11:10:01 / 修改时间：11:15:13" itemprop="dateCreated datePublished" datetime="2023-11-04T11:10:01+08:00">2023-11-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.7k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>2 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>所谓高性能、高并发，其实都是在指高并发的I&#x2F;O。经典的C10K问题，其实最终也是在谈I&#x2F;O。如果你是一个服务端开发人员，没研究过经典的C10K问题，<a target="_blank" rel="noopener" href="http://www.kegel.com/c10k.html">这里进</a>，值得你好好研究一番。当然，现在大家已经在谈C100K、C1000K的问题了，不用着急，等你熟悉了C10K的问题，C100K也不是大问题。</p>
+<p>但是，能真正理解C10K里的讨论的基础，你需要至少懂一点I&#x2F;O的基本概念。</p>
+<span id="more"></span>
+
+<h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><p>很多介绍I&#x2F;O的帖子，都喜欢把 blocking、nonblocking，同步、异步放在一起来对比，然后组合出各种不同的I&#x2F;O模型，再加上分类之间又有重叠，看完之后很多人还是觉得很模糊。</p>
+<p>我一直将blocking&#x2F;nonblocking理解为I&#x2F;O模型（对I&#x2F;O的读取和写入会不会阻塞），而同步和异步，理解成编程模型的范畴。本身，不管是blocking还是nonblocking，都是同步的；而nonblocking之上的I&#x2F;O多路复用，也是同步调用。而不管是blocking还是nonblocking都可以施加于各种编程模型使之变为异步，例如nonblocking+epoll+多线程，让数据复制的部分异步化。</p>
+<p>这里之外，还有一个重要的AIO (asynchronous I&#x2F;O)的概念。很多人把AIO也算为一种I&#x2F;O模型，包括《UNIX 网络编程》中也这么来定义。但是，从I&#x2F;O的本质来看，AIO更像是基于I&#x2F;O的编程模型。同时，Linux对AIO支持的很差，并且<a target="_blank" rel="noopener" href="http://lse.sourceforge.net/io/aio.html">原生的AIO并不支持socket</a>，很多lib都是用户空间里的多线程的模拟。所以，我把AIO理解为异步化编程的阻塞或非阻塞I&#x2F;O调用。</p>
+<h4 id="阻塞IO-blocking-I-O"><a href="#阻塞IO-blocking-I-O" class="headerlink" title="阻塞IO(blocking I&#x2F;O)"></a>阻塞IO(blocking I&#x2F;O)</h4><p>这个是大家最熟悉，并且也是最简单的I&#x2F;O模型。任何时候用户空间的进程发起阻塞的read&#x2F;write调用，用户进程都会进入阻塞状态(TASK_INTERRUPTIBLE) ，直到内核将进程需要读的数据准备好并复制到用户空间，进程被再次唤醒。在这个过程中，进程因为read&#x2F;write调用处于阻塞状态。</p>
+<p>从用户空间进入内核空间，是通过系统调用来实现，最终通过异常进入内核(SYS ENTER)，这个时候，如果要读取的数据内核没有准备好（例如，如果需要从磁盘加载数据到内存缓存区、等待socket数据等等），内核通知其他硬件驱动去准备数据，然后发生进程切换(context switch)，当前进程因为要读取的数据没有准备好而进入休眠（task&#x2F;process的状态变为 TASK_INTERRUPTIBLE）而阻塞。当磁盘或者网络驱动程序准备好数据后，通过中断通知内核，内核将数据从内核缓冲区复制到用户空间(copy_to_userspace&#x2F;copy_from_usersapce函数)，然后唤醒等待的进程。</p>
+<p>在这个过程中，可能发生多次context switch，但是从用户空间的进程的视角来看，是因为read&#x2F;write调用而阻塞了自己的执行。</p>
+<h4 id="非阻塞IO-noblocking-I-O"><a href="#非阻塞IO-noblocking-I-O" class="headerlink" title="非阻塞IO(noblocking I&#x2F;O)"></a>非阻塞IO(noblocking I&#x2F;O)</h4><p>如果理解了阻塞I&#x2F;O，那么非阻塞I&#x2F;O就比较好理解了：</p>
+<p>每次用户空间的进程调用read&#x2F;write系统调用，如果内核发现用户空间进程请求的数据没有准备好、会造成进程阻塞，系统调用直接返回 EAGAIN，告诉用户空间进程：hi，数据还没好，你下次再试！</p>
+<p>所以，在这种模型下，用户空间进程需要频繁的、定时的去以非阻塞的模式调用read&#x2F;write操作，直到成功！而用户空间进程，可以在发现阻塞的时候，去执行其他事情。</p>
+<p>在这个过程中，会发生进程切换(context switch)吗？不一定，可能会也可能不会。如果发生，也是在时钟中断或者从内核态返回用户态的时候，但是，这个切换和read&#x2F;write没有多少关系，切换的原因要么是时间片到期要么是内核抢占。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">阻塞和非阻塞的本质，是用户空间进程是否需要等待I/O</span><br><span class="line">这里我用了“等待”两个字。“我 - 用户进程”需要数据，内核可以立即给我，我就不用等；如果我要的数据内核没有，我首先需要等，等就必然造成阻塞。但是，数据从内核空间复制到用户空间，也需要时间，“我 - 用户进程” 也需要等待数据复制完成，这里的等待和I/O没有关系.</span><br><span class="line"></span><br><span class="line">至于epoll/poll，我们放到后面谈。epoll本质上只是一种高效处理nonblocking I/O的内核I/O多路复用，nonblocking != epoll，nonblocking != epoll，nonblocking != epoll! 从概念上大家一定不能混！</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="同步和异步"><a href="#同步和异步" class="headerlink" title="同步和异步"></a>同步和异步</h4><p>在谈“同步”和“异步”编程模型之前，我觉得还是有必要简单聊一下“并行”和“并发”：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">并发是并行的基础和前提。如果 action A 和 action B 可以互不干扰、互不等待的运行，我们可以说 A 和 B是可以并发的执行。如果只有一个CPU，那么A和B可以交替的执行，A和B是并发的；如果有多个CPU，A和B可以同时分别在两个CPU上同时的运行，此时A和B是并行的！</span><br></pre></td></tr></table></figure>
+
+<p><strong>同步编程模型</strong></p>
+<p>这也是大家熟悉同时也最容易被程序猿们接受和上手的编程模型。所谓同步，就是你在发出一个调用的时候，在没有获取到结果之前，调用不会返回，而一旦调用返回了，调用者也就“同步”地获取到返回值了。</p>
+<p>换一种说法，就是，调用是顺序发生的，A 调用 B；获取到B的结果；A 再调用C。</p>
+<p><strong>异步编程模型</strong></p>
+<p>而异步则不同，调用在发出之后，你不用等待调用的结果，调用直接返回。而你需要注册一个回调函数，当有结果的时候，系统调用你注册的回调函数把结果传回给你。在这个过程中，进程可以去做其他事情。</p>
+<p>同步是否比异步高效？</p>
+<p>不一定！不一定！不一定！我觉得这是很多人存在的误区：既然获取结果的任务交给了某一个异步去做，那异步一定比同步效率高啊！</p>
+<p>如果计算资源是无限的，异步一定比同步效率高。但是，在相同的计算资源下，就不一定，任何事情，总是需要“有人”去做，你不做，就是其他人去做。而这个其他人，可能是其他用户空间的进程，例如用户态模拟的AIO，无非是多进程多线程或者线程池；也可能是内核线程（Linux内核有好多功能就是基于内核线程，例如pdflush、工作队列）。但是不管是“谁”，操作系统都需要调度和协调（进程切换，也就是context switch；协调包括进程同步、以及调度算法）。这个调度和协调的代价，很可能远远高于你的一次异步操作。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%AB%98%E6%80%A7%E8%83%BD/" rel="tag"><i class="fa fa-tag"></i> 高性能</a>
+              <a href="/tags/%E9%AB%98%E5%B9%B6%E5%8F%91/" rel="tag"><i class="fa fa-tag"></i> 高并发</a>
+              <a href="/tags/I-O/" rel="tag"><i class="fa fa-tag"></i> I/O</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2023/11/01/SpringBoot%E7%BC%93%E5%AD%98%E5%BA%94%E7%94%A8%E5%AE%9E%E8%B7%B5/" rel="prev" title="SpringBoot缓存应用实践">
+                  <i class="fa fa-angle-left"></i> SpringBoot缓存应用实践
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2023/11/04/%E5%8D%95%E8%B0%83%E6%A0%88%E5%BA%94%E7%94%A8/" rel="next" title="单调栈应用">
+                  单调栈应用 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  
+  <div class="comments">
+  <script src="https://utteranc.es/client.js" repo="DXProgramer/hexo-comments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script>
+  </div>
+  
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Xiangger</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">234k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:33</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<!-- 樱花特效 -->
+  
+      <script async src="/js/fairyDustCursor.js"></script>
+  
+</body>
+</html>

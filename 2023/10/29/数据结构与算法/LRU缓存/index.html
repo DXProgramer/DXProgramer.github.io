@@ -22,29 +22,29 @@
     <meta name="description" content="缓存是什么其实缓存的思想在生活中处处可见，比如说我们的书架上摆满了各种书籍，但是我最近想集中精力攻克数据结构这门课，因次为了方便，我将与数据结构有关的书先从书架取下来，放在我们的书桌上，这样我们取书的时候就快很多了，伸手可得，而不用跑到书架旁取书了，在这个例子里，书桌所扮演的就是缓存的角色。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="LRU缓存">
-<meta property="og:url" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/index.html">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/index.html">
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="缓存是什么其实缓存的思想在生活中处处可见，比如说我们的书架上摆满了各种书籍，但是我最近想集中精力攻克数据结构这门课，因次为了方便，我将与数据结构有关的书先从书架取下来，放在我们的书桌上，这样我们取书的时候就快很多了，伸手可得，而不用跑到书架旁取书了，在这个例子里，书桌所扮演的就是缓存的角色。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/1.png">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/2.png">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/3.png">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/4.png">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/5.jpg">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/6.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/1.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/2.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/3.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/4.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/5.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/6.jpg">
 <meta property="article:published_time" content="2023-10-29T02:33:05.000Z">
 <meta property="article:modified_time" content="2023-10-29T02:55:01.106Z">
 <meta property="article:author" content="Xiangger">
 <meta property="article:tag" content="LRU">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/1.png">
+<meta name="twitter:image" content="https://dxprogramer.github.io/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/1.png">
 
 
-<link rel="canonical" href="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/">
+<link rel="canonical" href="https://dxprogramer.github.io/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/","path":"2023/10/29/LRU缓存/","title":"LRU缓存"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/","path":"2023/10/29/数据结构与算法/LRU缓存/","title":"LRU缓存"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>LRU缓存 | Xiangger</title>
@@ -215,7 +215,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/10/29/LRU%E7%BC%93%E5%AD%98/">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -296,7 +296,7 @@
 <span id="more"></span>
 
 <p>在计算机中，我们知道，访问磁盘的效率比访问内存的效率低得多，低多少了，大概是10W级别吧，如下图所示。</p>
-<p><img src="/2023/10/29/LRU%E7%BC%93%E5%AD%98/1.png" alt="图片"></p>
+<p><img src="/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/1.png" alt="图片"></p>
 <p>我们知道有个很著名的二八定律。其实计算机世界中也有很多情况遵守这个定律，比如说网站访问的特点：80% 的业务访问集中在20% 的数据上。那么很自然就想到：既然大部分业务访问集中在一小部分数据上，那么如果通过设计合理的数据结构把这一小部分数据存放在内存中，是不是极大的提高了系统的性能呢，这就是缓存。</p>
 <p>从上面可以看出，无论是生活中还是计算机世界中的缓存，主要有以下两个特点：</p>
 <ul>
@@ -306,13 +306,13 @@
 <h2 id="什么是LRU缓存"><a href="#什么是LRU缓存" class="headerlink" title="什么是LRU缓存"></a>什么是LRU缓存</h2><p>由于内存是有限的，因此缓存总有满的时候，那么当缓存满了的时候，这时候又有新的数据需要加入到缓存中时，我们该怎么办了？没什么别的办法，只有从缓存中删除旧数据为新数据腾出空间，那么究竟删除原来缓存的哪些数据了？这就涉及到缓存的替换策略，LRU就是一种缓存策略。</p>
 <p>LRU，Least Recently Used的简写，翻译过来就是“最近最少使用”。该算法依据于程序的局部性原理， 其淘汰旧数据的策略是，<strong>距离当前最久没有被访问过的数据</strong>应该被淘汰。</p>
 <p>举个例子：现在有一个能存放5个数据的缓存，刚开始中缓存中存放了3个数据A-&gt;B-&gt;C，如下所示：</p>
-<p><img src="/2023/10/29/LRU%E7%BC%93%E5%AD%98/2.png" alt="图片"></p>
+<p><img src="/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/2.png" alt="图片"></p>
 <p>接着又在缓存中插入2个数据D-&gt;E，此时缓存已经满了。如下：</p>
-<p><img src="/2023/10/29/LRU%E7%BC%93%E5%AD%98/3.png" alt="图片"></p>
+<p><img src="/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/3.png" alt="图片"></p>
 <p>好了，现在我们来访问数据A，现在A成为了最近访问的数据，B成了最久没有访问过的数据:</p>
-<p><img src="/2023/10/29/LRU%E7%BC%93%E5%AD%98/4.png" alt="图片"></p>
+<p><img src="/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/4.png" alt="图片"></p>
 <p>现在我们又有一个数据F想要插入到缓存中，由于缓存已经满了，需要从缓存中淘汰旧数据，此时缓存中的数据B是距离当前时间最久没有被访问过的数据，根据LRU算法，我们会淘汰掉数据B：将F插入到当前B的位置。</p>
-<p><img src="/2023/10/29/LRU%E7%BC%93%E5%AD%98/5.jpg" alt="图片"></p>
+<p><img src="/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/5.jpg" alt="图片"></p>
 <p>此时数据C成为了距离当前时间最久没有被访问过的数据，因此如果再来一个数据的话，就应该插入到C当前的位置，依次类推。</p>
 <h2 id="LRU缓存设计"><a href="#LRU缓存设计" class="headerlink" title="LRU缓存设计"></a>LRU缓存设计</h2><p>理解LRU缓存的思想其实挺简单，但是要自己动手设计一个LRU缓存就并不那么简单了，这节主要讲讲LRU缓存的设计思路。</p>
 <p>首先从前面的分析可以看出，LRU缓存主要的操作是插入删除以及查找，因此我们可以考虑用双链表来维护缓存，该链表将缓存数据按访问时间从新到旧排列起来。</p>
@@ -324,7 +324,7 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//定义LRU缓存</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">LRUCacheS</span></span><br><span class="line">&#123;  </span><br><span class="line">    <span class="type">int</span> cacheCapacity;  <span class="comment">//缓存的容量</span></span><br><span class="line">    cacheEntryS **hashMap;  <span class="comment">//缓存的哈希表</span></span><br><span class="line">      </span><br><span class="line">    cacheEntryS *lruListHead;<span class="comment">//缓存的双向链表表头</span></span><br><span class="line">    cacheEntryS *lruListTail;<span class="comment">//缓存的双向链表表尾</span></span><br><span class="line">    <span class="type">int</span> lruListSize;    <span class="comment">//缓存的双向链表节点个数</span></span><br><span class="line">&#125;LRUCacheS;</span><br></pre></td></tr></table></figure>
 
 <p>如果一大坨代码看的比较晕，那么对着下面的结构关系图应该能理解的比较透彻，注意下图中没有指向的指针都是NULL：</p>
-<p><img src="/2023/10/29/LRU%E7%BC%93%E5%AD%98/6.jpg" alt="图片"></p>
+<p><img src="/2023/10/29/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/LRU%E7%BC%93%E5%AD%98/6.jpg" alt="图片"></p>
 <h2 id="LRU缓存接口设计"><a href="#LRU缓存接口设计" class="headerlink" title="LRU缓存接口设计"></a>LRU缓存接口设计</h2><p>通过前面的分析不难看出，对一个LRU缓存的最重要的操作无外乎是创建、销毁、插入数据、查找数据。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*********************************************</span></span><br><span class="line"><span class="comment">函数名：LRUCacheCreate</span></span><br><span class="line"><span class="comment">功能:创建LRU缓存</span></span><br><span class="line"><span class="comment">输入参数：capacity，缓存的数据容量</span></span><br><span class="line"><span class="comment">输出参数：lruCache，指向新建缓存的指针</span></span><br><span class="line"><span class="comment">针返回值：0---成功     -1---失败</span></span><br><span class="line"><span class="comment">*********************************************/</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">LRUCacheCreate</span><span class="params">(<span class="type">int</span> capacity, <span class="type">void</span> **lruCache)</span></span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/*********************************************</span></span><br><span class="line"><span class="comment">函数名：LRUCacheDestory</span></span><br><span class="line"><span class="comment">功能:销毁LRU缓存</span></span><br><span class="line"><span class="comment">输入参数：lruCache指向新建缓存的指针</span></span><br><span class="line"><span class="comment">输出参数：无</span></span><br><span class="line"><span class="comment">针返回值：0---成功     -1---失败</span></span><br><span class="line"><span class="comment">*********************************************/</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">LRUCacheDestory</span><span class="params">(<span class="type">void</span> *lruCache)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*********************************************</span></span><br><span class="line"><span class="comment">函数名：LRUCacheSet</span></span><br><span class="line"><span class="comment">功能:将数据插入到LRU缓存中</span></span><br><span class="line"><span class="comment">输入参数：key:数据索引   data:数据内容</span></span><br><span class="line"><span class="comment">输出参数：无</span></span><br><span class="line"><span class="comment">针返回值：0---成功     -1---失败</span></span><br><span class="line"><span class="comment">*********************************************/</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">LRUCacheSet</span><span class="params">(<span class="type">void</span> *lruCache, <span class="type">char</span> key, <span class="type">char</span> data)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*********************************************</span></span><br><span class="line"><span class="comment">函数名：LRUCacheGet</span></span><br><span class="line"><span class="comment">功能:将从LRU缓存中获取数据</span></span><br><span class="line"><span class="comment">输入参数：key:数据索引</span></span><br><span class="line"><span class="comment">输出参数：无</span></span><br><span class="line"><span class="comment">针返回值：缓存中存在key对应的data,返回</span></span><br><span class="line"><span class="comment">        缓存中不存在key对应的data，返回&#x27;\0&#x27;</span></span><br><span class="line"><span class="comment">*********************************************/</span></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">LRUCacheGet</span><span class="params">(<span class="type">void</span> *lruCache, <span class="type">char</span> key)</span></span>;</span><br></pre></td></tr></table></figure>
 
@@ -344,7 +344,7 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2023/10/28/%E9%93%BE%E8%A1%A8/" rel="prev" title="链表">
+                <a href="/2023/10/28/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E9%93%BE%E8%A1%A8/" rel="prev" title="链表">
                   <i class="fa fa-angle-left"></i> 链表
                 </a>
             </div>

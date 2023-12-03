@@ -22,25 +22,25 @@
     <meta name="description" content="堆，又称为优先队列。虽然名为优先队列，但堆并不是队列。堆和队列是两种不同的数据结构，堆是树态的，队列是线性的。在队列中，我们可以向队列添加元素，取出的时候是按照进入队列的先后顺序取出元素的，先进先出；而在堆中，却不是按照元素添加的先后顺序，而是按照元素的优先级取出元素。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="二叉堆">
-<meta property="og:url" content="https://dxprogramer.github.io/2023/11/05/%E4%BA%8C%E5%8F%89%E5%A0%86/index.html">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/11/05/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E4%BA%8C%E5%8F%89%E5%A0%86/index.html">
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="堆，又称为优先队列。虽然名为优先队列，但堆并不是队列。堆和队列是两种不同的数据结构，堆是树态的，队列是线性的。在队列中，我们可以向队列添加元素，取出的时候是按照进入队列的先后顺序取出元素的，先进先出；而在堆中，却不是按照元素添加的先后顺序，而是按照元素的优先级取出元素。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/11/05/%E4%BA%8C%E5%8F%89%E5%A0%86/1.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/05/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E4%BA%8C%E5%8F%89%E5%A0%86/1.jpg">
 <meta property="article:published_time" content="2023-11-05T08:07:24.000Z">
 <meta property="article:modified_time" content="2023-11-05T09:14:36.105Z">
 <meta property="article:author" content="Xiangger">
 <meta property="article:tag" content="二叉树">
 <meta property="article:tag" content="堆">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://dxprogramer.github.io/2023/11/05/%E4%BA%8C%E5%8F%89%E5%A0%86/1.jpg">
+<meta name="twitter:image" content="https://dxprogramer.github.io/2023/11/05/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E4%BA%8C%E5%8F%89%E5%A0%86/1.jpg">
 
 
-<link rel="canonical" href="https://dxprogramer.github.io/2023/11/05/%E4%BA%8C%E5%8F%89%E5%A0%86/">
+<link rel="canonical" href="https://dxprogramer.github.io/2023/11/05/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E4%BA%8C%E5%8F%89%E5%A0%86/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/11/05/%E4%BA%8C%E5%8F%89%E5%A0%86/","path":"2023/11/05/二叉堆/","title":"二叉堆"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/11/05/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E4%BA%8C%E5%8F%89%E5%A0%86/","path":"2023/11/05/数据结构与算法/二叉堆/","title":"二叉堆"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>二叉堆 | Xiangger</title>
@@ -210,7 +210,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/11/05/%E4%BA%8C%E5%8F%89%E5%A0%86/">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/11/05/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E4%BA%8C%E5%8F%89%E5%A0%86/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -291,7 +291,7 @@
 <p> 1.父节点的键值总是优先于任何一个子节点的键值；</p>
 <p> 2.左右子树都是一个二叉堆。</p>
 <p><strong>展示最大堆</strong></p>
-<p><img src="/2023/11/05/%E4%BA%8C%E5%8F%89%E5%A0%86/1.jpg" alt="图片"></p>
+<p><img src="/2023/11/05/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E4%BA%8C%E5%8F%89%E5%A0%86/1.jpg" alt="图片"></p>
 <p>用数组存储二叉堆，堆的顶点下标可以从0开始也可以从1开始。看上面图中，以self为参照物，self下标的变量为i：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">parent(i) = (i - 1) / 2;</span><br><span class="line">leftChild(i) = 2*i+1；</span><br><span class="line">rightChild(i) = leftChild(i) + 1 = 2 * i + 2;</span><br></pre></td></tr></table></figure>
 
@@ -327,7 +327,7 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2023/11/04/%E6%8E%A5%E9%9B%A8%E6%B0%B4/" rel="prev" title="接雨水">
+                <a href="/2023/11/04/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%A5%E9%9B%A8%E6%B0%B4/" rel="prev" title="接雨水">
                   <i class="fa fa-angle-left"></i> 接雨水
                 </a>
             </div>

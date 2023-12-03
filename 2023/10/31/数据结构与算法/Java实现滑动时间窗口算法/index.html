@@ -22,34 +22,34 @@
     <meta name="description" content="滑动时间窗限流算法解决了固定时间窗限流算法的问题。其没有划分固定的时间窗起点与终点，而是将每一次请求的到来时间点作为统计时间窗的终点，起点则是终点向前推时间窗长度的时间点。这种时间窗称为“滑动时间窗”。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java实现滑动时间窗口算法">
-<meta property="og:url" content="https://dxprogramer.github.io/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/index.html">
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="滑动时间窗限流算法解决了固定时间窗限流算法的问题。其没有划分固定的时间窗起点与终点，而是将每一次请求的到来时间点作为统计时间窗的终点，起点则是终点向前推时间窗长度的时间点。这种时间窗称为“滑动时间窗”。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/1.png">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/2.png">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/3.png">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/4.png">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/5.png">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/6.png">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/7.png">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/8.png">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/9.png">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/10.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/1.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/2.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/3.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/4.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/5.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/6.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/7.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/8.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/9.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/10.png">
 <meta property="article:published_time" content="2023-10-31T14:24:11.000Z">
 <meta property="article:modified_time" content="2023-10-31T14:41:52.698Z">
 <meta property="article:author" content="Xiangger">
 <meta property="article:tag" content="限流">
 <meta property="article:tag" content="滑动窗口">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://dxprogramer.github.io/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/1.png">
+<meta name="twitter:image" content="https://dxprogramer.github.io/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/1.png">
 
 
-<link rel="canonical" href="https://dxprogramer.github.io/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/">
+<link rel="canonical" href="https://dxprogramer.github.io/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/","path":"2023/10/31/Java实现滑动时间窗口算法/","title":"Java实现滑动时间窗口算法"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/","path":"2023/10/31/数据结构与算法/Java实现滑动时间窗口算法/","title":"Java实现滑动时间窗口算法"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>Java实现滑动时间窗口算法 | Xiangger</title>
@@ -219,7 +219,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -300,25 +300,25 @@
 <p>效果：任意10秒内，通过的次数不超过2次。或者按照实现原理来说，任意通过2次内的时间差，都不超过10秒。</p>
 <p>实现原理：</p>
 <p>1.这条线就是队列list，当第一个事件进来，队列大小是0，时间是第1秒：</p>
-<p><img src="/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/1.png" alt="图片"></p>
+<p><img src="/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/1.png" alt="图片"></p>
 <p>2.因为size&#x3D;0，小于5，都没有到限制的次数，完全不用考虑时间窗口，直接把这次事件的时间戳放到0的位置：</p>
-<p><img src="/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/2.png" alt="图片"></p>
+<p><img src="/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/2.png" alt="图片"></p>
 <p>3.第2.8秒的时候，第二个事件来了。因为此时size&#x3D;1，还是小于5，把这次事件的时间戳放到0的位置，原来第1秒来的事件时间戳会往后移动一格：</p>
-<p><img src="/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/3.png" alt="图片"></p>
+<p><img src="/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/3.png" alt="图片"></p>
 <p>4.陆续的又来了3个事件，队列大小变成了5，先来的时间戳依次向后移动。此时，第6个事件来了，时间是第8秒：</p>
-<p><img src="/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/4.png" alt="图片"></p>
+<p><img src="/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/4.png" alt="图片"></p>
 <p>5.因为size&#x3D;5，不小于5，此时已经达到限制次数，以后都需要考虑时间窗口了。所以取出位置4的时间（离现在最远的时间），和第6个事件的时间戳做比较：</p>
-<p><img src="/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/5.png" alt="图片"></p>
+<p><img src="/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/5.png" alt="图片"></p>
 <p>6.得到的差是7秒，小于时间窗口10秒，说明在10秒内，来的事件个数大于5了，所以本次不允许通过：</p>
-<p><img src="/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/6.png" alt="图片"></p>
+<p><img src="/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/6.png" alt="图片"></p>
 <p>7.接下来即便来上100个事件，只要时间差小于等于10秒，都同上，拒绝通过：</p>
-<p><img src="/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/7.png" alt="图片"></p>
+<p><img src="/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/7.png" alt="图片"></p>
 <p>8.第11.1秒，第101次事件过来了。因为size&#x3D;5，不小于5，所以取出位置4的时间（离现在最远的时间），和第101个事件的时间戳做比较：</p>
-<p><img src="/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/8.png" alt="图片"></p>
+<p><img src="/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/8.png" alt="图片"></p>
 <p>9.得到的差是10.1秒，大于时间窗口10秒，说明在10秒内，来的事件个数小于等于5了，所以本次允许通过：</p>
-<p><img src="/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/9.png" alt="图片"></p>
+<p><img src="/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/9.png" alt="图片"></p>
 <p>10.删除位置4的时间（离现在最远的时间），把这次事件的时间戳放到0的位置，后面的时间戳依次向后移动：</p>
-<p><img src="/2023/10/31/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/10.png" alt="图片"></p>
+<p><img src="/2023/10/31/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/Java%E5%AE%9E%E7%8E%B0%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95/10.png" alt="图片"></p>
 <p>往后再来其他事件，就是重复4-10的步骤，即可实现，在任意滑动时间窗口内，限制通过的次数</p>
 <p>其本质思想是转换概念，将原本问题的确定时间大小，进行次数限制。转换成确定次数大小，进行时间限制。</p>
 

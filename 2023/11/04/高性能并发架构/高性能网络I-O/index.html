@@ -22,7 +22,7 @@
     <meta name="description" content="所谓高性能、高并发，其实都是在指高并发的I&#x2F;O。经典的C10K问题，其实最终也是在谈I&#x2F;O。如果你是一个服务端开发人员，没研究过经典的C10K问题，这里进，值得你好好研究一番。当然，现在大家已经在谈C100K、C1000K的问题了，不用着急，等你熟悉了C10K的问题，C100K也不是大问题。 但是，能真正理解C10K里的讨论的基础，你需要至少懂一点I&#x2F;O的基本概念。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="高性能网络I&#x2F;O">
-<meta property="og:url" content="https://dxprogramer.github.io/2023/11/04/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9CI-O/index.html">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/11/04/%E9%AB%98%E6%80%A7%E8%83%BD%E5%B9%B6%E5%8F%91%E6%9E%B6%E6%9E%84/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9CI-O/index.html">
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="所谓高性能、高并发，其实都是在指高并发的I&#x2F;O。经典的C10K问题，其实最终也是在谈I&#x2F;O。如果你是一个服务端开发人员，没研究过经典的C10K问题，这里进，值得你好好研究一番。当然，现在大家已经在谈C100K、C1000K的问题了，不用着急，等你熟悉了C10K的问题，C100K也不是大问题。 但是，能真正理解C10K里的讨论的基础，你需要至少懂一点I&#x2F;O的基本概念。">
 <meta property="og:locale" content="zh_CN">
@@ -35,11 +35,11 @@
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://dxprogramer.github.io/2023/11/04/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9CI-O/">
+<link rel="canonical" href="https://dxprogramer.github.io/2023/11/04/%E9%AB%98%E6%80%A7%E8%83%BD%E5%B9%B6%E5%8F%91%E6%9E%B6%E6%9E%84/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9CI-O/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/11/04/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9CI-O/","path":"2023/11/04/高性能网络I-O/","title":"高性能网络I/O"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/11/04/%E9%AB%98%E6%80%A7%E8%83%BD%E5%B9%B6%E5%8F%91%E6%9E%B6%E6%9E%84/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9CI-O/","path":"2023/11/04/高性能并发架构/高性能网络I-O/","title":"高性能网络I/O"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>高性能网络I/O | Xiangger</title>
@@ -157,18 +157,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-count">42</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">52</span>
+        <span class="site-state-item-count">53</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -210,7 +210,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/11/04/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9CI-O/">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/11/04/%E9%AB%98%E6%80%A7%E8%83%BD%E5%B9%B6%E5%8F%91%E6%9E%B6%E6%9E%84/%E9%AB%98%E6%80%A7%E8%83%BD%E7%BD%91%E7%BB%9CI-O/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -375,13 +375,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">263k</span>
+    <span title="站点总字数">265k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:59</span>
+    <span title="站点阅读时长">4:01</span>
   </span>
 </div>
 <div class="busuanzi-count">

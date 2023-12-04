@@ -22,7 +22,7 @@
     <meta name="description" content="当我们采用多数据源的时候，同时也会出现一个这样的特殊场景：我们希望对 A 数据源的更新和 B 数据源的更新具备事务性。这样的例子很常见，比如：在订单库中创建一条订单记录，同时还需要在商品库中扣减商品库存。如果库存扣减失败，那么我们希望订单创建也能够回滚。如果这两条数据在一个数据库中，那么通过之前介绍的事务管理就能轻松解决了。但是，当这两个操作位于不同的数据库中，那么就无法实现了。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SpringBoot多数据源事务管理">
-<meta property="og:url" content="https://dxprogramer.github.io/2023/11/07/SpringBoot%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/11/07/SpringBoot/SpringBoot%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/index.html">
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="当我们采用多数据源的时候，同时也会出现一个这样的特殊场景：我们希望对 A 数据源的更新和 B 数据源的更新具备事务性。这样的例子很常见，比如：在订单库中创建一条订单记录，同时还需要在商品库中扣减商品库存。如果库存扣减失败，那么我们希望订单创建也能够回滚。如果这两条数据在一个数据库中，那么通过之前介绍的事务管理就能轻松解决了。但是，当这两个操作位于不同的数据库中，那么就无法实现了。">
 <meta property="og:locale" content="zh_CN">
@@ -35,11 +35,11 @@
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://dxprogramer.github.io/2023/11/07/SpringBoot%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/">
+<link rel="canonical" href="https://dxprogramer.github.io/2023/11/07/SpringBoot/SpringBoot%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/11/07/SpringBoot%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/","path":"2023/11/07/SpringBoot多数据源事务管理/","title":"SpringBoot多数据源事务管理"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/11/07/SpringBoot/SpringBoot%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/","path":"2023/11/07/SpringBoot/SpringBoot多数据源事务管理/","title":"SpringBoot多数据源事务管理"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>SpringBoot多数据源事务管理 | Xiangger</title>
@@ -157,7 +157,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-count">41</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -168,7 +168,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-count">52</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -210,7 +210,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/11/07/SpringBoot%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/11/07/SpringBoot/SpringBoot%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -394,13 +394,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">246k</span>
+    <span title="站点总字数">263k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:44</span>
+    <span title="站点阅读时长">3:59</span>
   </span>
 </div>
 <div class="busuanzi-count">

@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>MySQL基础架构</title>
+      <link href="/2023/12/10/MySQL/MySQL%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84/"/>
+      <url>/2023/12/10/MySQL/MySQL%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84/</url>
+      
+        <content type="html"><![CDATA[<p>MySQL分为Server和存储引擎层两部分，其中： Server层包括：连接池、查询缓存、分析器、优化器、执行器等，涵盖MySQL的大多数核心服务功能，以及所有的内置函数（如日期、时间、数字和加密函数等），所有跨存储引擎的功能都在这一层实现，比如存储过程、触发器、视图等； 存储引擎层负责数据的存储和提取。其架构模式是插件式，支持InnoDB、MyISAM、Memory等多个存储引擎，现在最常用的存储引擎是InnoDB（5.5.5版本后默认存储引擎）。</p><span id="more"></span><p>MySQL的连接器、分析器、优化器和执行器是MySQL的核心组件，它们分别负责不同的功能，如下所述：</p><ol><li>连接器（Connection Manager）：连接器是MySQL的一个独立组件，用于建立与服务器之间的连接，并负责用户身份验证、权限管理和调用其他MySQL模块来完成用户请求。一旦连接成功建立，它就会开始扮演协调器的角色，接收来自客户端的请求，将请求转发到查询分析器进行处理，并将结果返回给客户端。</li><li>分析器（Parser）：查询分析器从连接器接收SQL语句，并验证语法和解析其中的各个部分，如表名、列名、运算符和条件等。如果SQL语句不符合MySQL的语法和标准，则查询分析器将返回错误消息。</li><li>优化器（Optimizer）：查询优化器接收查询分析器的请求，并选择执行查询的最有效计划。优化器将尝试找到最佳的执行方案，以便在查询时最小化资源消耗，同时尽可能快地返回结果。</li><li>执行器（Executor）：查询执行器将执行优化的查询计划，并将结果返回给查询分析器。如果需要检索数据，则执行器将访问存储引擎，以在磁盘上找到数据并将其返回给查询分析器。在这个过程中，执行器还会进行权限检查和事务管理等操作。</li></ol><p>这些组件共同协作，完成了MySQL的核心功能，如语法分析、查询优化、数据管理和权限验证等操作。MySQL的性能和可靠性得益于这个复杂的体系结构，其中每个组件都有自己独特的功能和优点。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> MySQL </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> mysql </tag>
+            
+            <tag> 系统架构 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>binlog和redolog</title>
       <link href="/2023/12/10/MySQL/binlog%E5%92%8Credolog/"/>
       <url>/2023/12/10/MySQL/binlog%E5%92%8Credolog/</url>
@@ -434,9 +461,9 @@
       
         <tags>
             
-            <tag> 系统优化 </tag>
-            
             <tag> 高并发 </tag>
+            
+            <tag> 系统优化 </tag>
             
         </tags>
       
@@ -704,9 +731,9 @@
             
             <tag> 高性能 </tag>
             
-            <tag> 高并发 </tag>
-            
             <tag> I/O </tag>
+            
+            <tag> 高并发 </tag>
             
         </tags>
       

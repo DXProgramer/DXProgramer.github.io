@@ -4,7 +4,34 @@
   
     
     <entry>
-      <title>两阶段提交</title>
+      <title>binlog和redolog</title>
+      <link href="/2023/12/10/MySQL/binlog%E5%92%8Credolog/"/>
+      <url>/2023/12/10/MySQL/binlog%E5%92%8Credolog/</url>
+      
+        <content type="html"><![CDATA[<p>继续聊一下binlog和redo log。</p><span id="more"></span><h3 id="两阶段提交不同时刻异常重启分析"><a href="#两阶段提交不同时刻异常重启分析" class="headerlink" title="两阶段提交不同时刻异常重启分析"></a><strong>两阶段提交不同时刻异常重启分析</strong></h3><p><img src="/2023/12/10/MySQL/binlog%E5%92%8Credolog/1.png" alt="图片"></p><p>在图中时刻A崩溃crash，此时redo log处于prepare状态，binlog还没有写，redo log也没有提交，所以崩溃恢复时，事务会回滚。由于Binlog也没有写，所以不会传到备库。</p><p>在时刻B崩溃，binlog已经写完，redo log没有commit。根据3.2.3两阶段提交的实现逻辑，这时候B属于redo log已经处于prepare状态，并且binlog完整的情况，因此，事务会提交。</p><p><strong>实际上这就是两阶段提交算法的一种业务使用，如果接受者接受建议失败，则事务失败。</strong></p><h3 id="MySQL如何确认binlog的完整性"><a href="#MySQL如何确认binlog的完整性" class="headerlink" title="MySQL如何确认binlog的完整性"></a><strong>MySQL如何确认binlog的完整性</strong></h3><p>一个事务的binlog是有完整格式：</p><ul><li>statement格式的binlog，最后会有commit;</li><li>row格式的binlog，最后会有一个XID event；</li></ul><p>MySQL5.6.2版本后，引入binlog-checksum参数，验证binlog内容正确性。对于 binlog 日志由于磁盘原因，可能会在日志中间出错的情况，MySQL 可以通过校验 checksum 的结果来发现。所以，MySQL 还是有办法验证事务 binlog 的完整性的。</p><p>即：checksum用于保证binlog数据的完整性，commit标签、XID event标签保证事务完整性。</p><h3 id="redo-log和binlog的关联"><a href="#redo-log和binlog的关联" class="headerlink" title="redo log和binlog的关联"></a><strong>redo log和binlog的关联</strong></h3><p>redo log和binlog有一个共同的字段XID，崩溃恢复的时候，会按照顺序扫描redo log：</p><ul><li>如果碰到既有prepare又有commit的redo log，直接提交；</li><li>如果碰到只有prepare没有commit的redo log，拿着XID去binlog找对应的事务；</li></ul><h3 id="prepare状态的redo-log-binlog可以实现事务"><a href="#prepare状态的redo-log-binlog可以实现事务" class="headerlink" title="prepare状态的redo log+binlog可以实现事务"></a><strong>prepare状态的redo log+binlog可以实现事务</strong></h3><p>实际上这个说的就是时刻B，这时候由于binlog已经写入，之后就会被从库（或者这个binlog恢复的库）使用。</p><p>为了保证主从的数据一致性，主库也必须提交这个事务。因此说：</p><ul><li>集群正常运行时，要有完成的binlog保证从库的数据一致性，要有commit状态的redo log保证主库的数据一致性；</li><li>发生crash时，有prepare状态的redo log和完整的binlog也能保证主从库的数据一致性；</li></ul><h3 id="是否可以只使用binlog"><a href="#是否可以只使用binlog" class="headerlink" title="是否可以只使用binlog"></a><strong>是否可以只使用binlog</strong></h3><p>如果只使用binlog，过程可能是：数据更新到内存 -&gt; 写binlog -&gt;提交事务</p><p>但是这种方式无法支持事务，因为binlog没有崩溃恢复的能力。binlog由于WAL技术，有些修改是还没有落盘但是事务已经提交，这时候如果crash，重启后根据binlog可能认为这些修改已经落盘，从而导致丢失修改。</p><p><img src="/2023/12/10/MySQL/binlog%E5%92%8Credolog/2.png" alt="图片"></p><p>如图所示，一旦发生crash，那么事务2会回滚，然后应用binlog2可以补回来。但是对于事务1，系统已经提交完成，不会再应用一次binlog1。</p><p>InnoDB使用的是WAL技术，执行事务的时候，写完内存和日志，事务就算完成。crash之后，依赖日志恢复数据页。即：图中的事务1可能已经丢失，而且是数据页级的丢失，无法找回。</p><h4 id="binlog不具备checkpoint"><a href="#binlog不具备checkpoint" class="headerlink" title="binlog不具备checkpoint"></a><strong>binlog不具备checkpoint</strong></h4><p>从理论上分析就是：InnoDB设计思路是数据写入时，写到内存、redo log和binlog就算是写入成功，内存中的数据是否落盘主要看redo log有没有日志数据，只要redo log日志数据没有被checkpoint擦除，就代表数据还在内存中，crash恢复时，就会把redo log的数据先恢复到内存的数据页中，执行一次重放就可以恢复数据了。当然也存在说，可能落盘的redo log也还没有被checkpoint擦除，但是这种场景，可以通过redo log的LSN和数据页的LSN对比判定，如果相同，就会跳过这个checkpoint进行下一个数据页的恢复。</p><p>而binlog是追加写，既有落盘数据，也有未落盘的数据，因此，crash恢复时无法确定是从哪个点开始的数据已经刷盘，如果binlog也有checkpoint机制，好像就可以做数据补偿，但是这不就是redo log吗？</p><p>如果优化Binlog实现记录数据页的修改，那就是实现了另一个redo log。</p><p>因此说，Binlog不具备恢复“数据页”的能力，无法支持崩溃恢复。</p><h4 id="binlog的粒度问题"><a href="#binlog的粒度问题" class="headerlink" title="binlog的粒度问题"></a><strong>binlog的粒度问题</strong></h4><p>首先要清晰的是，数据的落盘是以page为最小单位，redo log记录的维度就是page。对于binlog，是以单条执行语句为维度进行记录。</p><p>redo log与Page直接相关，语句大体含义为“page#11, table, a,old value 1,new value 5”,这种物理日志执行重放，a的值不会有问题。</p><p>binlog是逻辑日志，包含的是多个page甚至是所有page的修改，以文中作者的示例：</p><ul><li>一个事务更新了page ABC</li><li>然后崩溃回复了，B坏了，AC没问题，而且AC还落盘了。</li><li>这样如果重做事务，B好了，AC又坏了</li></ul><p>详细解释就是：比如一个事务更新了page ABC，崩溃了之后，B坏了，AC没问题，而且AC还落盘了，这时候如果用redo log恢复，只用单独恢复B这个数据页，就保证了ABC 3个数据页都正常，而binlog并不具备恢复单个数据页的能力，所以如果用binlog恢复，会同时恢复ABC三个数据页的内容，而AC数据页本来内容已经是对的，这样恢复后反而就坏了。（比如原先对AC是新增操作，那等于又对正确数据错误的新增了）</p><h4 id="row级别的binlog是否可以"><a href="#row级别的binlog是否可以" class="headerlink" title="row级别的binlog是否可以"></a><strong>row级别的binlog是否可以</strong></h4><p>那是不是开启row格式binlog也可以实现这样的操作？答案是依旧不可以。</p><p>row格式的binlog记录的数据的前后项的变化，从一个值变成了另一个值，是操作的逻辑日志，类似于SQL语句。这里说的损坏是page的损坏，通过逻辑日志是无法恢复page的。redo log记录的是page的物理修改，操作是幂等的，因此page损坏时，通过redo log可以恢复这个损坏的page。</p><h3 id="是否可以只用redo-log"><a href="#是否可以只用redo-log" class="headerlink" title="是否可以只用redo log"></a><strong>是否可以只用redo log</strong></h3><p>单单使用redo log可以实现crash-safe，但是binlog对于MySQL还有如下用途：</p><ul><li>归档：redo log是循环写，写到末尾就回到开头继续写，这样历史日志无法保留，无法实现归档的能力；</li><li>MySQL系统依赖binlog：MySQL的高可用等能力，就是依赖了binlog的复制能力；</li><li>数据异构同步：很多公司通过消费binlog实现从MySQL到hive的备份，比如说阿里的canal就是消费binlog给应用通知.</li></ul><h3 id="redo-log与最终数据落盘"><a href="#redo-log与最终数据落盘" class="headerlink" title="redo log与最终数据落盘"></a><strong>redo log与最终数据落盘</strong></h3><p>redo log没有记录数据页完整数据，因此，没有能力自己去更新磁盘数据。</p><p>如果是正常运行实例，数据页被修改后，跟磁盘的数据页不一致，成为脏页。最终的数据落盘就是将内存中的数据页写盘，这个过程与redo log无关。</p><p>在崩溃恢复场景，InnoDB判断一个数据也可能在崩溃恢复时丢失了更新，就会将它读到内存，然后让redo log更新内存内容，这是因为redo log记录的是“在某个数据页执行了什么修改”，而不是“这个数据修改前后的值是什么”，因此，需要先把磁盘的数据读入内存在执行redo log操作的回放。更新完成后，内存页变为脏页，回到了上面的状态。</p><p>因此，我们说，只有在崩溃恢复时，redo log才会参与数据落盘过程中。</p><h3 id="redo-log先写内存还是先写文件"><a href="#redo-log先写内存还是先写文件" class="headerlink" title="redo log先写内存还是先写文件"></a><strong>redo log先写内存还是先写文件</strong></h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">begin;</span><br><span class="line">insert into t1 ...</span><br><span class="line">insert into t2 ...</span><br><span class="line">commit;</span><br></pre></td></tr></table></figure><p>在开启事务后执行数据插入，此时，会更新内存中的数据，并将执行语句写入redo log buffer中（标记为prepare状态），只有当执行commit语句时才会<strong>主动</strong>将日志刷盘写入redo log file（文件名为：ib_logfile+数字），以减少不必要的IO消耗。然后写binlog，再将redo log标记为commited。</p><p>但是上文也说了是主动，既然有主动，那自然也就有被动。由于redo log buffer是所有线程共用的，别的线程提交也会向buffer中提交日志。redo log并不保证事务的顺序性，当redo log写满了以及后台的每秒自动刷盘、其他事务的提交都会将redo log刷盘，因此，redo log不会阻塞其他的事务写。</p><p>但是，binlog虽然采用的是组提交（并发写入），但是binlog必须需要保证事务的顺序性，所以大事务提交 binlog写会阻塞后续的所有提交。</p><p>因此说，大事务一方面会导致事务的所有日志全部在redo log buffer中（非主动提交场景），同时binlog还要阻塞后续的所有事务，因此，要尽可能的避免大事务的出现。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> MySQL </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> mysql </tag>
+            
+            <tag> 事务 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>MySQL两阶段提交</title>
       <link href="/2023/12/09/MySQL/MySQL%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4/"/>
       <url>/2023/12/09/MySQL/MySQL%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4/</url>
       

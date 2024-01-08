@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>支付架构</title>
+      <link href="/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E6%94%AF%E4%BB%98%E6%9E%B6%E6%9E%84/"/>
+      <url>/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E6%94%AF%E4%BB%98%E6%9E%B6%E6%9E%84/</url>
+      
+        <content type="html"><![CDATA[<p>支付系统相关业务说明与系统架构。</p><span id="more"></span><p>陈天宇宙「大支付」全集:<a href="https://mp.weixin.qq.com/s/7SOGxBEA9_nz_5qCiWLN0w">https://mp.weixin.qq.com/s/7SOGxBEA9_nz_5qCiWLN0w</a></p><p>一文搞懂“支付系统”:<a href="https://mp.weixin.qq.com/s/MiSsqFVzGnxYim4NP6drvQ">https://mp.weixin.qq.com/s/MiSsqFVzGnxYim4NP6drvQ</a></p><p>订单视角看支付｜得物技术:<a href="https://mp.weixin.qq.com/s/NvG9wR_GwEnKTHMfkTJWng">https://mp.weixin.qq.com/s/NvG9wR_GwEnKTHMfkTJWng</a></p><p>“二清”改造:<a href="https://mp.weixin.qq.com/s/eRJh9GNgNgnao9hmN227Rg">https://mp.weixin.qq.com/s/eRJh9GNgNgnao9hmN227Rg</a></p><p>一张图，搞懂“发票系统”:<a href="https://mp.weixin.qq.com/s/V9sNbCAW_f8VTPVU5X_ubA">https://mp.weixin.qq.com/s/V9sNbCAW_f8VTPVU5X_ubA</a></p><p>Spring Boot 集成支付宝支付:<a href="https://mp.weixin.qq.com/s/gkIgj0Dp2b9X28owEGziiA">https://mp.weixin.qq.com/s/gkIgj0Dp2b9X28owEGziiA</a></p><p>如何对接第三方支付通道:<a href="https://mp.weixin.qq.com/s/X7aIBNdOm7NUr8gP4HZxcA">https://mp.weixin.qq.com/s/X7aIBNdOm7NUr8gP4HZxcA</a></p><p>浅析电商系统架构设计:<a href="https://mp.weixin.qq.com/s/lwKiIyWNuxs--DS8t7JEEA">https://mp.weixin.qq.com/s/lwKiIyWNuxs--DS8t7JEEA</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 系统架构 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 架构 </tag>
+            
+            <tag> 支付 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Swagger2集成</title>
       <link href="/2024/01/07/SpringBoot/Swagger2%E9%9B%86%E6%88%90/"/>
       <url>/2024/01/07/SpringBoot/Swagger2%E9%9B%86%E6%88%90/</url>

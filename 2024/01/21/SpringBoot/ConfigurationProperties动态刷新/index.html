@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/next_favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/next_favicon.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"dxprogramer.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"width":280},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="详细介绍在Spring Cloud中被@ConfigurationProperties注解的类如何被动态刷新。通过了解其工作原理，我们可以更好地利用Spring Cloud的动态配置功能，实现应用程序的灵活性和可扩展性。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ConfigurationProperties动态刷新">
+<meta property="og:url" content="https://dxprogramer.github.io/2024/01/21/SpringBoot/ConfigurationProperties%E5%8A%A8%E6%80%81%E5%88%B7%E6%96%B0/index.html">
+<meta property="og:site_name" content="Xiangger">
+<meta property="og:description" content="详细介绍在Spring Cloud中被@ConfigurationProperties注解的类如何被动态刷新。通过了解其工作原理，我们可以更好地利用Spring Cloud的动态配置功能，实现应用程序的灵活性和可扩展性。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-01-21T13:18:15.000Z">
+<meta property="article:modified_time" content="2024-01-21T13:26:37.902Z">
+<meta property="article:author" content="Xiangger">
+<meta property="article:tag" content="注解">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://dxprogramer.github.io/2024/01/21/SpringBoot/ConfigurationProperties%E5%8A%A8%E6%80%81%E5%88%B7%E6%96%B0/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2024/01/21/SpringBoot/ConfigurationProperties%E5%8A%A8%E6%80%81%E5%88%B7%E6%96%B0/","path":"2024/01/21/SpringBoot/ConfigurationProperties动态刷新/","title":"ConfigurationProperties动态刷新"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ConfigurationProperties动态刷新 | Xiangger</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Xiangger</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">业精于勤，荒于嬉；行成于思，毁于随</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">实现原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E6%89%BE-ConfigurationProperties%E6%B3%A8%E8%A7%A3%E7%9A%84%E7%B1%BB"><span class="nav-number">1.1.</span> <span class="nav-text">查找@ConfigurationProperties注解的类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E6%96%B0%E7%BB%91%E5%AE%9A-ConfigurationProperties%E6%B3%A8%E8%A7%A3%E7%9A%84%E7%B1%BB"><span class="nav-number">1.2.</span> <span class="nav-text">重新绑定@ConfigurationProperties注解的类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A6%E5%8F%91EnvironmentChangeEvent%E4%BA%8B"><span class="nav-number">1.3.</span> <span class="nav-text">触发EnvironmentChangeEvent事</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xiangger"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xiangger</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">58</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">66</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DXProgramer" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DXProgramer" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:13554742813@163.com" title="E-Mail → mailto:13554742813@163.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/your_weibo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;your_weibo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2024/01/21/SpringBoot/ConfigurationProperties%E5%8A%A8%E6%80%81%E5%88%B7%E6%96%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Xiangger">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ConfigurationProperties动态刷新 | Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ConfigurationProperties动态刷新
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-01-21 21:18:15 / 修改时间：21:26:37" itemprop="dateCreated datePublished" datetime="2024-01-21T21:18:15+08:00">2024-01-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/springboot/" itemprop="url" rel="index"><span itemprop="name">springboot</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>6.1k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>6 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>详细介绍在Spring Cloud中被@ConfigurationProperties注解的类如何被动态刷新。通过了解其工作原理，我们可以更好地利用Spring Cloud的动态配置功能，实现应用程序的灵活性和可扩展性。</p>
+<span id="more"></span>
+
+<p>当配置发生变化时，标记为 @RefreshScope 的 Spring @Bean 会得到特殊处理。此功能可解决有状态 Bean 的问题，因为这些 Bean 只有在初始化时才会注入配置。有时，在某些只能初始化一次的 Bean 上甚至必须应用 @RefreshScope 注解。如果某个 Bean 是 “不可变 “的，则必须使用 @RefreshScope 注解或在属性关键字下指定类名：<strong>spring.cloud.refresh.extra-refreshable</strong>，通过该配置指定具体的类后，该类也将能够动态的更新内容。相反，如果你不希望某个Bean被动态改变了，你可以使用<strong>spring.cloud.refresh.never-refreshable</strong>配置属性指定具体的类。</p>
+<h3 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h3><h4 id="查找-ConfigurationProperties注解的类"><a href="#查找-ConfigurationProperties注解的类" class="headerlink" title="查找@ConfigurationProperties注解的类"></a>查找@ConfigurationProperties注解的类</h4><p>容器自动配置了如下的Bean对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="meta">@ConditionalOnMissingBean(search = SearchStrategy.CURRENT)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> ConfigurationPropertiesBeans <span class="title function_">configurationPropertiesBeans</span><span class="params">()</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ConfigurationPropertiesBeans</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该类用来管理@ConfigurationProperties注解的类。该类还是一个BeanPostProcessor处理器类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ConfigurationPropertiesBeans</span> <span class="keyword">implements</span> <span class="title class_">BeanPostProcessor</span></span><br><span class="line">  <span class="keyword">private</span> Map&lt;String, ConfigurationPropertiesBean&gt; beans = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">  <span class="keyword">public</span> Object <span class="title function_">postProcessBeforeInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException &#123;</span><br><span class="line">    <span class="comment">// 如果这个类已经是refresh作用域了，那么直接跳过。</span></span><br><span class="line">    <span class="comment">// 被@RefreshScope注解的类是被创建代理后重新创建对象的。</span></span><br><span class="line">    <span class="keyword">if</span> (isRefreshScoped(beanName)) &#123;</span><br><span class="line">      <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果当前的bean</span></span><br><span class="line">    <span class="type">ConfigurationPropertiesBean</span> <span class="variable">propertiesBean</span> <span class="operator">=</span> ConfigurationPropertiesBean.get(<span class="built_in">this</span>.applicationContext, bean, beanName);</span><br><span class="line">    <span class="keyword">if</span> (propertiesBean != <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="built_in">this</span>.beans.put(beanName, propertiesBean);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> bean;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>进入ConfigurationPropertiesBean#get方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">ConfigurationPropertiesBean</span> &#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> ConfigurationPropertiesBean <span class="title function_">get</span><span class="params">(ApplicationContext applicationContext, Object bean, String beanName)</span> &#123;</span><br><span class="line">    <span class="comment">// 我们定义的Bean 可能是通过@Bean的方式@ConfigurationProperties也可以用在方法上，</span></span><br><span class="line">    <span class="comment">// 所以这里要获取对应创建该bean的方法</span></span><br><span class="line">    <span class="comment">// 所以这里可能返回null，不是通过@Bean注解的方式定义的bean</span></span><br><span class="line">    <span class="type">Method</span> <span class="variable">factoryMethod</span> <span class="operator">=</span> findFactoryMethod(applicationContext, beanName);</span><br><span class="line">    <span class="comment">// 创建实例</span></span><br><span class="line">    <span class="keyword">return</span> create(beanName, bean, bean.getClass(), factoryMethod);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> ConfigurationPropertiesBean <span class="title function_">create</span><span class="params">(String name, Object instance, Class&lt;?&gt; type, Method factory)</span> &#123;</span><br><span class="line">    <span class="comment">// 这里就先从Method上查找，如果没有在到类上查找</span></span><br><span class="line">    <span class="type">ConfigurationProperties</span> <span class="variable">annotation</span> <span class="operator">=</span> findAnnotation(instance, type, factory, ConfigurationProperties.class);</span><br><span class="line">    <span class="keyword">if</span> (annotation == <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 查找是否有@Validate注解，也就是说咱们定义的属性配置类是支持数据验证的</span></span><br><span class="line">    <span class="type">Validated</span> <span class="variable">validated</span> <span class="operator">=</span> findAnnotation(instance, type, factory, Validated.class);</span><br><span class="line">    Annotation[] annotations = (validated != <span class="literal">null</span>) ? <span class="keyword">new</span> <span class="title class_">Annotation</span>[] &#123; annotation, validated &#125;</span><br><span class="line">        : <span class="keyword">new</span> <span class="title class_">Annotation</span>[] &#123; annotation &#125;;</span><br><span class="line">    <span class="comment">// 下面的操作就是绑定对象与配置属性了。</span></span><br><span class="line">    <span class="type">ResolvableType</span> <span class="variable">bindType</span> <span class="operator">=</span> (factory != <span class="literal">null</span>) ? ResolvableType.forMethodReturnType(factory)</span><br><span class="line">        : ResolvableType.forClass(type);</span><br><span class="line">    Bindable&lt;Object&gt; bindTarget = Bindable.of(bindType).withAnnotations(annotations);</span><br><span class="line">    <span class="keyword">if</span> (instance != <span class="literal">null</span>) &#123;</span><br><span class="line">      bindTarget = bindTarget.withExistingValue(instance);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ConfigurationPropertiesBean</span>(name, instance, annotation, bindTarget);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所有加了@ConfigurationProperties注解的类都被包装到了ConfigurationPropertiesBean对象中。最后回到ConfigurationPropertiesBeans类中。将创建的所有ConfigurationPropertiesBean都添加到了一个Map集合中。</p>
+<p>到这里就将容器中的所有@ConfigurationProperties注解的类查找完成。接下来就是对属性发生变化的类进行重新绑定操作了。</p>
+<h4 id="重新绑定-ConfigurationProperties注解的类"><a href="#重新绑定-ConfigurationProperties注解的类" class="headerlink" title="重新绑定@ConfigurationProperties注解的类"></a>重新绑定@ConfigurationProperties注解的类</h4><p>容器自动配置了如下的Bean对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="meta">@ConditionalOnMissingBean(search = SearchStrategy.CURRENT)</span></span><br><span class="line"><span class="keyword">public</span> ConfigurationPropertiesRebinder <span class="title function_">configurationPropertiesRebinder</span><span class="params">(ConfigurationPropertiesBeans beans)</span> &#123;</span><br><span class="line">  <span class="comment">// 这里就注入了上一步中我们查找到的所有被@ConfigurationProperties注解的类</span></span><br><span class="line">  <span class="type">ConfigurationPropertiesRebinder</span> <span class="variable">rebinder</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ConfigurationPropertiesRebinder</span>(beans);</span><br><span class="line">  <span class="keyword">return</span> rebinder;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该类是一个事件监听器类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@ManagedResource</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ConfigurationPropertiesRebinder</span> <span class="keyword">implements</span> <span class="title class_">ApplicationContextAware</span>, ApplicationListener&lt;EnvironmentChangeEvent&gt; &#123;</span><br><span class="line">  <span class="keyword">private</span> ConfigurationPropertiesBeans beans;</span><br><span class="line">  <span class="keyword">public</span> <span class="title function_">ConfigurationPropertiesRebinder</span><span class="params">(ConfigurationPropertiesBeans beans)</span> &#123;</span><br><span class="line">    <span class="built_in">this</span>.beans = beans;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 监听EnvironmentChangeEvent上下文环境发生变化后的事件</span></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onApplicationEvent</span><span class="params">(EnvironmentChangeEvent event)</span> &#123;</span><br><span class="line">    <span class="comment">// 为了防止当前存在父子容器情况，判断下只处理自身容器中发生变化的情况。</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">this</span>.applicationContext.equals(event.getSource())</span><br><span class="line">        || event.getKeys().equals(event.getSource())) &#123;</span><br><span class="line">      <span class="comment">// 执行重新绑定</span></span><br><span class="line">      rebind();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">rebind</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="comment">// 遍历</span></span><br><span class="line">    <span class="keyword">for</span> (String name : <span class="built_in">this</span>.beans.getBeanNames()) &#123;</span><br><span class="line">      rebind(name);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">rebind</span><span class="params">(String name)</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="type">ApplicationContext</span> <span class="variable">appContext</span> <span class="operator">=</span> <span class="built_in">this</span>.applicationContext;</span><br><span class="line">    <span class="keyword">while</span> (appContext != <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="comment">// 再次判断当前的上下文中存在bean</span></span><br><span class="line">      <span class="keyword">if</span> (appContext.containsLocalBean(name)) &#123;</span><br><span class="line">        <span class="comment">// 重新绑定</span></span><br><span class="line">        <span class="keyword">return</span> rebind(name, appContext);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 在从父容器中查找</span></span><br><span class="line">        appContext = appContext.getParent();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">private</span> <span class="type">boolean</span> <span class="title function_">rebind</span><span class="params">(String name, ApplicationContext appContext)</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">// 从容器中获取bean的实例对象</span></span><br><span class="line">      <span class="type">Object</span> <span class="variable">bean</span> <span class="operator">=</span> appContext.getBean(name);</span><br><span class="line">      <span class="comment">// 如果是代理对象，则获取被代理的那个真实对象，因为被注入的就是那个真实的对象</span></span><br><span class="line">      <span class="keyword">if</span> (AopUtils.isAopProxy(bean)) &#123;</span><br><span class="line">        bean = ProxyUtils.getTargetObject(bean);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (bean != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 这里就会判断spring.cloud.refresh.never-refreshable中你配置的类</span></span><br><span class="line">        <span class="comment">// 与当前要重新绑定的类匹配了那就跳过。</span></span><br><span class="line">        <span class="keyword">if</span> (getNeverRefreshable().contains(bean.getClass().getName())) &#123;</span><br><span class="line">          <span class="keyword">return</span> <span class="literal">false</span>; <span class="comment">// ignore</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 这里执行下当前Bean的生命周期钩子回调</span></span><br><span class="line">        appContext.getAutowireCapableBeanFactory().destroyBean(bean);</span><br><span class="line">        <span class="comment">// 这里就执行绑定操作了，其中就会执行（ConfigurationPropertiesBindingPostProcessor）执行绑定</span></span><br><span class="line">        appContext.getAutowireCapableBeanFactory().initializeBean(bean, name);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>到此你也就知道了关于@ConfigurationProperties注解的类是如何被重新绑定的。接下来就是还差一步，是谁来触发ConfigurationPropertiesRebinder监听的EnvironmentChangeEvent事件的。</p>
+<h4 id="触发EnvironmentChangeEvent事"><a href="#触发EnvironmentChangeEvent事" class="headerlink" title="触发EnvironmentChangeEvent事"></a>触发EnvironmentChangeEvent事</h4><p>SpringCloud提供了一个RefreshEndpoint actuator接口，通过调用&#x2F;actuator&#x2F;refresh接口进行触发刷新动作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title class_">ContextRefresher</span> &#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">synchronized</span> Set&lt;String&gt; <span class="title function_">refresh</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="comment">// 刷新上下文</span></span><br><span class="line">    Set&lt;String&gt; keys = refreshEnvironment();</span><br><span class="line">    <span class="comment">// 所有的refresh作用域的Bean都进行刷新</span></span><br><span class="line">    <span class="built_in">this</span>.scope.refreshAll();</span><br><span class="line">    <span class="keyword">return</span> keys;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">synchronized</span> Set&lt;String&gt; <span class="title function_">refreshEnvironment</span><span class="params">()</span> &#123;</span><br><span class="line">    Map&lt;String, Object&gt; before = extract(<span class="built_in">this</span>.context.getEnvironment().getPropertySources());</span><br><span class="line">    updateEnvironment();</span><br><span class="line">    Set&lt;String&gt; keys = changes(before, extract(<span class="built_in">this</span>.context.getEnvironment().getPropertySources())).keySet();</span><br><span class="line">    <span class="comment">// 这里进行事件的发布</span></span><br><span class="line">    <span class="built_in">this</span>.context.publishEvent(<span class="keyword">new</span> <span class="title class_">EnvironmentChangeEvent</span>(<span class="built_in">this</span>.context, keys));</span><br><span class="line">    <span class="keyword">return</span> keys;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意：如果您使用的数据源 Bean 是 HikariDataSource，则无法刷新。这是 spring.cloud.refresh.never-refreshable 的默认值。如果需要刷新，请选择不同的数据源实现。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B3%A8%E8%A7%A3/" rel="tag"><i class="fa fa-tag"></i> 注解</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/01/21/Spring/PostConstruct%E6%B3%A8%E8%A7%A3/" rel="prev" title="PostConstruct注解">
+                  <i class="fa fa-angle-left"></i> PostConstruct注解
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  
+  <div class="comments">
+  <script src="https://utteranc.es/client.js" repo="DXProgramer/hexo-comments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script>
+  </div>
+  
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Xiangger</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">307k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">4:39</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<!-- 樱花特效 -->
+  
+      <script async src="/js/fairyDustCursor.js"></script>
+  
+</body>
+</html>

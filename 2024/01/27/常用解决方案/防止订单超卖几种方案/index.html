@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/next_favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/next_favicon.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"dxprogramer.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"width":280},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="大厂防止超卖的几种实现。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="防止订单超卖几种方案">
+<meta property="og:url" content="https://dxprogramer.github.io/2024/01/27/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E9%98%B2%E6%AD%A2%E8%AE%A2%E5%8D%95%E8%B6%85%E5%8D%96%E5%87%A0%E7%A7%8D%E6%96%B9%E6%A1%88/index.html">
+<meta property="og:site_name" content="Xiangger">
+<meta property="og:description" content="大厂防止超卖的几种实现。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-01-27T12:19:36.000Z">
+<meta property="article:modified_time" content="2024-01-27T13:12:12.994Z">
+<meta property="article:author" content="Xiangger">
+<meta property="article:tag" content="锁">
+<meta property="article:tag" content="面试">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://dxprogramer.github.io/2024/01/27/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E9%98%B2%E6%AD%A2%E8%AE%A2%E5%8D%95%E8%B6%85%E5%8D%96%E5%87%A0%E7%A7%8D%E6%96%B9%E6%A1%88/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2024/01/27/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E9%98%B2%E6%AD%A2%E8%AE%A2%E5%8D%95%E8%B6%85%E5%8D%96%E5%87%A0%E7%A7%8D%E6%96%B9%E6%A1%88/","path":"2024/01/27/常用解决方案/防止订单超卖几种方案/","title":"防止订单超卖几种方案"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>防止订单超卖几种方案 | Xiangger</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Xiangger</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">业精于勤，荒于嬉；行成于思，毁于随</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%B8%80%EF%BC%9ALock%E9%94%81"><span class="nav-number">1.</span> <span class="nav-text">方案一：Lock锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%BA%8C%EF%BC%9A%E6%95%B0%E6%8D%AE%E5%BA%93%E6%82%B2%E8%A7%82%E9%94%81"><span class="nav-number">2.</span> <span class="nav-text">方案二：数据库悲观锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%B8%89%EF%BC%9A%E4%B9%90%E8%A7%82%E9%94%81"><span class="nav-number">3.</span> <span class="nav-text">方案三：乐观锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%A1%88%E4%B8%89%EF%BC%9A%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97"><span class="nav-number">4.</span> <span class="nav-text">方案三：消息队列</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xiangger"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xiangger</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">59</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">67</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DXProgramer" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DXProgramer" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:13554742813@163.com" title="E-Mail → mailto:13554742813@163.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/your_weibo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;your_weibo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2024/01/27/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E9%98%B2%E6%AD%A2%E8%AE%A2%E5%8D%95%E8%B6%85%E5%8D%96%E5%87%A0%E7%A7%8D%E6%96%B9%E6%A1%88/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Xiangger">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="防止订单超卖几种方案 | Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          防止订单超卖几种方案
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-01-27 20:19:36 / 修改时间：21:12:12" itemprop="dateCreated datePublished" datetime="2024-01-27T20:19:36+08:00">2024-01-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" itemprop="url" rel="index"><span itemprop="name">解决方案</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>12k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>11 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>大厂防止超卖的几种实现。</p>
+<span id="more"></span>
+
+<h3 id="方案一：Lock锁"><a href="#方案一：Lock锁" class="headerlink" title="方案一：Lock锁"></a>方案一：Lock锁</h3><p>使用事务 + Lock锁</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Lock</span> <span class="variable">lock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ReentrantLock</span>(<span class="literal">true</span>); <span class="comment">// 多实例下要用分布式锁</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@PostMapping(&quot;/start/lock&quot;)</span></span><br><span class="line"><span class="keyword">public</span> Result <span class="title function_">startLock</span><span class="params">(<span class="type">long</span> skgId)</span>&#123;</span><br><span class="line">	lock.lock();</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">        log.info(<span class="string">&quot;开始秒杀方式一...&quot;</span>);</span><br><span class="line">        <span class="keyword">final</span> <span class="type">long</span> <span class="variable">userId</span> <span class="operator">=</span> (<span class="type">int</span>) (<span class="keyword">new</span> <span class="title class_">Random</span>().nextDouble() * (<span class="number">99999</span> - <span class="number">10000</span> + <span class="number">1</span>)) + <span class="number">10000</span>;</span><br><span class="line">        <span class="type">Result</span> <span class="variable">result</span> <span class="operator">=</span> secondKillService.startSecondKillByLock(skgId, userId);</span><br><span class="line">        <span class="keyword">if</span>(result != <span class="literal">null</span>)&#123;</span><br><span class="line">            log.info(<span class="string">&quot;用户:&#123;&#125;--&#123;&#125;&quot;</span>, userId, result.get(<span class="string">&quot;msg&quot;</span>));</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            log.info(<span class="string">&quot;用户:&#123;&#125;--&#123;&#125;&quot;</span>, userId, <span class="string">&quot;哎呦喂，人也太多了，请稍后！&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">	&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">		e.printStackTrace();</span><br><span class="line">	&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">		lock.unlock();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> Result.ok();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>SkillService</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="meta">@Transactional(rollbackFor = Exception.class)</span></span><br><span class="line"><span class="keyword">public</span> Result <span class="title function_">startSecondKillByLock</span><span class="params">(<span class="type">long</span> skgId, <span class="type">long</span> userId)</span> &#123;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 校验库存</span></span><br><span class="line">        <span class="type">SecondKill</span> <span class="variable">secondKill</span> <span class="operator">=</span> secondKillMapper.selectById(skgId);</span><br><span class="line">        <span class="type">Integer</span> <span class="variable">number</span> <span class="operator">=</span> secondKill.getNumber();</span><br><span class="line">        <span class="keyword">if</span> (number &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">//扣库存</span></span><br><span class="line">            secondKill.setNumber(number - <span class="number">1</span>);</span><br><span class="line">            secondKillMapper.updateById(secondKill);</span><br><span class="line">            <span class="comment">//创建订单</span></span><br><span class="line">            <span class="type">SuccessKilled</span> <span class="variable">killed</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SuccessKilled</span>();</span><br><span class="line">            killed.setSeckillId(skgId);</span><br><span class="line">            killed.setUserId(userId);</span><br><span class="line">            killed.setState((<span class="type">short</span>) <span class="number">0</span>);</span><br><span class="line">            killed.setCreateTime(<span class="keyword">new</span> <span class="title class_">Timestamp</span>(System.currentTimeMillis()));</span><br><span class="line">            successKilledMapper.insert(killed);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//支付</span></span><br><span class="line">            <span class="type">Payment</span> <span class="variable">payment</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Payment</span>();</span><br><span class="line">            payment.setSeckillId(skgId);</span><br><span class="line">            payment.setSeckillId(skgId);</span><br><span class="line">            payment.setUserId(userId);</span><br><span class="line">            payment.setMoney(<span class="number">40</span>);</span><br><span class="line">            payment.setState((<span class="type">short</span>) <span class="number">1</span>);</span><br><span class="line">            payment.setCreateTime(<span class="keyword">new</span> <span class="title class_">Timestamp</span>(System.currentTimeMillis()));</span><br><span class="line">            paymentMapper.insert(payment);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        	<span class="keyword">return</span> Result.error(SecondKillStateEnum.END);</span><br><span class="line">        &#125;</span><br><span class="line">     &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;==========================error&quot;</span>);</span><br><span class="line">     &#125;</span><br><span class="line">    <span class="keyword">return</span> Result.ok(SecondKillStateEnum.SUCCESS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注：在Transactional方法加上锁，有可能在事务提交之前，就已经把锁释放了，这样会导致商品超卖现象。所以加锁的时机很重要！</p>
+<p><strong>aop实现</strong></p>
+<p>自定义注解</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target(&#123;ElementType.PARAMETER, ElementType.METHOD&#125;)</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="keyword">public</span>  <span class="meta">@interface</span> ServiceLock &#123;</span><br><span class="line">    String <span class="title function_">description</span><span class="params">()</span>  <span class="keyword">default</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>aop切面</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Scope</span></span><br><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="meta">@Order(1)</span> <span class="comment">//order越小越是最先执行，但更重要的是最先执行的最后结束</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LockAspect</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * service 默认是单例的，并发下lock只有一个实例</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span>  <span class="type">Lock</span> <span class="variable">lock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ReentrantLock</span>(<span class="literal">true</span>); <span class="comment">// 互斥锁 参数默认false，不公平锁,分布式环境，用分布式锁</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Service层切点     用于记录错误日志</span></span><br><span class="line">    <span class="meta">@Pointcut(&quot;@annotation(com.dx.springboot.aop.ServiceLock)&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">lockAspect</span><span class="params">()</span> &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Around(&quot;lockAspect()&quot;)</span></span><br><span class="line">    <span class="keyword">public</span>  Object <span class="title function_">around</span><span class="params">(ProceedingJoinPoint joinPoint)</span> &#123;</span><br><span class="line">        lock.lock();</span><br><span class="line">        <span class="type">Object</span> <span class="variable">obj</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            obj = joinPoint.proceed();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">finally</span>&#123;</span><br><span class="line">            lock.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>controller</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PostMapping(&quot;/start/aop&quot;)</span></span><br><span class="line"><span class="keyword">public</span> Result <span class="title function_">startAop</span><span class="params">(<span class="type">long</span> skgId)</span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        log.info(<span class="string">&quot;开始秒杀方式二...&quot;</span>);</span><br><span class="line">        <span class="keyword">final</span> <span class="type">long</span> <span class="variable">userId</span> <span class="operator">=</span> (<span class="type">int</span>) (<span class="keyword">new</span> <span class="title class_">Random</span>().nextDouble() * (<span class="number">99999</span> - <span class="number">10000</span> + <span class="number">1</span>)) + <span class="number">10000</span>;</span><br><span class="line">        <span class="type">Result</span> <span class="variable">result</span> <span class="operator">=</span> secondKillService.startSecondKillByAop(skgId, userId);</span><br><span class="line">        <span class="keyword">if</span>(result != <span class="literal">null</span>)&#123;</span><br><span class="line">        	log.info(<span class="string">&quot;用户:&#123;&#125;--&#123;&#125;&quot;</span>, userId, result.get(<span class="string">&quot;msg&quot;</span>));</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        	log.info(<span class="string">&quot;用户:&#123;&#125;--&#123;&#125;&quot;</span>, userId, <span class="string">&quot;哎呦喂，人也太多了，请稍后！&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    	e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> Result.ok();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="方案二：数据库悲观锁"><a href="#方案二：数据库悲观锁" class="headerlink" title="方案二：数据库悲观锁"></a>方案二：数据库悲观锁</h3><p>悲观锁，什么是悲观锁呢？通俗的说，在做任何事情之前，都要进行加锁确认。这种数据库级加锁操作效率较低。使用for update一定要加上事务，当事务处理完后，for update才会将行级锁解除。</p>
+<p>controller</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PostMapping(&quot;/start/pes/lock/one&quot;)</span></span><br><span class="line"><span class="keyword">public</span> Result <span class="title function_">startPesLockOne</span><span class="params">(<span class="type">long</span> skgId)</span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">    	log.info(<span class="string">&quot;开始秒杀方式三...&quot;</span>);</span><br><span class="line">        <span class="keyword">final</span> <span class="type">long</span> <span class="variable">userId</span> <span class="operator">=</span> (<span class="type">int</span>) (<span class="keyword">new</span> <span class="title class_">Random</span>().nextDouble() * (<span class="number">99999</span> - <span class="number">10000</span> + <span class="number">1</span>)) + <span class="number">10000</span>;</span><br><span class="line">        <span class="type">Result</span> <span class="variable">result</span> <span class="operator">=</span> secondKillService.startSecondKillByUpdate(skgId, userId);</span><br><span class="line">        <span class="keyword">if</span>(result != <span class="literal">null</span>)&#123;</span><br><span class="line">            log.info(<span class="string">&quot;用户:&#123;&#125;--&#123;&#125;&quot;</span>, userId, result.get(<span class="string">&quot;msg&quot;</span>));</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            log.info(<span class="string">&quot;用户:&#123;&#125;--&#123;&#125;&quot;</span>, userId, <span class="string">&quot;哎呦喂，人也太多了，请稍后！&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    	e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> Result.ok();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>service</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">@Override</span></span><br><span class="line"> <span class="meta">@Transactional(rollbackFor = Exception.class)</span></span><br><span class="line"> <span class="keyword">public</span> Result <span class="title function_">startSecondKillByUpdate</span><span class="params">(<span class="type">long</span> skgId, <span class="type">long</span> userId)</span> &#123;</span><br><span class="line">     <span class="keyword">try</span> &#123;</span><br><span class="line">         <span class="comment">// 校验库存-悲观锁</span></span><br><span class="line">         <span class="type">SecondKill</span> <span class="variable">secondKill</span> <span class="operator">=</span> secondKillMapper.querySecondKillForUpdate(skgId);</span><br><span class="line">         <span class="type">Integer</span> <span class="variable">number</span> <span class="operator">=</span> secondKill.getNumber();</span><br><span class="line">         <span class="keyword">if</span> (number &gt; <span class="number">0</span>) &#123;</span><br><span class="line">             <span class="comment">//扣库存</span></span><br><span class="line">             secondKill.setNumber(number - <span class="number">1</span>);</span><br><span class="line">             secondKillMapper.updateById(secondKill);</span><br><span class="line">             <span class="comment">//创建订单</span></span><br><span class="line">             <span class="type">SuccessKilled</span> <span class="variable">killed</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SuccessKilled</span>();</span><br><span class="line">             killed.setSeckillId(skgId);</span><br><span class="line">             killed.setUserId(userId);</span><br><span class="line">             killed.setState((<span class="type">short</span>) <span class="number">0</span>);</span><br><span class="line">             killed.setCreateTime(<span class="keyword">new</span> <span class="title class_">Timestamp</span>(System.currentTimeMillis()));</span><br><span class="line">             successKilledMapper.insert(killed);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//支付</span></span><br><span class="line">            <span class="type">Payment</span> <span class="variable">payment</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Payment</span>();</span><br><span class="line">            payment.setSeckillId(skgId);</span><br><span class="line">            payment.setSeckillId(skgId);</span><br><span class="line">            payment.setUserId(userId);</span><br><span class="line">            payment.setMoney(<span class="number">40</span>);</span><br><span class="line">            payment.setState((<span class="type">short</span>) <span class="number">1</span>);</span><br><span class="line">            payment.setCreateTime(<span class="keyword">new</span> <span class="title class_">Timestamp</span>(System.currentTimeMillis()));</span><br><span class="line">            paymentMapper.insert(payment);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> Result.error(SecondKillStateEnum.END);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    	<span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ScorpiosException</span>(<span class="string">&quot;异常了个乖乖&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> Result.ok(SecondKillStateEnum.SUCCESS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Mapper</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Select(value = &quot;SELECT * FROM seckill WHERE seckill_id=#&#123;skgId&#125; FOR UPDATE&quot;)</span></span><br><span class="line">SecondKill <span class="title function_">querySecondKillForUpdate</span><span class="params">(<span class="meta">@Param(&quot;skgId&quot;)</span> Long skgId)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>悲观锁（二）</strong></p>
+<p>service</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="meta">@Transactional(rollbackFor = Exception.class)</span></span><br><span class="line"><span class="keyword">public</span> Result <span class="title function_">startSecondKillByUpdateTwo</span><span class="params">(<span class="type">long</span> skgId, <span class="type">long</span> userId)</span> &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 不校验，直接扣库存更新</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> secondKillMapper.updateSecondKillById(skgId);</span><br><span class="line">        <span class="keyword">if</span> (result &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">//创建订单</span></span><br><span class="line">            <span class="type">SuccessKilled</span> <span class="variable">killed</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SuccessKilled</span>();</span><br><span class="line">            killed.setSeckillId(skgId);</span><br><span class="line">            killed.setUserId(userId);</span><br><span class="line">            killed.setState((<span class="type">short</span>) <span class="number">0</span>);</span><br><span class="line">            killed.setCreateTime(<span class="keyword">new</span> <span class="title class_">Timestamp</span>(System.currentTimeMillis()));</span><br><span class="line">            successKilledMapper.insert(killed);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//支付</span></span><br><span class="line">            <span class="type">Payment</span> <span class="variable">payment</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Payment</span>();</span><br><span class="line">            payment.setSeckillId(skgId);</span><br><span class="line">            payment.setSeckillId(skgId);</span><br><span class="line">            payment.setUserId(userId);</span><br><span class="line">            payment.setMoney(<span class="number">40</span>);</span><br><span class="line">            payment.setState((<span class="type">short</span>) <span class="number">1</span>);</span><br><span class="line">            payment.setCreateTime(<span class="keyword">new</span> <span class="title class_">Timestamp</span>(System.currentTimeMillis()));</span><br><span class="line">            paymentMapper.insert(payment);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> Result.error(SecondKillStateEnum.END);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ScorpiosException</span>(<span class="string">&quot;异常了个乖乖&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> Result.ok(SecondKillStateEnum.SUCCESS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Mapper</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Update(value = &quot;UPDATE seckill SET number=number-1 WHERE seckill_id=#&#123;skgId&#125; AND number &gt; 0&quot;)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">updateSecondKillById</span><span class="params">(<span class="meta">@Param(&quot;skgId&quot;)</span> <span class="type">long</span> skgId)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="方案三：乐观锁"><a href="#方案三：乐观锁" class="headerlink" title="方案三：乐观锁"></a>方案三：乐观锁</h3><p>乐观锁，顾名思义，就是对操作结果很乐观，通过利用version字段来判断数据是否被修改。乐观锁，不进行库存数量的校验，直接做库存扣减。如果并发量特别大，使用的乐观锁会出现大量的数据更新异常（抛异常就会导致购买失败）。</p>
+<p>controller</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PostMapping(&quot;/start/opt/lock&quot;)</span></span><br><span class="line"><span class="keyword">public</span> Result <span class="title function_">startOptLock</span><span class="params">(<span class="type">long</span> skgId)</span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        log.info(<span class="string">&quot;开始秒杀方式五...&quot;</span>);</span><br><span class="line">        <span class="keyword">final</span> <span class="type">long</span> <span class="variable">userId</span> <span class="operator">=</span> (<span class="type">int</span>) (<span class="keyword">new</span> <span class="title class_">Random</span>().nextDouble() * (<span class="number">99999</span> - <span class="number">10000</span> + <span class="number">1</span>)) + <span class="number">10000</span>;</span><br><span class="line">        <span class="comment">// 参数添加了购买数量</span></span><br><span class="line">        <span class="type">Result</span> <span class="variable">result</span> <span class="operator">=</span> secondKillService.startSecondKillByPesLock(skgId, userId,<span class="number">1</span>);</span><br><span class="line">        <span class="keyword">if</span>(result != <span class="literal">null</span>)&#123;</span><br><span class="line">            log.info(<span class="string">&quot;用户:&#123;&#125;--&#123;&#125;&quot;</span>, userId, result.get(<span class="string">&quot;msg&quot;</span>));</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            log.info(<span class="string">&quot;用户:&#123;&#125;--&#123;&#125;&quot;</span>, userId, <span class="string">&quot;哎呦喂，人也太多了，请稍后！&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> Result.ok();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>service</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="meta">@Transactional(rollbackFor = Exception.class)</span></span><br><span class="line"><span class="keyword">public</span> Result <span class="title function_">startSecondKillByPesLock</span><span class="params">(<span class="type">long</span> skgId, <span class="type">long</span> userId, <span class="type">int</span> number)</span> &#123;</span><br><span class="line">    <span class="comment">// 乐观锁，不进行库存数量的校验，直接</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="type">SecondKill</span> <span class="variable">kill</span> <span class="operator">=</span> secondKillMapper.selectById(skgId);</span><br><span class="line">        <span class="comment">// 剩余的数量应该要大于等于秒杀的数量</span></span><br><span class="line">        <span class="keyword">if</span>(kill.getNumber() &gt;= number) &#123;</span><br><span class="line">            <span class="type">int</span> <span class="variable">result</span> <span class="operator">=</span> secondKillMapper.updateSecondKillByVersion(number,skgId,kill.getVersion());</span><br><span class="line">            <span class="keyword">if</span> (result &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">//创建订单</span></span><br><span class="line">                <span class="type">SuccessKilled</span> <span class="variable">killed</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SuccessKilled</span>();</span><br><span class="line">                killed.setSeckillId(skgId);</span><br><span class="line">                killed.setUserId(userId);</span><br><span class="line">                killed.setState((<span class="type">short</span>) <span class="number">0</span>);</span><br><span class="line">                killed.setCreateTime(<span class="keyword">new</span> <span class="title class_">Timestamp</span>(System.currentTimeMillis()));</span><br><span class="line">                successKilledMapper.insert(killed);</span><br><span class="line"></span><br><span class="line">                <span class="comment">//支付</span></span><br><span class="line">                <span class="type">Payment</span> <span class="variable">payment</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Payment</span>();</span><br><span class="line">                payment.setSeckillId(skgId);</span><br><span class="line">                payment.setSeckillId(skgId);</span><br><span class="line">                payment.setUserId(userId);</span><br><span class="line">                payment.setMoney(<span class="number">40</span>);</span><br><span class="line">                payment.setState((<span class="type">short</span>) <span class="number">1</span>);</span><br><span class="line">                payment.setCreateTime(<span class="keyword">new</span> <span class="title class_">Timestamp</span>(System.currentTimeMillis()));</span><br><span class="line">                paymentMapper.insert(payment);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> Result.error(SecondKillStateEnum.END);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ScorpiosException</span>(<span class="string">&quot;异常了个乖乖&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> Result.ok(SecondKillStateEnum.SUCCESS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Mapper</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Update(value = &quot;UPDATE seckill  SET number=number-#&#123;number&#125;,version=version+1 WHERE seckill_id=#&#123;skgId&#125; AND version = #&#123;version&#125;&quot;)</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">updateSecondKillByVersion</span><span class="params">(<span class="meta">@Param(&quot;number&quot;)</span> <span class="type">int</span> number, <span class="meta">@Param(&quot;skgId&quot;)</span> <span class="type">long</span> skgId, <span class="meta">@Param(&quot;version&quot;)</span><span class="type">int</span> version)</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="方案三：消息队列"><a href="#方案三：消息队列" class="headerlink" title="方案三：消息队列"></a>方案三：消息队列</h3><p>这里用java队列queue模拟，实际可用MQ中间件。</p>
+<p>队列</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 秒杀队列(固定长度为100)</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SecondKillQueue</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 队列大小</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">QUEUE_MAX_SIZE</span>   <span class="operator">=</span> <span class="number">1000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 用于多线程间下单的队列</span></span><br><span class="line">    <span class="keyword">static</span> BlockingQueue&lt;SuccessKilled&gt; blockingQueue = <span class="keyword">new</span> <span class="title class_">LinkedBlockingQueue</span>&lt;SuccessKilled&gt;(QUEUE_MAX_SIZE);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用静态内部类，实现单例模式</span></span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">SecondKillQueue</span><span class="params">()</span>&#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">SingletonHolder</span>&#123;</span><br><span class="line">        <span class="comment">// 静态初始化器，由JVM来保证线程安全</span></span><br><span class="line">        <span class="keyword">private</span>  <span class="keyword">static</span> <span class="type">SecondKillQueue</span> <span class="variable">queue</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SecondKillQueue</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 单例队列</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> SecondKillQueue <span class="title function_">getSkillQueue</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> SingletonHolder.queue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 生产入队</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> kill</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> InterruptedException</span></span><br><span class="line"><span class="comment">     * add(e) 队列未满时，返回true；队列满则抛出IllegalStateException(“Queue full”)异常——AbstractQueue</span></span><br><span class="line"><span class="comment">     * put(e) 队列未满时，直接插入没有返回值；队列满时会阻塞等待，一直等到队列未满时再插入。</span></span><br><span class="line"><span class="comment">     * offer(e) 队列未满时，返回true；队列满时返回false。非阻塞立即返回。</span></span><br><span class="line"><span class="comment">     * offer(e, time, unit) 设定等待的时间，如果在指定时间内还不能往队列中插入数据则返回false，插入成功返回true。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span>  Boolean  <span class="title function_">produce</span><span class="params">(SuccessKilled kill)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> blockingQueue.offer(kill);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 消费出队</span></span><br><span class="line"><span class="comment">     * poll() 获取并移除队首元素，在指定的时间内去轮询队列看有没有首元素有则返回，否者超时后返回null</span></span><br><span class="line"><span class="comment">     * take() 与带超时时间的poll类似不同在于take时候如果当前队列空了它会一直等待其他线程调用notEmpty.signal()才会被唤醒</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span>  SuccessKilled <span class="title function_">consume</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException &#123;</span><br><span class="line">        <span class="keyword">return</span> blockingQueue.take();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取队列大小</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">size</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> blockingQueue.size();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>自动消费队列</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TaskRunner</span> <span class="keyword">implements</span> <span class="title class_">ApplicationRunner</span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> SecondKillService seckillService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">(ApplicationArguments <span class="keyword">var</span>)</span>&#123;</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">            log.info(<span class="string">&quot;队列启动成功&quot;</span>);</span><br><span class="line">            <span class="keyword">while</span>(<span class="literal">true</span>)&#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="comment">// 进程内队列</span></span><br><span class="line">                    <span class="type">SuccessKilled</span> <span class="variable">kill</span> <span class="operator">=</span> SecondKillQueue.getSkillQueue().consume();</span><br><span class="line">                    <span class="keyword">if</span>(kill != <span class="literal">null</span>)&#123;</span><br><span class="line">                        <span class="type">Result</span> <span class="variable">result</span> <span class="operator">=</span> seckillService.startSecondKill(kill.getSeckillId(), kill.getUserId());</span><br><span class="line">                        <span class="keyword">if</span>(result != <span class="literal">null</span> &amp;&amp; result.equals(Result.ok(SecondKillStateEnum.SUCCESS)))&#123;</span><br><span class="line">                            log.info(<span class="string">&quot;TaskRunner,result:&#123;&#125;&quot;</span>,result);</span><br><span class="line">                            log.info(<span class="string">&quot;TaskRunner从消息队列取出用户，用户:&#123;&#125;&#123;&#125;&quot;</span>,kill.getUserId(),<span class="string">&quot;秒杀成功&quot;</span>);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;).start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>service</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">@Transactional(rollbackFor = Exception.class)</span><br><span class="line">public Result startSecondKill(long skgId, long userId) &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        // 校验库存</span><br><span class="line">        SecondKill secondKill = secondKillMapper.selectById(skgId);</span><br><span class="line">        Integer number = secondKill.getNumber();</span><br><span class="line">        if (number &gt; 0) &#123;</span><br><span class="line">            //扣库存</span><br><span class="line">            secondKill.setNumber(number - 1);</span><br><span class="line">            secondKillMapper.updateById(secondKill);</span><br><span class="line">            //创建订单</span><br><span class="line">            SuccessKilled killed = new SuccessKilled();</span><br><span class="line">            killed.setSeckillId(skgId);</span><br><span class="line">            killed.setUserId(userId);</span><br><span class="line">            killed.setState((short) 0);</span><br><span class="line">            killed.setCreateTime(new Timestamp(System.currentTimeMillis()));</span><br><span class="line">            successKilledMapper.insert(killed);</span><br><span class="line"></span><br><span class="line">            //支付</span><br><span class="line">            Payment payment = new Payment();</span><br><span class="line">            payment.setSeckillId(skgId);</span><br><span class="line">            payment.setSeckillId(skgId);</span><br><span class="line">            payment.setUserId(userId);</span><br><span class="line">            payment.setMoney(40);</span><br><span class="line">            payment.setState((short) 1);</span><br><span class="line">            payment.setCreateTime(new Timestamp(System.currentTimeMillis()));</span><br><span class="line">            paymentMapper.insert(payment);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            return Result.error(SecondKillStateEnum.END);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; catch (Exception e) &#123;</span><br><span class="line">    //            throw new ScorpiosException(&quot;异常了个乖乖&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">	return Result.ok(SecondKillStateEnum.SUCCESS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>队列入数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PostMapping(&quot;/start/queue&quot;)</span></span><br><span class="line"><span class="keyword">public</span> Result <span class="title function_">startQueue</span><span class="params">(<span class="type">long</span> skgId)</span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        log.info(<span class="string">&quot;开始秒杀方式六...&quot;</span>);</span><br><span class="line">        <span class="keyword">final</span> <span class="type">long</span> <span class="variable">userId</span> <span class="operator">=</span> (<span class="type">int</span>) (<span class="keyword">new</span> <span class="title class_">Random</span>().nextDouble() * (<span class="number">99999</span> - <span class="number">10000</span> + <span class="number">1</span>)) + <span class="number">10000</span>;</span><br><span class="line">        <span class="type">SuccessKilled</span> <span class="variable">kill</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SuccessKilled</span>();</span><br><span class="line">        kill.setSeckillId(skgId);</span><br><span class="line">        kill.setUserId(userId);</span><br><span class="line">        <span class="type">Boolean</span> <span class="variable">flag</span> <span class="operator">=</span> SecondKillQueue.getSkillQueue().produce(kill);</span><br><span class="line">        <span class="comment">// 虽然进入了队列，但是不一定能秒杀成功 进队出队有时间间隙,消费跟不上生产</span></span><br><span class="line">        <span class="keyword">if</span>(flag)&#123;</span><br><span class="line">            log.info(<span class="string">&quot;用户:&#123;&#125;&#123;&#125;&quot;</span>,kill.getUserId(),<span class="string">&quot;秒杀成功&quot;</span>);</span><br><span class="line">        &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">            log.info(<span class="string">&quot;用户:&#123;&#125;&#123;&#125;&quot;</span>,userId,<span class="string">&quot;秒杀失败&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> Result.ok();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%94%81/" rel="tag"><i class="fa fa-tag"></i> 锁</a>
+              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"><i class="fa fa-tag"></i> 面试</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/01/21/SpringBoot/ConfigurationProperties%E5%8A%A8%E6%80%81%E5%88%B7%E6%96%B0/" rel="prev" title="ConfigurationProperties动态刷新">
+                  <i class="fa fa-angle-left"></i> ConfigurationProperties动态刷新
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  
+  <div class="comments">
+  <script src="https://utteranc.es/client.js" repo="DXProgramer/hexo-comments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script>
+  </div>
+  
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Xiangger</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">319k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">4:50</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<!-- 樱花特效 -->
+  
+      <script async src="/js/fairyDustCursor.js"></script>
+  
+</body>
+</html>

@@ -237,7 +237,7 @@
       <link href="/2024/01/13/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E6%96%87%E7%AB%A0%E5%90%88%E9%9B%86/"/>
       <url>/2024/01/13/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E6%96%87%E7%AB%A0%E5%90%88%E9%9B%86/</url>
       
-        <content type="html"><![CDATA[<p>计算机网络相关文章合集</p><span id="more"></span><p>你必须理解的计算机核心概念:<a href="https://mp.weixin.qq.com/s/XmHhlZzpYbJWW_m5NMPqEw">https://mp.weixin.qq.com/s/XmHhlZzpYbJWW_m5NMPqEw</a></p><p>一个故事讲完https:<a href="https://mp.weixin.qq.com/s/StqqafHePlBkWAPQZg3NrA">https://mp.weixin.qq.com/s/StqqafHePlBkWAPQZg3NrA</a></p>]]></content>
+        <content type="html"><![CDATA[<p>计算机网络相关文章合集</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/XmHhlZzpYbJWW_m5NMPqEw">你必须理解的计算机核心概念</a></p><p><a href="https://mp.weixin.qq.com/s/StqqafHePlBkWAPQZg3NrA">一个故事讲完https</a></p>]]></content>
       
       
       <categories>
@@ -287,7 +287,7 @@
       <link href="/2024/01/10/redis/redis%E5%90%88%E9%9B%86/"/>
       <url>/2024/01/10/redis/redis%E5%90%88%E9%9B%86/</url>
       
-        <content type="html"><![CDATA[<p>redis合集</p><span id="more"></span><p>Redis到底是单线程还是多线程程序？:<a href="https://mp.weixin.qq.com/s/krvb4H9ljaQz3fBVSCyv8Q">https://mp.weixin.qq.com/s/krvb4H9ljaQz3fBVSCyv8Q</a></p><p>Redis 集群模式：<a href="https://mp.weixin.qq.com/s/nOFGPTydhMjF9zPOv1GSRg">https://mp.weixin.qq.com/s/nOFGPTydhMjF9zPOv1GSRg</a></p><p>得物 Redis 设计与实践：<a href="https://mp.weixin.qq.com/s/dnlxCXgAxHsfyVNYTDsewA">https://mp.weixin.qq.com/s/dnlxCXgAxHsfyVNYTDsewA</a></p><p>Spring Cache 操作 Redis 实现数据缓存-上：<a href="https://mp.weixin.qq.com/s/eowKXZ1Bp42g9gSCEka9TA">https://mp.weixin.qq.com/s/eowKXZ1Bp42g9gSCEka9TA</a></p><p>Spring Cache 操作 Redis 实现数据缓存-下：<a href="https://mp.weixin.qq.com/s/heTAQ-H-DeldQcVIaheN3A">https://mp.weixin.qq.com/s/heTAQ-H-DeldQcVIaheN3A</a></p><p>Redis 是如何实现点赞、取消点赞的：<a href="https://mp.weixin.qq.com/s/JGM9FnuzxmPCg8-Q-t9j-Q">https://mp.weixin.qq.com/s/JGM9FnuzxmPCg8-Q-t9j-Q</a></p><p>Redis常见、常用的知识点：<a href="https://mp.weixin.qq.com/s/RPSxd-DjtLxqN2nsgW_QMQ">https://mp.weixin.qq.com/s/RPSxd-DjtLxqN2nsgW_QMQ</a></p>]]></content>
+        <content type="html"><![CDATA[<p>redis合集</p><span id="more"></span><p>Redis到底是单线程还是多线程程序？:<a href="https://mp.weixin.qq.com/s/krvb4H9ljaQz3fBVSCyv8Q">https://mp.weixin.qq.com/s/krvb4H9ljaQz3fBVSCyv8Q</a></p><p>Redis 集群模式：<a href="https://mp.weixin.qq.com/s/nOFGPTydhMjF9zPOv1GSRg">https://mp.weixin.qq.com/s/nOFGPTydhMjF9zPOv1GSRg</a></p><p>得物 Redis 设计与实践：<a href="https://mp.weixin.qq.com/s/dnlxCXgAxHsfyVNYTDsewA">https://mp.weixin.qq.com/s/dnlxCXgAxHsfyVNYTDsewA</a></p><p>Spring Cache 操作 Redis 实现数据缓存-上：<a href="https://mp.weixin.qq.com/s/eowKXZ1Bp42g9gSCEka9TA">https://mp.weixin.qq.com/s/eowKXZ1Bp42g9gSCEka9TA</a></p><p>Spring Cache 操作 Redis 实现数据缓存-下：<a href="https://mp.weixin.qq.com/s/heTAQ-H-DeldQcVIaheN3A">https://mp.weixin.qq.com/s/heTAQ-H-DeldQcVIaheN3A</a></p><p>Redis 是如何实现点赞、取消点赞的：<a href="https://mp.weixin.qq.com/s/JGM9FnuzxmPCg8-Q-t9j-Q">https://mp.weixin.qq.com/s/JGM9FnuzxmPCg8-Q-t9j-Q</a></p><p>Redis常见、常用的知识点：<a href="https://mp.weixin.qq.com/s/RPSxd-DjtLxqN2nsgW_QMQ">https://mp.weixin.qq.com/s/RPSxd-DjtLxqN2nsgW_QMQ</a></p><p><a href="https://mp.weixin.qq.com/s/ZPXEF28il4BIOlIBAYXFzA">高可用之战：Redis Sentinal（哨兵模式）</a></p>]]></content>
       
       
       <categories>

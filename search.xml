@@ -4,6 +4,60 @@
   
     
     <entry>
+      <title>陈天宇宙-支付架构与设计</title>
+      <link href="/2024/04/20/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E4%B8%8E%E8%AE%BE%E8%AE%A1/%E9%99%88%E5%A4%A9%E5%AE%87%E5%AE%99-%E6%94%AF%E4%BB%98%E6%9E%B6%E6%9E%84%E4%B8%8E%E8%AE%BE%E8%AE%A1/"/>
+      <url>/2024/04/20/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E4%B8%8E%E8%AE%BE%E8%AE%A1/%E9%99%88%E5%A4%A9%E5%AE%87%E5%AE%99-%E6%94%AF%E4%BB%98%E6%9E%B6%E6%9E%84%E4%B8%8E%E8%AE%BE%E8%AE%A1/</url>
+      
+        <content type="html"><![CDATA[<p>陈天宇宙公众号精华合集。</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/7SOGxBEA9_nz_5qCiWLN0w">陈天宇宙「大支付」全集</a></p><p><a href="https://mp.weixin.qq.com/s/IZBxufLgMzicRNW6dlYgEA">我的支付内核，浓缩成了54张图</a></p><p><a href="https://mp.weixin.qq.com/s/MiSsqFVzGnxYim4NP6drvQ">一文搞懂“支付系统”</a></p><p><a href="https://mp.weixin.qq.com/s/V9sNbCAW_f8VTPVU5X_ubA">一张图，搞懂“发票系统</a></p><p><a href="https://mp.weixin.qq.com/s/eRJh9GNgNgnao9hmN227Rg">“二清”改造</a></p><p><a href="https://mp.weixin.qq.com/s/_xbGeEdAGGGoUVYqKS8SYA">万字长文：15个需求，97个灵魂拷问</a></p><p><a href="https://mp.weixin.qq.com/s/HwAsvJhyHCosrbLvnJ0n7g">这么做账户，贼酸爽</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 系统架构 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 支付系统 </tag>
+            
+            <tag> 架构设计 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>分布式系统中的补偿机制设计</title>
+      <link href="/2024/01/28/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E8%A1%A5%E5%81%BF%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/"/>
+      <url>/2024/01/28/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E8%A1%A5%E5%81%BF%E6%9C%BA%E5%88%B6%E8%AE%BE%E8%AE%A1/</url>
+      
+        <content type="html"><![CDATA[<p>应用系统在分布式的情况下，在通信时会有着一个显著的问题，即一个业务流程往往需要组合一组服务，且单单一次通信可能会经过 DNS 服务，网卡、交换机、路由器、负载均衡等设备，而这些服务于设备都不一定是一直稳定的，在数据传输的整个过程中，只要任意一个环节出错，都会导致问题的产生。因为业务需要在一致性上的保证。也就是说，如果一个步骤失败了，要么不断重试保证所有的步骤都成功，要么回滚到以前的服务调用。</p><span id="more"></span><h3 id="关于业务补偿机制"><a href="#关于业务补偿机制" class="headerlink" title="关于业务补偿机制"></a>关于业务补偿机制</h3><h4 id="什么是业务补偿"><a href="#什么是业务补偿" class="headerlink" title="什么是业务补偿"></a>什么是业务补偿</h4><p>即当某个操作发生了异常时，如何通过内部机制将这个异常产生的「不一致」状态消除掉。</p><h4 id="业务补偿设计的实现方式"><a href="#业务补偿设计的实现方式" class="headerlink" title="业务补偿设计的实现方式"></a>业务补偿设计的实现方式</h4><p>业务补偿设计的实现方式主要可分为两种：</p><ul><li><strong>回滚（事务补偿）</strong>，逆向操作，回滚业务流程，意味着放弃，当前操作必然会失败；</li><li><strong>重试</strong>，正向操作，努力地把一个业务流程执行完成，代表着还有成功的机会。</li></ul><p>一般来说，业务的事务补偿都是需要一个工作流引擎的。这个工作流引擎把各式各样的服务给串联在一起，并在工作流上做相应的业务补偿，整个过程设计成为最终一致性的。</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Ps：因为「补偿」已经是一个额外流程了，既然能够走这个额外流程，说明时效性并不是第一考虑的因素。所以做补偿的核心要点是：宁可慢，不可错。</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 解决方案 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 分布式 </tag>
+            
+            <tag> 补偿机制 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>防止订单超卖几种方案</title>
       <link href="/2024/01/27/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E9%98%B2%E6%AD%A2%E8%AE%A2%E5%8D%95%E8%B6%85%E5%8D%96%E5%87%A0%E7%A7%8D%E6%96%B9%E6%A1%88/"/>
       <url>/2024/01/27/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E9%98%B2%E6%AD%A2%E8%AE%A2%E5%8D%95%E8%B6%85%E5%8D%96%E5%87%A0%E7%A7%8D%E6%96%B9%E6%A1%88/</url>
@@ -260,7 +314,7 @@
       <link href="/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E6%94%AF%E4%BB%98%E6%9E%B6%E6%9E%84/"/>
       <url>/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E6%94%AF%E4%BB%98%E6%9E%B6%E6%9E%84/</url>
       
-        <content type="html"><![CDATA[<p>支付系统相关业务说明与系统架构。</p><span id="more"></span><p>陈天宙：</p><p>陈天宇宙「大支付」全集:<a href="https://mp.weixin.qq.com/s/7SOGxBEA9_nz_5qCiWLN0w">https://mp.weixin.qq.com/s/7SOGxBEA9_nz_5qCiWLN0w</a></p><p>我的支付内核，浓缩成了54张图：<a href="https://mp.weixin.qq.com/s/IZBxufLgMzicRNW6dlYgEA">https://mp.weixin.qq.com/s/IZBxufLgMzicRNW6dlYgEA</a></p><p>一文搞懂“支付系统”:<a href="https://mp.weixin.qq.com/s/MiSsqFVzGnxYim4NP6drvQ">https://mp.weixin.qq.com/s/MiSsqFVzGnxYim4NP6drvQ</a></p><p>“二清”改造:<a href="https://mp.weixin.qq.com/s/eRJh9GNgNgnao9hmN227Rg">https://mp.weixin.qq.com/s/eRJh9GNgNgnao9hmN227Rg</a></p><p>一张图，搞懂“发票系统”:<a href="https://mp.weixin.qq.com/s/V9sNbCAW_f8VTPVU5X_ubA">https://mp.weixin.qq.com/s/V9sNbCAW_f8VTPVU5X_ubA</a></p><p>万字长文：15个需求，97个灵魂拷问:<a href="https://mp.weixin.qq.com/s/_xbGeEdAGGGoUVYqKS8SYA">https://mp.weixin.qq.com/s/_xbGeEdAGGGoUVYqKS8SYA</a></p><p>订单视角看支付｜得物技术:<a href="https://mp.weixin.qq.com/s/NvG9wR_GwEnKTHMfkTJWng">https://mp.weixin.qq.com/s/NvG9wR_GwEnKTHMfkTJWng</a></p><p>详解快捷支付：<a href="https://mp.weixin.qq.com/s/4SlgVwSM9z9Kpm7_3HB7Vw">https://mp.weixin.qq.com/s/4SlgVwSM9z9Kpm7_3HB7Vw</a></p><p>Spring Boot 集成支付宝支付:<a href="https://mp.weixin.qq.com/s/gkIgj0Dp2b9X28owEGziiA">https://mp.weixin.qq.com/s/gkIgj0Dp2b9X28owEGziiA</a></p><p>如何对接第三方支付通道:<a href="https://mp.weixin.qq.com/s/X7aIBNdOm7NUr8gP4HZxcA">https://mp.weixin.qq.com/s/X7aIBNdOm7NUr8gP4HZxcA</a></p><p>支付与清结算的区别: <a href="https://mp.weixin.qq.com/s/JfeNT9EnTeIpwMbA7HWaeA">https://mp.weixin.qq.com/s/JfeNT9EnTeIpwMbA7HWaeA</a></p><p>直连与间连的区别：<a href="https://mp.weixin.qq.com/s/5hZX6CwWAn2Kz-Zb63chuw">https://mp.weixin.qq.com/s/5hZX6CwWAn2Kz-Zb63chuw</a></p>]]></content>
+        <content type="html"><![CDATA[<p>支付系统相关业务说明与系统架构。</p><span id="more"></span><p>订单视角看支付｜得物技术:<a href="https://mp.weixin.qq.com/s/NvG9wR_GwEnKTHMfkTJWng">https://mp.weixin.qq.com/s/NvG9wR_GwEnKTHMfkTJWng</a></p><p>详解快捷支付：<a href="https://mp.weixin.qq.com/s/4SlgVwSM9z9Kpm7_3HB7Vw">https://mp.weixin.qq.com/s/4SlgVwSM9z9Kpm7_3HB7Vw</a></p><p>Spring Boot 集成支付宝支付:<a href="https://mp.weixin.qq.com/s/gkIgj0Dp2b9X28owEGziiA">https://mp.weixin.qq.com/s/gkIgj0Dp2b9X28owEGziiA</a></p><p>如何对接第三方支付通道:<a href="https://mp.weixin.qq.com/s/X7aIBNdOm7NUr8gP4HZxcA">https://mp.weixin.qq.com/s/X7aIBNdOm7NUr8gP4HZxcA</a></p><p>支付与清结算的区别: <a href="https://mp.weixin.qq.com/s/JfeNT9EnTeIpwMbA7HWaeA">https://mp.weixin.qq.com/s/JfeNT9EnTeIpwMbA7HWaeA</a></p><p>直连与间连的区别：<a href="https://mp.weixin.qq.com/s/5hZX6CwWAn2Kz-Zb63chuw">https://mp.weixin.qq.com/s/5hZX6CwWAn2Kz-Zb63chuw</a></p>]]></content>
       
       
       <categories>

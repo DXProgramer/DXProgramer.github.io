@@ -19,29 +19,30 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"dxprogramer.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"width":280},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="在MySQL中，事务A中使用select…for update where id&#x3D;1锁住了，某一条数据，事务还没提交， 此时，事务B中去用select … where id&#x3D;1查询那条数据，会阻塞等待吗？">
+    <meta name="description" content="更新缓存的步骤特别简单，共两步：更新数据库和更新缓存。但这简单的两步中需要考虑很多问题。 1）先更新数据库还是先更新缓存？更新缓存时是先删除还是直接更新？ 2）假设第一步成功了，第二步失败了怎么办？ 3）假设两个线程同时更新同一个数据，A线程先完成第一步，B线程先完成第二步怎么办？">
 <meta property="og:type" content="article">
-<meta property="og:title" content="select for update加锁">
-<meta property="og:url" content="https://dxprogramer.github.io/2023/11/16/MySQL/select-for-update%E5%8A%A0%E9%94%81/index.html">
+<meta property="og:title" content="缓存读写一致思考">
+<meta property="og:url" content="https://dxprogramer.github.io/2024/10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E4%B8%80%E8%87%B4%E6%80%9D%E8%80%83/index.html">
 <meta property="og:site_name" content="Xiangger">
-<meta property="og:description" content="在MySQL中，事务A中使用select…for update where id&#x3D;1锁住了，某一条数据，事务还没提交， 此时，事务B中去用select … where id&#x3D;1查询那条数据，会阻塞等待吗？">
+<meta property="og:description" content="更新缓存的步骤特别简单，共两步：更新数据库和更新缓存。但这简单的两步中需要考虑很多问题。 1）先更新数据库还是先更新缓存？更新缓存时是先删除还是直接更新？ 2）假设第一步成功了，第二步失败了怎么办？ 3）假设两个线程同时更新同一个数据，A线程先完成第一步，B线程先完成第二步怎么办？">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-11-16T14:58:45.000Z">
-<meta property="article:modified_time" content="2023-11-16T15:17:31.616Z">
+<meta property="og:image" content="https://dxprogramer.github.io/2024/10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E4%B8%80%E8%87%B4%E6%80%9D%E8%80%83/1.png">
+<meta property="article:published_time" content="2024-10-26T13:25:26.000Z">
+<meta property="article:modified_time" content="2024-10-26T13:46:41.733Z">
 <meta property="article:author" content="Xiangger">
-<meta property="article:tag" content="锁">
-<meta property="article:tag" content="mysql">
+<meta property="article:tag" content="缓存">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://dxprogramer.github.io/2024/10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E4%B8%80%E8%87%B4%E6%80%9D%E8%80%83/1.png">
 
 
-<link rel="canonical" href="https://dxprogramer.github.io/2023/11/16/MySQL/select-for-update%E5%8A%A0%E9%94%81/">
+<link rel="canonical" href="https://dxprogramer.github.io/2024/10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E4%B8%80%E8%87%B4%E6%80%9D%E8%80%83/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/11/16/MySQL/select-for-update%E5%8A%A0%E9%94%81/","path":"2023/11/16/MySQL/select-for-update加锁/","title":"select for update加锁"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2024/10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E4%B8%80%E8%87%B4%E6%80%9D%E8%80%83/","path":"2024/10/26/常用解决方案/缓存设计/缓存读写一致思考/","title":"缓存读写一致思考"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>select for update加锁 | Xiangger</title>
+<title>缓存读写一致思考 | Xiangger</title>
   
 
 
@@ -141,7 +142,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8%E8%A1%8C%E9%94%81"><span class="nav-number">1.</span> <span class="nav-text">为什么要用行锁</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E5%90%881%EF%BC%9A%E5%85%88%E6%9B%B4%E6%96%B0%E7%BC%93%E5%AD%98%EF%BC%8C%E5%86%8D%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">1.</span> <span class="nav-text">组合1：先更新缓存，再更新数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E5%90%882%EF%BC%9A%E5%85%88%E5%88%A0%E9%99%A4%E7%BC%93%E5%AD%98%EF%BC%8C%E5%86%8D%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">2.</span> <span class="nav-text">组合2：先删除缓存，再更新数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E5%90%883%EF%BC%9A%E5%85%88%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%8C%E5%86%8D%E6%9B%B4%E6%96%B0%E7%BC%93%E5%AD%98"><span class="nav-number">3.</span> <span class="nav-text">组合3：先更新数据库，再更新缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E5%90%884%EF%BC%9A%E5%85%88%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%8C%E5%86%8D%E5%88%A0%E9%99%A4%E7%BC%93%E5%AD%98"><span class="nav-number">4.</span> <span class="nav-text">组合4：先更新数据库，再删除缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E5%90%885%EF%BC%9A%E5%85%88%E5%88%A0%E9%99%A4%E7%BC%93%E5%AD%98%EF%BC%8C%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%8C%E5%86%8D%E5%88%A0%E9%99%A4%E7%BC%93%E5%AD%98"><span class="nav-number">5.</span> <span class="nav-text">组合5：先删除缓存，更新数据库，再删除缓存</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -209,7 +210,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/11/16/MySQL/select-for-update%E5%8A%A0%E9%94%81/">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2024/10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E4%B8%80%E8%87%B4%E6%80%9D%E8%80%83/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -222,12 +223,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="select for update加锁 | Xiangger">
+      <meta itemprop="name" content="缓存读写一致思考 | Xiangger">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          select for update加锁
+          缓存读写一致思考
         </h1>
 
         <div class="post-meta-container">
@@ -239,7 +240,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2023-11-16 22:58:45 / 修改时间：23:17:31" itemprop="dateCreated datePublished" datetime="2023-11-16T22:58:45+08:00">2023-11-16</time>
+      <time title="创建时间：2024-10-26 21:25:26 / 修改时间：21:46:41" itemprop="dateCreated datePublished" datetime="2024-10-26T21:25:26+08:00">2024-10-26</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -247,7 +248,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+          <a href="/categories/%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" itemprop="url" rel="index"><span itemprop="name">解决方案</span></a>
         </span>
     </span>
 
@@ -265,14 +266,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>1.3k</span>
+      <span>1.8k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>1 分钟</span>
+      <span>2 分钟</span>
     </span>
 </div>
 
@@ -282,44 +283,37 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><p>在MySQL中，事务A中使用select…for update where id&#x3D;1锁住了，某一条数据，事务还没提交，</p>
-<p>此时，事务B中去用select … where id&#x3D;1查询那条数据，会阻塞等待吗？</p>
+    <div class="post-body" itemprop="articleBody"><p>更新缓存的步骤特别简单，共两步：更新数据库和更新缓存。但这简单的两步中需要考虑很多问题。</p>
+<p>1）先更新数据库还是先更新缓存？更新缓存时是先删除还是直接更新？</p>
+<p>2）假设第一步成功了，第二步失败了怎么办？</p>
+<p>3）假设两个线程同时更新同一个数据，A线程先完成第一步，B线程先完成第二步怎么办？</p>
 <span id="more"></span>
 
-<p>select…for update在MySQL中，是一种悲观锁的用法，一般情况下，会锁住一行数据，但如果没有使用正确的话，也会把整张表锁住，导致SQL性能急剧下降。</p>
-<h3 id="为什么要用行锁"><a href="#为什么要用行锁" class="headerlink" title="为什么要用行锁"></a>为什么要用行锁</h3><p>假如现在有这样一种业务场景：用户A给你转账了2000元，此时刚好，用户B也给你转账了3000元，而你的账户初始化金额是1000元。</p>
-<p>用户A的请求，先查询出money，然后给money加上2000，在事务1中会执行下面这条sql：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update account set money=#&#123;money&#125; where id=123;</span><br></pre></td></tr></table></figure>
-
-<p>同时，用户B的请求，也是先查询出money，然后给money加上3000，在事务2中执行下面这条sql：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update account set money=#&#123;money&#125; where id=123;</span><br></pre></td></tr></table></figure>
-
-<p>这两条sql执行成功之后，你的money可能是：3000、4000、6000，这三种情况中的一种。</p>
-<p>理想结果，用户A和用户B总共给你转账5000，最终你账户的钱应该是6000才对，3000和4000是怎么来的？</p>
-<p>假如事务1在执行update语句的过程中，事务2同时也在执行update语句。</p>
-<p>事务1中查询到money是1000，此外事务2也查询到money是1000。</p>
-<p>如果事务1先执行update语句，事务2后执行update语句，第一次update的3000，会被后面的4000覆盖掉，最终结果为4000。</p>
-<p>如果事务2先执行update语句，事务1后执行update语句，第一次update的4000，会被后面的3000覆盖掉，最终结果为3000。</p>
-<p>这两种情况都产生了严重的数据问题。我们需要有某种机制，保证计算金额后事务1和事务2要顺序执行，不要一起执行。</p>
-<p>这就需要<code>加锁了</code>。</p>
-<p>目前MySQL中使用比较多的有：表锁、行锁和间隙锁。</p>
-<p>我们这个业务场景，非常适合使用<code>行锁</code>。</p>
-<p>在事务1执行update语句的过程中，先要把某一行数据锁住，此时，其他的事务必须等待事务1执行完，提交了事务，才能获取那一行的数据。在MySQL中是通过select…for update语句来实现的行锁的功能。但如果你在实际工作中使用不正确，也容易把整张表锁住，严重影响性能。</p>
-<p>select…where…for update语句的用法是否正确，跟where条件中的参数有很大的关系。</p>
-<ol>
-<li>主键字段：加行锁。</li>
-<li>唯一索引字段：加行锁。</li>
-<li>普通索引字段：加间隙锁。</li>
-<li>主键范围：加多个行锁。</li>
-<li>唯一索引范围，加多个行锁。</li>
-<li>普通字段：加间隙锁，看着像表锁。。</li>
-<li>查询空数据：加间隙锁。</li>
-</ol>
-<p>如果事务1加了行锁，一直没有释放锁，事务2操作相同行的数据时，会一直等待直到超时。</p>
-<p>如果事务1加了表锁，一直没有释放锁，事务2不管操作的是哪一行数据，都会一直等待直到超时。</p>
-<p>注意：for update关键字是加在select语句中的，它从查到那行数据开始，直到事务提交，整个过程中都会加锁。</p>
-<p>而直接执行update语句，是在更新数据的时候加锁，二者有本质的区别。</p>
-<p>​	</p>
+<h3 id="组合1：先更新缓存，再更新数据库"><a href="#组合1：先更新缓存，再更新数据库" class="headerlink" title="组合1：先更新缓存，再更新数据库"></a>组合1：先更新缓存，再更新数据库</h3><p>对于这个组合，会遇到这种情况：假设第二步更新数据库失败了，要求回滚缓存的更新，这时该怎么办呢？Redis不支持事务回滚，除非采用手工回滚的方式，这种解决方案有些缺陷。</p>
+<p>这里简单举个例子。</p>
+<p>1）原来缓存中的值是a，两个线程同时更新库存。</p>
+<p>2）线程A将缓存中的值更新成b，且保存了原来的值a，然后更新数据库。</p>
+<p>3）线程B将缓存中的值更新成c，且保存了原来的值b，然后更新数据库。</p>
+<p>4）线程A更新数据库时失败了，它必须回滚，那现在缓存中的值更新成什么呢？理论上应该更新成c，因为数据库中的值是c，但是，线程A里面无从获得c这个值。</p>
+<p>如果在线程A更新缓存与数据库的整个过程中，先把缓存及数据库都锁上，确保别的线程不能更新，是否可行？当然是可行的。但是其他线程能不能读取？</p>
+<p>假设线程A更新数据库失败回滚缓存时，线程C也加入进来，它需要先读取缓存中的值，这时又返回什么值？</p>
+<p>看到这个场景，是不是有点儿熟悉？不错，这就是典型的事务隔离级别场景。所以就不推荐这个组合，因为此处只是需要使用一下缓存，而这个组合就要考虑事务隔离级别的一些逻辑，成本太大。接着考虑别的组合。</p>
+<h3 id="组合2：先删除缓存，再更新数据库"><a href="#组合2：先删除缓存，再更新数据库" class="headerlink" title="组合2：先删除缓存，再更新数据库"></a>组合2：先删除缓存，再更新数据库</h3><p>使用这种方案，即使更新数据库失败了也不需要回滚缓存。这种做法虽然巧妙规避了失败回滚的问题，却引出了两个更大的问题。</p>
+<p>1）假设线程A先删除缓存，再更新数据库。在线程A完成更新数据库之前，后执行的线程B反而超前完成了操作，读取Key发现没有数据后，将数据库中的旧值存放到了缓存中。线程A在线程B都完成后再更新数据库，这样就会出现缓存（旧值）与数据库的值（新值）不一致的问题。</p>
+<p>2）为了解决一致性问题，可以让线程A给Key加锁，因为写操作特别耗时，这种处理方法会导致大量的读请求卡在锁中。以上描述的是典型的高可用和一致性难以两全的问题，如果再加上分区容错 就 是 CAP （ 一 致 性 Consistency 、 可 用 性 Availability 、 分 区 容 错 性Partition Tolerance）了。</p>
+<p><img src="/2024/10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E4%B8%80%E8%87%B4%E6%80%9D%E8%80%83/1.png"></p>
+<h3 id="组合3：先更新数据库，再更新缓存"><a href="#组合3：先更新数据库，再更新缓存" class="headerlink" title="组合3：先更新数据库，再更新缓存"></a>组合3：先更新数据库，再更新缓存</h3><p>对于组合3，同样需要考虑两个问题。</p>
+<p>1）假设第一步（更新数据库）成功，第二步（更新缓存）失败了怎么办？</p>
+<p>因为缓存不是主流程，数据库才是，所以不会因为更新缓存失败而回滚第一步对数据库的更新。此时一般采取的做法是重试机制，但重试机制如果存在延时还是会出现数据库与缓存不一致的情况，不好处理。</p>
+<p>2）假设两个线程同时更新同一个数据，线程A先完成了第一步，线程B先完成了第二步怎么办？线程A把值更新成a，线程B把值更新成b，此时数据库中的最新值是b，因为线程A先完成了第一步，后完成第二步，所以缓存中的最新值是a，数据库与缓存的值还是不一致，这个逻辑还是有问题的。</p>
+<p>因此，也不建议采用这个组合。</p>
+<h3 id="组合4：先更新数据库，再删除缓存"><a href="#组合4：先更新数据库，再删除缓存" class="headerlink" title="组合4：先更新数据库，再删除缓存"></a>组合4：先更新数据库，再删除缓存</h3><p>针对组合4，先看看它能不能解决组合3的第二个问题。</p>
+<p>假设两个线程同时更新同一个数据，线程A先完成第一步，线程B先完成第二步怎么办？</p>
+<p>线程A把值更新成a，线程B把值更新成b，此时数据库中的最新值是b，因为线程A先完成了第一步，所以第二步谁先完成已经不重要了，因为都是直接删除缓存数据。这个问题解决了。</p>
+<p>那么，它能解决组合3的第一个问题吗？假设第一步成功，第二步失败了怎么办？</p>
+<p>这种情况的出现概率与组合3相比明显低不少，因为删除比更新容易多了。虽然这个组合方案不完美，但出现一致性问题的概率较低。</p>
+<p>除了组合3会碰到的问题，组合4还会碰到别的问题吗？是的。假设线程A要更新数据，先完成第一步更新数据库，在线程A删除缓存之前，线程B要访问缓存，那么取得的就是旧数据。这是一个小小的缺陷。那么，以上问题有办法解决吗？</p>
+<h3 id="组合5：先删除缓存，更新数据库，再删除缓存"><a href="#组合5：先删除缓存，更新数据库，再删除缓存" class="headerlink" title="组合5：先删除缓存，更新数据库，再删除缓存"></a>组合5：先删除缓存，更新数据库，再删除缓存</h3><p>还有一个方案，就是先删除缓存，再更新数据库，再删除缓存。这个方案其实和先更新数据库，再删除缓存差不多，因为还是会出现类似的问题：假设线程A要更新数据库，先删除了缓存，这一瞬间线程C要读缓存，先把数据迁移到缓存；然后线程A完成了更新数据库的操作，这一瞬间线程B也要访问缓存，此时它访问到的就是线程C放到缓存里面的旧数据。相比组合4，概率进一步减小（涉及三个线程）。</p>
 
     </div>
 
@@ -329,22 +323,18 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E9%94%81/" rel="tag"><i class="fa fa-tag"></i> 锁</a>
-              <a href="/tags/mysql/" rel="tag"><i class="fa fa-tag"></i> mysql</a>
+              <a href="/tags/%E7%BC%93%E5%AD%98/" rel="tag"><i class="fa fa-tag"></i> 缓存</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2023/11/15/%E7%94%9F%E4%BA%A7%E8%80%85%E5%92%8C%E6%B6%88%E8%B4%B9%E8%80%85%E6%A8%A1%E5%9E%8B/" rel="prev" title="生产者和消费者模型">
-                  <i class="fa fa-angle-left"></i> 生产者和消费者模型
+                <a href="/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/" rel="prev" title="Redis内存淘汰机制详解">
+                  <i class="fa fa-angle-left"></i> Redis内存淘汰机制详解
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2023/11/18/thread-isInterrupted-%E4%B8%8EThread-interrupted-%E7%9A%84%E5%8C%BA%E5%88%AB/" rel="next" title="thread.isInterrupted()与Thread.interrupted()的区别">
-                  thread.isInterrupted()与Thread.interrupted()的区别 <i class="fa fa-angle-right"></i>
-                </a>
             </div>
           </div>
     </footer>

@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>Redis内存淘汰机制详解</title>
+      <link href="/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/"/>
+      <url>/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/</url>
+      
+        <content type="html"><![CDATA[<p>​        一般来说，缓存的容量是小于数据总量的，所以，当缓存数据越来越多，Redis 不可避免的会被写满，这时候就涉及到 Redis 的内存淘汰机制了。我们需要选定某种策略将“不重要”的数据从 Redis 中清除，为新的数据腾出空间。</p><span id="more"></span><h3 id="配置Redis内存大小"><a href="#配置Redis内存大小" class="headerlink" title="配置Redis内存大小"></a>配置Redis内存大小</h3><p>​       根据“八二原理“，即 80% 的请求访问了 20% 的数据，因此如果按照这个原理来配置，将 Redis 内存大小设置为数据总量的 20%，就有可能拦截到 80% 的请求。当然，只是有可能，对于不同的业务场景需要进行不同的配置，一般建议把缓存容量设置为总数据量的 15% 到 30%，兼顾访问性能和内存空间开销。</p><p>配置方式（以 5GB 为例，如果不带单位则默认单位是字节）：</p><p>命令行：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config set maxmemory 5gb</span><br></pre></td></tr></table></figure><p>配置文件：</p><p><img src="/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/1.png"></p><p>查看 maxmemory 命令：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config get maxmemory</span><br></pre></td></tr></table></figure><h3 id="Redis内存淘汰策略"><a href="#Redis内存淘汰策略" class="headerlink" title="Redis内存淘汰策略"></a>Redis内存淘汰策略</h3><p>在 Redis 4.0 版本之前有 6 种策略，4.0 增加了 2种，主要新增了 LFU 算法。</p><p>下图为 Redis 6.2.0 版本的配置文件：</p><p><img src="/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/2.png"></p><p>其中，默认的淘汰策略是 noevition，也就是不淘汰。</p><p>我们可以对 8 种淘汰策略可以分为两大类：</p><h4 id="不进行淘汰的策略"><a href="#不进行淘汰的策略" class="headerlink" title="不进行淘汰的策略"></a><strong>不进行淘汰的策略</strong></h4><p>noevition，此策略不会对缓存的数据进行淘汰，当内存不够了就会报错，因此，如果真实数据集大小大于缓存容量，就不要使用此策略了。</p><p><img src="/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/3.png"></p><h4 id="会进行淘汰的策略"><a href="#会进行淘汰的策略" class="headerlink" title="会进行淘汰的策略"></a><strong>会进行淘汰的策略</strong></h4><ul><li>allkeys-random：随机删除</li><li>allkeys-lru：使用 LRU 算法进行筛选删除</li><li>allkeys-lfu：使用 LFU 算法进行筛选删除</li><li>volatile-random：随机删除</li><li>volatile-ttl：根据过期时间先后进行删除，越早过期的越先被删除</li><li>volatile-lru：使用 LRU 算法进行筛选删除</li><li>volatile-lfu：使用 LFU 算法进行筛选删除</li></ul><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1) 以 volatile 开头的策略只针对设置了过期时间的数据，即使缓存没有被写满，如果数据过期也会被删除。</span><br><span class="line"></span><br><span class="line">2)以 allkeys 开头的策略是针对所有数据的，如果数据被选中了，即使过期时间没到，也会被删除。当然，如果它的过期时间到了但未被策略选中，同样会被删除。</span><br></pre></td></tr></table></figure><h5 id="LRU算法"><a href="#LRU算法" class="headerlink" title="LRU算法"></a>LRU算法</h5><p>​         LRU 全称是 Least Recently Used，即最近最少使用，会将最不常用的数据筛选出来，保留最近频繁使用的数据。LRU 会把所有数据组成一个链表，链表头部称为 MRU，代表最近最常使用的数据；尾部称为 LRU代表最近最不常使用的数据；下图是一个简单的例子：</p><p><img src="/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/5.png"></p><p><strong>但是，如果直接在 Redis 中使用 LRU 算法也会有一些问题：</strong></p><p>LRU 算法在实现过程中使用链表管理所有缓存的数据，这会给 Redis 带来额外的开销，而且，当有数据访问时就会有链表移动操作，进而降低 Redis 的性能。</p><p>于是，Redis 对 LRU 的实现进行了一些改变：</p><ul><li>记录每个 key 最近一次被访问的时间戳（由键值对数据结构 RedisObject 中的 lru 字段记录）</li><li>在第一次淘汰数据时，会先随机选择 N 个数据作为一个候选集合，然后淘汰 lru 值最小的。（N 可以通过 config set maxmemory-samples 100 命令来配置）</li><li>后续再淘汰数据时，会挑选数据进入候选集合，进入集合的条件是：它的 lru 小于候选集合中最小的 lru。</li><li>如果候选集合中数据个数达到了 maxmemory-samples，Redis 就会将 lru 值小的数据淘汰出去。</li></ul><h5 id="LFU算法"><a href="#LFU算法" class="headerlink" title="LFU算法"></a>LFU算法</h5><p>LFU 全称 Least Frequently Used，即最不经常使用策略，它是基于数据访问次数来淘汰数据的，在 Redis 4.0 时添加进来。它在 LRU 策略基础上，为每个数据增加了一个计数器，来统计这个数据的访问次数。</p><p>前面说到，LRU 使用了 RedisObject 中的 lru 字段记录时间戳，lru 是 24bit 的，LFU 将 lru 拆分为两部分：</p><ul><li>ldt 值：lru 字段的前 16bit，表示数据的访问时间戳</li><li>counter 值：lru 字段的后 8bit，表示数据的访问次数 使用 LFU 策略淘汰缓存时，会把访问次数最低的数据淘汰，如果访问次数相同，再根据访问的时间，将访问时间戳最小的淘汰。</li></ul><p><strong>为什么 Redis 有了 LRU 还需要 LFU 呢？</strong></p><p>在一些场景下，有些数据被访问的次数非常少，甚至只会被访问一次。当这些数据服务完访问请求后，如果还继续留存在缓存中的话，就只会白白占用缓存空间。</p><p>由于 LRU 是基于访问时间的，如果系统对大量数据进行单次查询，这些数据的 lru 值就很大，使用 LFU 算法就不容易被淘汰。</p><h4 id="配置淘汰策略"><a href="#配置淘汰策略" class="headerlink" title="配置淘汰策略"></a>配置淘汰策略</h4><p>命令行：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config set maxmemory-policy allkeys-lru</span><br></pre></td></tr></table></figure><p>配置文件：</p><p><img src="/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/4.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> redis </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 中间件 </tag>
+            
+            <tag> 缓存 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>单点登录（CAS）</title>
       <link href="/2024/10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%EF%BC%88CAS%EF%BC%89/"/>
       <url>/2024/10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%EF%BC%88CAS%EF%BC%89/</url>

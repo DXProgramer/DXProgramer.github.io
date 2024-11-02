@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/next_favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/next_favicon.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"dxprogramer.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"width":280},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="在日常开发中有很多地方都有类似扣减库存的操作，比如电商系统中的商品库存，抽奖系统中的奖品库存等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何实现库存扣减操作和防止被超卖？">
+<meta property="og:url" content="https://dxprogramer.github.io/2024/11/02/redis/Redis%20%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%BA%93%E5%AD%98%E6%89%A3%E5%87%8F%E6%93%8D%E4%BD%9C%E5%92%8C%E9%98%B2%E6%AD%A2%E8%A2%AB%E8%B6%85%E5%8D%96%EF%BC%9F/index.html">
+<meta property="og:site_name" content="Xiangger">
+<meta property="og:description" content="在日常开发中有很多地方都有类似扣减库存的操作，比如电商系统中的商品库存，抽奖系统中的奖品库存等。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-11-02T11:22:57.000Z">
+<meta property="article:modified_time" content="2024-11-02T11:51:30.242Z">
+<meta property="article:author" content="Xiangger">
+<meta property="article:tag" content="电商">
+<meta property="article:tag" content="高并发">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://dxprogramer.github.io/2024/11/02/redis/Redis%20%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%BA%93%E5%AD%98%E6%89%A3%E5%87%8F%E6%93%8D%E4%BD%9C%E5%92%8C%E9%98%B2%E6%AD%A2%E8%A2%AB%E8%B6%85%E5%8D%96%EF%BC%9F/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2024/11/02/redis/Redis%20%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%BA%93%E5%AD%98%E6%89%A3%E5%87%8F%E6%93%8D%E4%BD%9C%E5%92%8C%E9%98%B2%E6%AD%A2%E8%A2%AB%E8%B6%85%E5%8D%96%EF%BC%9F/","path":"2024/11/02/redis/Redis 如何实现库存扣减操作和防止被超卖？/","title":"如何实现库存扣减操作和防止被超卖？"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>如何实现库存扣减操作和防止被超卖？ | Xiangger</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Xiangger</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">业精于勤，荒于嬉；行成于思，毁于随</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E5%8D%95%E5%BA%93%E5%AD%98"><span class="nav-number">2.1.</span> <span class="nav-text">基于数据库单库存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E5%A4%9A%E5%BA%93%E5%AD%98"><span class="nav-number">2.2.</span> <span class="nav-text">基于数据库多库存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8Eredis"><span class="nav-number">2.3.</span> <span class="nav-text">基于redis</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xiangger"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Xiangger</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">69</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">76</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/DXProgramer" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;DXProgramer" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:13554742813@163.com" title="E-Mail → mailto:13554742813@163.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/your_weibo" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;your_weibo" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+        <div class="back-to-top animated" role="button" aria-label="返回顶部">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2024/11/02/redis/Redis%20%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E5%BA%93%E5%AD%98%E6%89%A3%E5%87%8F%E6%93%8D%E4%BD%9C%E5%92%8C%E9%98%B2%E6%AD%A2%E8%A2%AB%E8%B6%85%E5%8D%96%EF%BC%9F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Xiangger">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="如何实现库存扣减操作和防止被超卖？ | Xiangger">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          如何实现库存扣减操作和防止被超卖？
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-11-02 19:22:57 / 修改时间：19:51:30" itemprop="dateCreated datePublished" datetime="2024-11-02T19:22:57+08:00">2024-11-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>6.3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>6 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>在日常开发中有很多地方都有类似扣减库存的操作，比如电商系统中的商品库存，抽奖系统中的奖品库存等。</p>
+<span id="more"></span>
+
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><p>1、使用mysql数据库，使用一个字段来存储库存，每次扣减库存去更新这个字段。</p>
+<p>2、还是使用数据库，但是将库存分成多份存到多条记录里面，扣减库存的时候路由一下，这样子增大了并发量，但是还是避免不了大量的去访问数据库来更新库存。</p>
+<p>3、将库存放到redis使用redis的incrby特性来扣减库存。	</p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><h4 id="基于数据库单库存"><a href="#基于数据库单库存" class="headerlink" title="基于数据库单库存"></a>基于数据库单库存</h4><p>​        第一种方式在所有请求都会在这里等待锁，获取锁就去扣减库存。在并发量不高的情况下可以使用，但是一旦并发量大了就会有大量请求阻塞在这里，导致请求超时，进而整个系统雪崩；而且会频繁的去访问数据库，大量占用数据库资源，所以在并发高的情况下这种方式不适用。</p>
+<h4 id="基于数据库多库存"><a href="#基于数据库多库存" class="headerlink" title="基于数据库多库存"></a>基于数据库多库存</h4><p>​        第二种方式其实是第一种方式的优化版本，在一定程度上提高了并发量，但是在还是会大量的对数据库做更新操作大量占用数据库资源。</p>
+<p>基于数据库来实现扣减库存还存在的一些问题：</p>
+<p>（1）用数据库扣减库存的方式，扣减库存的操作必须在一条语句中执行，不能先selec再update，这样在并发下会出现超扣的情况。如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update number set x=x-<span class="number">1</span> where x &gt; <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<p>（2）MySQL自身对于高并发的处理性能就会出现问题，一般来说，MySQL的处理性能会随着并发thread上升而上升，但是到了一定的并发度之后会出现明显的拐点，之后一路下降，最终甚至会比单thread的性能还要差。</p>
+<p>（3）当减库存和高并发碰到一起的时候，由于操作的库存数目在同一行，就会出现争抢InnoDB行锁的问题，导致出现互相等待甚至死锁，从而大大降低MySQL的处理性能，最终导致前端页面出现超时异常。</p>
+<h4 id="基于redis"><a href="#基于redis" class="headerlink" title="基于redis"></a>基于redis</h4><p>​        针对上述问题的问题我们就有了第三种方案，将库存放到缓存，利用redis的incrby特性来扣减库存，解决了超扣和性能问题。但是一旦缓存丢失需要考虑恢复方案。比如抽奖系统扣奖品库存的时候，初始库存&#x3D;总的库存数-已经发放的奖励数，但是如果是异步发奖，需要等到MQ消息消费完了才能重启redis初始化库存，否则也存在库存不一致的问题。</p>
+<p>基于redis实现扣减库存的具体实现：</p>
+<p>（1）使用redis的lua脚本来实现扣减库存</p>
+<p>（2）由于是分布式环境下所以还需要一个分布式锁来控制只能有一个服务去初始化库存</p>
+<p>（3）需要提供一个回调函数，在初始化库存的时候去调用这个函数获取初始化库存。</p>
+<p>初始化库存回调函数(IStockCallback )</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** * 获取库存回调 */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">IStockCallback</span> &#123;</span><br><span class="line"> <span class="comment">/**  </span></span><br><span class="line"><span class="comment"> * 获取库存  </span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span>  </span></span><br><span class="line"><span class="comment"> */</span> </span><br><span class="line">    <span class="type">int</span> <span class="title function_">getStock</span><span class="params">()</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>扣减库存服务（StockService）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** </span></span><br><span class="line"><span class="comment">* 库存管理 </span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="meta">@Servicepublic</span> <span class="keyword">class</span> <span class="title class_">StockService</span> &#123;    </span><br><span class="line">    <span class="type">Logger</span> <span class="variable">logger</span> <span class="operator">=</span> LoggerFactory.getLogger(StockService.class);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**     </span></span><br><span class="line"><span class="comment">    * 不限库存     </span></span><br><span class="line"><span class="comment">    */</span>    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">long</span> <span class="variable">UNINITIALIZED_STOCK</span> <span class="operator">=</span> -<span class="number">3L</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**     </span></span><br><span class="line"><span class="comment">    * Redis 客户端     </span></span><br><span class="line"><span class="comment">    */</span>    </span><br><span class="line">    <span class="meta">@Autowired</span>    </span><br><span class="line">    <span class="keyword">private</span> RedisTemplate&lt;String, Object&gt; redisTemplate;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**     </span></span><br><span class="line"><span class="comment">    * 执行扣库存的脚本     </span></span><br><span class="line"><span class="comment">    */</span>    </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String STOCK_LUA;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">static</span> &#123;        </span><br><span class="line">        <span class="comment">/**         </span></span><br><span class="line"><span class="comment">        * <span class="doctag">@desc</span> 扣减库存Lua脚本         </span></span><br><span class="line"><span class="comment">        * 库存（stock）-1：表示不限库存         </span></span><br><span class="line"><span class="comment">        * 库存（stock）0：表示没有库存         </span></span><br><span class="line"><span class="comment">        * 库存（stock）大于0：表示剩余库存             </span></span><br><span class="line"><span class="comment">        * <span class="doctag">@params</span> 库存key         </span></span><br><span class="line"><span class="comment">        * <span class="doctag">@return</span>         </span></span><br><span class="line"><span class="comment">        *   -3:库存未初始化         </span></span><br><span class="line"><span class="comment">        *   -2:库存不足         </span></span><br><span class="line"><span class="comment">        *   -1:不限库存         </span></span><br><span class="line"><span class="comment">        *   大于等于0:剩余库存（扣减之后剩余的库存）         </span></span><br><span class="line"><span class="comment">        *      redis缓存的库存(value)是-1表示不限库存，直接返回1         </span></span><br><span class="line"><span class="comment">        */</span>        </span><br><span class="line">        <span class="type">StringBuilder</span> <span class="variable">sb</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();        </span><br><span class="line">        sb.append(<span class="string">&quot;if (redis.call(&#x27;exists&#x27;, KEYS[1]) == 1) then&quot;</span>);        </span><br><span class="line">        sb.append(<span class="string">&quot;    local stock = tonumber(redis.call(&#x27;get&#x27;, KEYS[1]));&quot;</span>);</span><br><span class="line">        sb.append(<span class="string">&quot;    local num = tonumber(ARGV[1]);&quot;</span>);        </span><br><span class="line">        sb.append(<span class="string">&quot;    if (stock == -1) then&quot;</span>);        </span><br><span class="line">        sb.append(<span class="string">&quot;        return -1;&quot;</span>);        </span><br><span class="line">        sb.append(<span class="string">&quot;    end;&quot;</span>);        </span><br><span class="line">        sb.append(<span class="string">&quot;    if (stock &gt;= num) then&quot;</span>);        </span><br><span class="line">        sb.append(<span class="string">&quot;        return redis.call(&#x27;incrby&#x27;, KEYS[1], 0 - num);&quot;</span>); </span><br><span class="line">        sb.append(<span class="string">&quot;    end;&quot;</span>);        </span><br><span class="line">        sb.append(<span class="string">&quot;    return -2;&quot;</span>); </span><br><span class="line">        sb.append(<span class="string">&quot;end;&quot;</span>);        </span><br><span class="line">        sb.append(<span class="string">&quot;return -3;&quot;</span>);        </span><br><span class="line">        STOCK_LUA = sb.toString();    </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> key           库存key     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> expire        库存有效时间,单位秒     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> num           扣减数量     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> stockCallback 初始化库存回调函数     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> -2:库存不足; -1:不限库存; 大于等于0:扣减库存之后的剩余库存     </span></span><br><span class="line"><span class="comment">    */</span>    </span><br><span class="line">    <span class="keyword">public</span> <span class="type">long</span> <span class="title function_">stock</span><span class="params">(String key, <span class="type">long</span> expire, <span class="type">int</span> num, IStockCallback stockCallback)</span> &#123; </span><br><span class="line">        <span class="type">long</span> <span class="variable">stock</span> <span class="operator">=</span> stock(key, num);        <span class="comment">// 初始化库存        </span></span><br><span class="line">        <span class="keyword">if</span> (stock == UNINITIALIZED_STOCK) &#123;            </span><br><span class="line">            <span class="type">RedisLock</span> <span class="variable">redisLock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">RedisLock</span>(redisTemplate, key);            </span><br><span class="line">            <span class="keyword">try</span> &#123;                </span><br><span class="line">                <span class="comment">// 获取锁                </span></span><br><span class="line">                <span class="keyword">if</span> (redisLock.tryLock()) &#123;                    </span><br><span class="line">                    <span class="comment">// 双重验证，避免并发时重复回源到数据库                    </span></span><br><span class="line">                    stock = stock(key, num);                    </span><br><span class="line">                    <span class="keyword">if</span> (stock == UNINITIALIZED_STOCK) &#123;                        </span><br><span class="line">                        <span class="comment">// 获取初始化库存                        </span></span><br><span class="line">                        <span class="keyword">final</span> <span class="type">int</span> <span class="variable">initStock</span> <span class="operator">=</span> stockCallback.getStock(); </span><br><span class="line">                        <span class="comment">// 将库存设置到redis</span></span><br><span class="line">                        redisTemplate.opsForValue().set(key, initStock, expire,</span><br><span class="line">                                                        TimeUnit.SECONDS);                 </span><br><span class="line">                        <span class="comment">// 调一次扣库存的操作                        </span></span><br><span class="line">                        stock = stock(key, num);                    </span><br><span class="line">                    &#125;                </span><br><span class="line">                &#125;            </span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;                </span><br><span class="line">                logger.error(e.getMessage(), e);            </span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;                </span><br><span class="line">                redisLock.unlock();            </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;        </span><br><span class="line">        <span class="keyword">return</span> stock;    </span><br><span class="line">    &#125;</span><br><span class="line">   </span><br><span class="line">    <span class="comment">/**     * 加库存(还原库存)     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> key    库存key     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> num    库存数量     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span>     </span></span><br><span class="line"><span class="comment">    */</span>    </span><br><span class="line">    <span class="keyword">public</span> <span class="type">long</span> <span class="title function_">addStock</span><span class="params">(String key, <span class="type">int</span> num)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> addStock(key, <span class="literal">null</span>, num);    </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**     </span></span><br><span class="line"><span class="comment">    * 加库存     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> key    库存key     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> expire 过期时间（秒）     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> num    库存数量     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span>     </span></span><br><span class="line"><span class="comment">    */</span>    </span><br><span class="line">    <span class="keyword">public</span> <span class="type">long</span> <span class="title function_">addStock</span><span class="params">(String key, Long expire, <span class="type">int</span> num)</span> &#123;        </span><br><span class="line">        <span class="type">boolean</span> <span class="variable">hasKey</span> <span class="operator">=</span> redisTemplate.hasKey(key);        </span><br><span class="line">        <span class="comment">// 判断key是否存在，存在就直接更新        </span></span><br><span class="line">        <span class="keyword">if</span> (hasKey) &#123;            </span><br><span class="line">            <span class="keyword">return</span> redisTemplate.opsForValue().increment(key, num);        </span><br><span class="line">        &#125;</span><br><span class="line">        Assert.notNull(expire,<span class="string">&quot;初始化库存失败，库存过期时间不能为null&quot;</span>);        </span><br><span class="line">        <span class="type">RedisLock</span> <span class="variable">redisLock</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">RedisLock</span>(redisTemplate, key);        </span><br><span class="line">        <span class="keyword">try</span> &#123;            </span><br><span class="line">            <span class="keyword">if</span> (redisLock.tryLock()) &#123;                </span><br><span class="line">                <span class="comment">// 获取到锁后再次判断一下是否有key                </span></span><br><span class="line">                hasKey = redisTemplate.hasKey(key);                </span><br><span class="line">                <span class="keyword">if</span> (!hasKey) &#123;                    </span><br><span class="line">                    <span class="comment">// 初始化库存                    </span></span><br><span class="line">                    redisTemplate.opsForValue().set(key, num, expire, TimeUnit.SECONDS);</span><br><span class="line">                &#125;            </span><br><span class="line">            &#125;        </span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;            </span><br><span class="line">            logger.error(e.getMessage(), e);        </span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;            </span><br><span class="line">            redisLock.unlock();        </span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> num;    </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**     </span></span><br><span class="line"><span class="comment">    * 获取库存     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> key 库存key     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> -1:不限库存; 大于等于0:剩余库存     </span></span><br><span class="line"><span class="comment">    */</span>    </span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">getStock</span><span class="params">(String key)</span> &#123;        </span><br><span class="line">        <span class="type">Integer</span> <span class="variable">stock</span> <span class="operator">=</span> (Integer) redisTemplate.opsForValue().get(key);        </span><br><span class="line">        <span class="keyword">return</span> stock == <span class="literal">null</span> ? -<span class="number">1</span> : stock;    </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**     </span></span><br><span class="line"><span class="comment">    * 扣库存     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> key 库存key     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@param</span> num 扣减库存数量     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span> 扣减之后剩余的库存【-3:库存未初始化; -2:库存不足; -1:不限库存; 大于等于0:扣减库存之后的剩余库存】     </span></span><br><span class="line"><span class="comment">    */</span>    </span><br><span class="line">    <span class="keyword">private</span> Long <span class="title function_">stock</span><span class="params">(String key, <span class="type">int</span> num)</span> &#123;        </span><br><span class="line">        <span class="comment">// 脚本里的KEYS参数        </span></span><br><span class="line">        List&lt;String&gt; keys = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();        </span><br><span class="line">        keys.add(key);        </span><br><span class="line">        <span class="comment">// 脚本里的ARGV参数        </span></span><br><span class="line">        List&lt;String&gt; args = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();        </span><br><span class="line">        args.add(Integer.toString(num));</span><br><span class="line">        <span class="type">long</span> <span class="variable">result</span> <span class="operator">=</span> redisTemplate.execute(<span class="keyword">new</span> <span class="title class_">RedisCallback</span>&lt;Long&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span>            </span><br><span class="line">            <span class="keyword">public</span> Long <span class="title function_">doInRedis</span><span class="params">(RedisConnection connection)</span> <span class="keyword">throws</span> DataAccessException &#123;</span><br><span class="line">                <span class="type">Object</span> <span class="variable">nativeConnection</span> <span class="operator">=</span> connection.getNativeConnection();</span><br><span class="line">                <span class="comment">// 集群模式和单机模式虽然执行脚本的方法一样，但是没有共同的接口，所以只能分开执行</span></span><br><span class="line">                <span class="comment">// 集群模式                </span></span><br><span class="line">                <span class="keyword">if</span> (nativeConnection <span class="keyword">instanceof</span> JedisCluster) &#123;                    </span><br><span class="line">                    <span class="keyword">return</span> (Long) ((JedisCluster) nativeConnection).eval(STOCK_LUA, keys,</span><br><span class="line">                                                                         args);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 单机模式                </span></span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (nativeConnection <span class="keyword">instanceof</span> Jedis) &#123;</span><br><span class="line">                    <span class="keyword">return</span> (Long) ((Jedis) nativeConnection).eval(STOCK_LUA, keys, args);</span><br><span class="line">                &#125;                </span><br><span class="line">                <span class="keyword">return</span> UNINITIALIZED_STOCK;            </span><br><span class="line">            &#125;       </span><br><span class="line">        &#125;);        </span><br><span class="line">        <span class="keyword">return</span> result;    </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">StockController</span> &#123;</span><br><span class="line">    <span class="meta">@Autowired</span>    </span><br><span class="line">    <span class="keyword">private</span> StockService stockService;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@RequestMapping(value = &quot;stock&quot;, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)</span>  </span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">stock</span><span class="params">()</span> &#123;        </span><br><span class="line">        <span class="comment">// 商品ID        </span></span><br><span class="line">        <span class="type">long</span> <span class="variable">commodityId</span> <span class="operator">=</span> <span class="number">1</span>;        <span class="comment">// 库存ID        </span></span><br><span class="line">        <span class="type">String</span> <span class="variable">redisKey</span> <span class="operator">=</span> <span class="string">&quot;redis_key:stock:&quot;</span> + commodityId;        </span><br><span class="line">        <span class="type">long</span> <span class="variable">stock</span> <span class="operator">=</span> stockService.stock(redisKey, <span class="number">60</span> * <span class="number">60</span>, <span class="number">2</span>, () -&gt; </span><br><span class="line">                                        initStock(commodityId));        </span><br><span class="line">        <span class="keyword">return</span> stock &gt;= <span class="number">0</span>;    </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**     </span></span><br><span class="line"><span class="comment">    * 获取初始的库存     </span></span><br><span class="line"><span class="comment">    * <span class="doctag">@return</span>     </span></span><br><span class="line"><span class="comment">    */</span>    </span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> <span class="title function_">initStock</span><span class="params">(<span class="type">long</span> commodityId)</span> &#123;        </span><br><span class="line">        <span class="comment">// TODO 这里做一些初始化库存的操作        </span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">1000</span>;    </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@RequestMapping(value = &quot;getStock&quot;, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)</span> </span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">getStock</span><span class="params">()</span> &#123;        </span><br><span class="line">        <span class="comment">// 商品ID        </span></span><br><span class="line">        <span class="type">long</span> <span class="variable">commodityId</span> <span class="operator">=</span> <span class="number">1</span>;        <span class="comment">// 库存ID        </span></span><br><span class="line">        <span class="type">String</span> <span class="variable">redisKey</span> <span class="operator">=</span> <span class="string">&quot;redis_key:stock:&quot;</span> + commodityId;</span><br><span class="line">        <span class="keyword">return</span> stockService.getStock(redisKey);    </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@RequestMapping(value = &quot;addStock&quot;, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">addStock</span><span class="params">()</span> &#123;        </span><br><span class="line">        <span class="comment">// 商品ID        </span></span><br><span class="line">        <span class="type">long</span> <span class="variable">commodityId</span> <span class="operator">=</span> <span class="number">2</span>;        </span><br><span class="line">        <span class="comment">// 库存ID        </span></span><br><span class="line">        <span class="type">String</span> <span class="variable">redisKey</span> <span class="operator">=</span> <span class="string">&quot;redis_key:stock:&quot;</span> + commodityId;</span><br><span class="line">        <span class="keyword">return</span> stockService.addStock(redisKey, <span class="number">2</span>);    </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%94%B5%E5%95%86/" rel="tag"><i class="fa fa-tag"></i> 电商</a>
+              <a href="/tags/%E9%AB%98%E5%B9%B6%E5%8F%91/" rel="tag"><i class="fa fa-tag"></i> 高并发</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2024/10/26/mybatis/mybatis%E4%BD%BF%E7%94%A8%E7%9A%849%E7%A7%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="prev" title="mybtis使用的9种设计模式">
+                  <i class="fa fa-angle-left"></i> mybtis使用的9种设计模式
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    
+  
+  <div class="comments">
+  <script src="https://utteranc.es/client.js" repo="DXProgramer/hexo-comments" issue-term="pathname" theme="github-light" crossorigin="anonymous" async></script>
+  </div>
+  
+  
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Xiangger</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">346k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:14</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+<!-- 樱花特效 -->
+  
+      <script async src="/js/fairyDustCursor.js"></script>
+  
+</body>
+</html>

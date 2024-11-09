@@ -22,7 +22,7 @@
     <meta name="description" content="关于线程安全问题是一块非常基础的知识，但基础不代表简单，一个人的基本功能往往能决定他是否可以写出高质量、高性能的代码。关于什么是synchronized、Lock、volatile，虽然都能道出一二，但概念都懂一用就懵，一不小心还能写出一个死锁出来。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一文彻底搞懂线程安全">
-<meta property="og:url" content="https://dxprogramer.github.io/2023/10/29/%E4%B8%80%E6%96%87%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/index.html">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/10/29/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80/%E4%B8%80%E6%96%87%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/index.html">
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="关于线程安全问题是一块非常基础的知识，但基础不代表简单，一个人的基本功能往往能决定他是否可以写出高质量、高性能的代码。关于什么是synchronized、Lock、volatile，虽然都能道出一二，但概念都懂一用就懵，一不小心还能写出一个死锁出来。">
 <meta property="og:locale" content="zh_CN">
@@ -33,11 +33,11 @@
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://dxprogramer.github.io/2023/10/29/%E4%B8%80%E6%96%87%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/">
+<link rel="canonical" href="https://dxprogramer.github.io/2023/10/29/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80/%E4%B8%80%E6%96%87%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/10/29/%E4%B8%80%E6%96%87%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/","path":"2023/10/29/一文彻底搞懂线程安全/","title":"一文彻底搞懂线程安全"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/10/29/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80/%E4%B8%80%E6%96%87%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/","path":"2023/10/29/并发编程/线程基础/一文彻底搞懂线程安全/","title":"一文彻底搞懂线程安全"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>一文彻底搞懂线程安全 | Xiangger</title>
@@ -208,7 +208,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/10/29/%E4%B8%80%E6%96%87%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/10/29/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80/%E4%B8%80%E6%96%87%E5%BD%BB%E5%BA%95%E6%90%9E%E6%87%82%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">

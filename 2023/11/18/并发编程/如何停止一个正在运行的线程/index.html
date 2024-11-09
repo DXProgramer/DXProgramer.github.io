@@ -22,7 +22,7 @@
     <meta name="description" content="停止一个线程意味着在任务处理完任务之前停掉正在做的操作，也就是放弃当前的操作。停止一个线程可以用Thread.stop()方法，但最好不要用它。虽然它确实可以停止一个正在运行的线程，但是这个方法是不安全的，而且是已被废弃的方法。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="如何停止一个正在运行的线程">
-<meta property="og:url" content="https://dxprogramer.github.io/2023/11/18/%E5%A6%82%E4%BD%95%E5%81%9C%E6%AD%A2%E4%B8%80%E4%B8%AA%E6%AD%A3%E5%9C%A8%E8%BF%90%E8%A1%8C%E7%9A%84%E7%BA%BF%E7%A8%8B/index.html">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/11/18/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E5%A6%82%E4%BD%95%E5%81%9C%E6%AD%A2%E4%B8%80%E4%B8%AA%E6%AD%A3%E5%9C%A8%E8%BF%90%E8%A1%8C%E7%9A%84%E7%BA%BF%E7%A8%8B/index.html">
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="停止一个线程意味着在任务处理完任务之前停掉正在做的操作，也就是放弃当前的操作。停止一个线程可以用Thread.stop()方法，但最好不要用它。虽然它确实可以停止一个正在运行的线程，但是这个方法是不安全的，而且是已被废弃的方法。">
 <meta property="og:locale" content="zh_CN">
@@ -33,11 +33,11 @@
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://dxprogramer.github.io/2023/11/18/%E5%A6%82%E4%BD%95%E5%81%9C%E6%AD%A2%E4%B8%80%E4%B8%AA%E6%AD%A3%E5%9C%A8%E8%BF%90%E8%A1%8C%E7%9A%84%E7%BA%BF%E7%A8%8B/">
+<link rel="canonical" href="https://dxprogramer.github.io/2023/11/18/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E5%A6%82%E4%BD%95%E5%81%9C%E6%AD%A2%E4%B8%80%E4%B8%AA%E6%AD%A3%E5%9C%A8%E8%BF%90%E8%A1%8C%E7%9A%84%E7%BA%BF%E7%A8%8B/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/11/18/%E5%A6%82%E4%BD%95%E5%81%9C%E6%AD%A2%E4%B8%80%E4%B8%AA%E6%AD%A3%E5%9C%A8%E8%BF%90%E8%A1%8C%E7%9A%84%E7%BA%BF%E7%A8%8B/","path":"2023/11/18/如何停止一个正在运行的线程/","title":"如何停止一个正在运行的线程"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/11/18/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E5%A6%82%E4%BD%95%E5%81%9C%E6%AD%A2%E4%B8%80%E4%B8%AA%E6%AD%A3%E5%9C%A8%E8%BF%90%E8%A1%8C%E7%9A%84%E7%BA%BF%E7%A8%8B/","path":"2023/11/18/并发编程/如何停止一个正在运行的线程/","title":"如何停止一个正在运行的线程"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>如何停止一个正在运行的线程 | Xiangger</title>
@@ -208,7 +208,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/11/18/%E5%A6%82%E4%BD%95%E5%81%9C%E6%AD%A2%E4%B8%80%E4%B8%AA%E6%AD%A3%E5%9C%A8%E8%BF%90%E8%A1%8C%E7%9A%84%E7%BA%BF%E7%A8%8B/">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/11/18/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E5%A6%82%E4%BD%95%E5%81%9C%E6%AD%A2%E4%B8%80%E4%B8%AA%E6%AD%A3%E5%9C%A8%E8%BF%90%E8%A1%8C%E7%9A%84%E7%BA%BF%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">

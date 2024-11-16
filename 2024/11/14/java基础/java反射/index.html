@@ -19,13 +19,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"dxprogramer.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"width":280},"copycode":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta property="og:type" content="article">
+    <meta name="description" content="在 Java中，反射机制（Reflection）非常重要。">
+<meta property="og:type" content="article">
 <meta property="og:title" content="java反射">
 <meta property="og:url" content="https://dxprogramer.github.io/2024/11/14/java%E5%9F%BA%E7%A1%80/java%E5%8F%8D%E5%B0%84/index.html">
 <meta property="og:site_name" content="Xiangger">
+<meta property="og:description" content="在 Java中，反射机制（Reflection）非常重要。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-11-14T13:32:37.000Z">
-<meta property="article:modified_time" content="2024-11-14T13:33:51.770Z">
+<meta property="article:modified_time" content="2024-11-14T13:46:08.778Z">
 <meta property="article:author" content="Xiangger">
 <meta property="article:tag" content="java">
 <meta property="article:tag" content="反射">
@@ -126,7 +128,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -139,6 +141,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text">特点</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -153,18 +156,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">72</span>
+          <span class="site-state-item-count">73</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">78</span>
+        <span class="site-state-item-count">79</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -236,7 +239,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2024-11-14 21:32:37 / 修改时间：21:33:51" itemprop="dateCreated datePublished" datetime="2024-11-14T21:32:37+08:00">2024-11-14</time>
+      <time title="创建时间：2024-11-14 21:32:37 / 修改时间：21:46:08" itemprop="dateCreated datePublished" datetime="2024-11-14T21:32:37+08:00">2024-11-14</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -262,7 +265,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>0</span>
+      <span>551</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
@@ -279,7 +282,37 @@
     
     
     
-    <div class="post-body" itemprop="articleBody">
+    <div class="post-body" itemprop="articleBody"><p>在 Java中，反射机制（Reflection）非常重要。</p>
+<span id="more"></span>
+
+<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>定义：Java语言中 一种动态（运行时）访问、检测 &amp; 修改它本身的能力。</p>
+<p>作用：动态（运行时）获取类的<strong>完整结构信息 &amp; 调用对象的方法</strong>。</p>
+<ol>
+<li><p>类的结构信息包括：变量、方法等。</p>
+</li>
+<li><p>正常情况下，Java类在编译前，就已经被加载到JVM中；而反射机制使得程序运行时还可以动态地去操作类的变量、方法等信息。</p>
+</li>
+</ol>
+<h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><p>优点：灵活性高。因为反射属于动态编译，即只有到运行时才动态创建 &amp;获取对象实例。</p>
+<p>编译方式说明： </p>
+<ol>
+<li><p>静态编译：在编译时确定类型 &amp; 绑定对象。如常见的使用new关键字创建对象 </p>
+</li>
+<li><p>动态编译：运行时确定类型 &amp; 绑定对象。动态编译体现了Java的灵活性、多态特性 &amp; 降低类之间的藕合性</p>
+</li>
+</ol>
+<p>缺点：</p>
+<ol>
+<li>执行效率低：因为反射的操作 主要通过JVM执行，所以时间成本会 高于 直接执行相同操作。<ol>
+<li>因为接口的通用性，Java的invoke方法是传object和object[]数组的。基本类型参数需要装箱和拆箱，产生大量额外的对象和内存开销，频繁促发GC。</li>
+<li>编译器难以对动态调用的代码提前做优化，比如方法内联。</li>
+<li>反射需要按名检索类和方法，有一定的时间开销。</li>
+</ol>
+</li>
+<li>容易破坏类结构：因为反射操作饶过了源码，容易干扰类原有的内部逻辑。</li>
+</ol>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/8iL47GrIq8I9HOqVl2oh_A">原文：一步步带你深入了解神秘的Java反射机制</a></p>
+
     </div>
 
     
@@ -301,6 +334,9 @@
                 </a>
             </div>
             <div class="post-nav-item">
+                <a href="/2024/11/16/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E8%AE%A1%E6%95%B0%E7%B3%BB%E7%BB%9F/" rel="next" title="计数系统">
+                  计数系统 <i class="fa fa-angle-right"></i>
+                </a>
             </div>
           </div>
     </footer>
@@ -338,13 +374,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">371k</span>
+    <span title="站点总字数">372k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:37</span>
+    <span title="站点阅读时长">5:38</span>
   </span>
 </div>
 <div class="busuanzi-count">

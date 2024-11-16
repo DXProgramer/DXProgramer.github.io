@@ -26,14 +26,14 @@
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="项目思考由于项目发起了一个抽奖活动，发起活动之前给所有用户发短信提示他们购买了我们的产品有抽奖权益。然后用户上来进入抽奖页面点击爆增，过了一会儿页面就打不开了。后面查看了下各种日志，发现了瓶颈在数据库，由于读写冲突严重，导致响应变慢，有不少连接都超时了。后面看到监控和日志留下的数据，发现负责抽奖的微服务集群qps暴涨12倍，db的qps也涨了10倍。这很明显是一个高并发下如何摆脱数据库读写，I&amp;#">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://dxprogramer.github.io/2023/11/12/%E9%AB%98%E6%80%A7%E8%83%BD%E5%B9%B6%E5%8F%91%E6%9E%B6%E6%9E%84/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8B%E7%9A%84%E6%8A%BD%E5%A5%96%E4%BC%98%E5%8C%96/1.png">
+<meta property="og:image" content="https://dxprogramer.github.io/.io//11/12/%E9%AB%98%E6%80%A7%E8%83%BD%E5%B9%B6%E5%8F%91%E6%9E%B6%E6%9E%84/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8B%E7%9A%84%E6%8A%BD%E5%A5%96%E4%BC%98%E5%8C%96/1.png">
 <meta property="article:published_time" content="2023-11-12T13:53:41.000Z">
 <meta property="article:modified_time" content="2023-11-12T14:09:20.462Z">
 <meta property="article:author" content="Xiangger">
 <meta property="article:tag" content="高并发">
 <meta property="article:tag" content="系统优化">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://dxprogramer.github.io/2023/11/12/%E9%AB%98%E6%80%A7%E8%83%BD%E5%B9%B6%E5%8F%91%E6%9E%B6%E6%9E%84/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8B%E7%9A%84%E6%8A%BD%E5%A5%96%E4%BC%98%E5%8C%96/1.png">
+<meta name="twitter:image" content="https://dxprogramer.github.io/.io//11/12/%E9%AB%98%E6%80%A7%E8%83%BD%E5%B9%B6%E5%8F%91%E6%9E%B6%E6%9E%84/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8B%E7%9A%84%E6%8A%BD%E5%A5%96%E4%BC%98%E5%8C%96/1.png">
 
 
 <link rel="canonical" href="https://dxprogramer.github.io/2023/11/12/%E9%AB%98%E6%80%A7%E8%83%BD%E5%B9%B6%E5%8F%91%E6%9E%B6%E6%9E%84/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8B%E7%9A%84%E6%8A%BD%E5%A5%96%E4%BC%98%E5%8C%96/">
@@ -158,18 +158,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">72</span>
+          <span class="site-state-item-count">73</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">78</span>
+        <span class="site-state-item-count">79</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -317,7 +317,7 @@
 <p>中奖只是少数，大部分人并不会中奖，所以可以在第一步便限制只有少数用户的请求能够打到真正抽奖逻辑上。是否可以考虑在抽奖之前先用随机算法生成一批中奖候选人。然后当用户请求过来时如果其中绝大多数请求都非中奖候选人，则直接返回抽奖失败，不走抽奖拿奖品的流程。少部分用户请求是中奖候选人，则进入队列，排在队列前面的获得奖品，发完为止，先到先得。</p>
 <p>举个例子：10万个用户抽奖，奖品100个，先随机选出中奖候选人500个。用户请求过来时，不走抽奖查库逻辑的用户过滤掉99500个，剩余的候选人的请求用队列处理,先到先得。这样可以把绝大多数的请求拦截在服务上游不用查库，但是缺点是不能保证奖品一定会被抽完（可能抽奖候选人只有不到100人参与抽奖）。</p>
 <p><strong>四.设计架构图</strong></p>
-<p><img src="/2023/11/12/%E9%AB%98%E6%80%A7%E8%83%BD%E5%B9%B6%E5%8F%91%E6%9E%B6%E6%9E%84/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8B%E7%9A%84%E6%8A%BD%E5%A5%96%E4%BC%98%E5%8C%96/1.png" alt="图片"></p>
+<p><img src="/.io//11/12/%E9%AB%98%E6%80%A7%E8%83%BD%E5%B9%B6%E5%8F%91%E6%9E%B6%E6%9E%84/%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8B%E7%9A%84%E6%8A%BD%E5%A5%96%E4%BC%98%E5%8C%96/1.png" alt="图片"></p>
 
     </div>
 
@@ -380,13 +380,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">371k</span>
+    <span title="站点总字数">372k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:37</span>
+    <span title="站点阅读时长">5:38</span>
   </span>
 </div>
 <div class="busuanzi-count">

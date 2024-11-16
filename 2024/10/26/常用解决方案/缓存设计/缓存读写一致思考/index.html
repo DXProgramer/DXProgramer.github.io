@@ -26,13 +26,13 @@
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="更新缓存的步骤特别简单，共两步：更新数据库和更新缓存。但这简单的两步中需要考虑很多问题。 1）先更新数据库还是先更新缓存？更新缓存时是先删除还是直接更新？ 2）假设第一步成功了，第二步失败了怎么办？ 3）假设两个线程同时更新同一个数据，A线程先完成第一步，B线程先完成第二步怎么办？">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://dxprogramer.github.io/2024/10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E4%B8%80%E8%87%B4%E6%80%9D%E8%80%83/1.png">
+<meta property="og:image" content="https://dxprogramer.github.io/.io//10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E4%B8%80%E8%87%B4%E6%80%9D%E8%80%83/1.png">
 <meta property="article:published_time" content="2024-10-26T13:25:26.000Z">
 <meta property="article:modified_time" content="2024-10-26T13:46:41.733Z">
 <meta property="article:author" content="Xiangger">
 <meta property="article:tag" content="缓存">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://dxprogramer.github.io/2024/10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E4%B8%80%E8%87%B4%E6%80%9D%E8%80%83/1.png">
+<meta name="twitter:image" content="https://dxprogramer.github.io/.io//10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E4%B8%80%E8%87%B4%E6%80%9D%E8%80%83/1.png">
 
 
 <link rel="canonical" href="https://dxprogramer.github.io/2024/10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E4%B8%80%E8%87%B4%E6%80%9D%E8%80%83/">
@@ -157,18 +157,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">72</span>
+          <span class="site-state-item-count">73</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-count">20</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">78</span>
+        <span class="site-state-item-count">79</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -301,7 +301,7 @@
 <h3 id="组合2：先删除缓存，再更新数据库"><a href="#组合2：先删除缓存，再更新数据库" class="headerlink" title="组合2：先删除缓存，再更新数据库"></a>组合2：先删除缓存，再更新数据库</h3><p>使用这种方案，即使更新数据库失败了也不需要回滚缓存。这种做法虽然巧妙规避了失败回滚的问题，却引出了两个更大的问题。</p>
 <p>1）假设线程A先删除缓存，再更新数据库。在线程A完成更新数据库之前，后执行的线程B反而超前完成了操作，读取Key发现没有数据后，将数据库中的旧值存放到了缓存中。线程A在线程B都完成后再更新数据库，这样就会出现缓存（旧值）与数据库的值（新值）不一致的问题。</p>
 <p>2）为了解决一致性问题，可以让线程A给Key加锁，因为写操作特别耗时，这种处理方法会导致大量的读请求卡在锁中。以上描述的是典型的高可用和一致性难以两全的问题，如果再加上分区容错 就 是 CAP （ 一 致 性 Consistency 、 可 用 性 Availability 、 分 区 容 错 性Partition Tolerance）了。</p>
-<p><img src="/2024/10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E4%B8%80%E8%87%B4%E6%80%9D%E8%80%83/1.png"></p>
+<p><img src="/.io//10/26/%E5%B8%B8%E7%94%A8%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/%E7%BC%93%E5%AD%98%E8%AE%BE%E8%AE%A1/%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E4%B8%80%E8%87%B4%E6%80%9D%E8%80%83/1.png"></p>
 <h3 id="组合3：先更新数据库，再更新缓存"><a href="#组合3：先更新数据库，再更新缓存" class="headerlink" title="组合3：先更新数据库，再更新缓存"></a>组合3：先更新数据库，再更新缓存</h3><p>对于组合3，同样需要考虑两个问题。</p>
 <p>1）假设第一步（更新数据库）成功，第二步（更新缓存）失败了怎么办？</p>
 <p>因为缓存不是主流程，数据库才是，所以不会因为更新缓存失败而回滚第一步对数据库的更新。此时一般采取的做法是重试机制，但重试机制如果存在延时还是会出现数据库与缓存不一致的情况，不好处理。</p>
@@ -375,13 +375,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">371k</span>
+    <span title="站点总字数">372k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:37</span>
+    <span title="站点阅读时长">5:38</span>
   </span>
 </div>
 <div class="busuanzi-count">

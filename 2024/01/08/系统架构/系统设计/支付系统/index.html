@@ -21,27 +21,26 @@
 
     <meta name="description" content="支付系统相关业务说明与系统架构。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="支付架构">
-<meta property="og:url" content="https://dxprogramer.github.io/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E6%94%AF%E4%BB%98%E6%9E%B6%E6%9E%84/index.html">
+<meta property="og:title" content="支付系统">
+<meta property="og:url" content="https://dxprogramer.github.io/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E6%94%AF%E4%BB%98%E7%B3%BB%E7%BB%9F/index.html">
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="支付系统相关业务说明与系统架构。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-01-08T15:33:13.000Z">
-<meta property="article:modified_time" content="2024-04-20T15:14:24.066Z">
+<meta property="article:modified_time" content="2024-11-16T12:13:00.655Z">
 <meta property="article:author" content="Xiangger">
-<meta property="article:tag" content="架构">
-<meta property="article:tag" content="支付">
+<meta property="article:tag" content="支付系统">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://dxprogramer.github.io/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E6%94%AF%E4%BB%98%E6%9E%B6%E6%9E%84/">
+<link rel="canonical" href="https://dxprogramer.github.io/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E6%94%AF%E4%BB%98%E7%B3%BB%E7%BB%9F/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E6%94%AF%E4%BB%98%E6%9E%B6%E6%9E%84/","path":"2024/01/08/系统架构/支付架构/","title":"支付架构"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E6%94%AF%E4%BB%98%E7%B3%BB%E7%BB%9F/","path":"2024/01/08/系统架构/系统设计/支付系统/","title":"支付系统"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>支付架构 | Xiangger</title>
+<title>支付系统 | Xiangger</title>
   
 
 
@@ -155,7 +154,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">73</span>
+          <span class="site-state-item-count">75</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -208,7 +207,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E6%94%AF%E4%BB%98%E6%9E%B6%E6%9E%84/">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E6%94%AF%E4%BB%98%E7%B3%BB%E7%BB%9F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -221,12 +220,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="支付架构 | Xiangger">
+      <meta itemprop="name" content="支付系统 | Xiangger">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          支付架构
+          支付系统
         </h1>
 
         <div class="post-meta-container">
@@ -244,7 +243,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-04-20 23:14:24" itemprop="dateModified" datetime="2024-04-20T23:14:24+08:00">2024-04-20</time>
+      <time title="修改时间：2024-11-16 20:13:00" itemprop="dateModified" datetime="2024-11-16T20:13:00+08:00">2024-11-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -252,7 +251,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">系统架构</span></a>
+          <a href="/categories/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">系统设计</span></a>
         </span>
     </span>
 
@@ -270,7 +269,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>379</span>
+      <span>132</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
@@ -290,12 +289,24 @@
     <div class="post-body" itemprop="articleBody"><p>支付系统相关业务说明与系统架构。</p>
 <span id="more"></span>
 
-<p>订单视角看支付｜得物技术:<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/NvG9wR_GwEnKTHMfkTJWng">https://mp.weixin.qq.com/s/NvG9wR_GwEnKTHMfkTJWng</a></p>
-<p>详解快捷支付：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/4SlgVwSM9z9Kpm7_3HB7Vw">https://mp.weixin.qq.com/s/4SlgVwSM9z9Kpm7_3HB7Vw</a></p>
-<p>Spring Boot 集成支付宝支付:<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/gkIgj0Dp2b9X28owEGziiA">https://mp.weixin.qq.com/s/gkIgj0Dp2b9X28owEGziiA</a></p>
-<p>如何对接第三方支付通道:<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/X7aIBNdOm7NUr8gP4HZxcA">https://mp.weixin.qq.com/s/X7aIBNdOm7NUr8gP4HZxcA</a></p>
-<p>支付与清结算的区别: <a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/JfeNT9EnTeIpwMbA7HWaeA">https://mp.weixin.qq.com/s/JfeNT9EnTeIpwMbA7HWaeA</a></p>
-<p>直连与间连的区别：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/5hZX6CwWAn2Kz-Zb63chuw">https://mp.weixin.qq.com/s/5hZX6CwWAn2Kz-Zb63chuw</a></p>
+<p>支付业务：</p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/JfeNT9EnTeIpwMbA7HWaeA">支付与清结算的区别</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/5hZX6CwWAn2Kz-Zb63chuw">直连与间连的区别</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/4SlgVwSM9z9Kpm7_3HB7Vw">详解快捷支付</a></p>
+<br>
+
+<br>
+
+<p>陈天宇宙：</p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2MTg1NTM4NA==&action=getalbum&album_id=2671511412426670080&scene=126&sessionid=887105303#wechat_redirect">陈天宇宙：账户与钱包</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2MTg1NTM4NA==&action=getalbum&album_id=3238280778946576386&scene=126&sessionid=887105303#wechat_redirect">陈天宇宙：支付核心</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2MTg1NTM4NA==&action=getalbum&album_id=2671508268393168897&scene=126&sessionid=887105303#wechat_redirect">陈天宇宙：支付方法论</a></p>
+<hr>
+<p>系统设计：</p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/NvG9wR_GwEnKTHMfkTJWng">订单视角看支付｜得物技术</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/gkIgj0Dp2b9X28owEGziiA">Spring Boot 集成支付宝支付</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/X7aIBNdOm7NUr8gP4HZxcA">如何对接第三方支付通道</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/z1me9clFSARX7jlJR1YwRQ">优雅的支付系统设计</a></p>
 
     </div>
 
@@ -305,8 +316,7 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E6%9E%B6%E6%9E%84/" rel="tag"><i class="fa fa-tag"></i> 架构</a>
-              <a href="/tags/%E6%94%AF%E4%BB%98/" rel="tag"><i class="fa fa-tag"></i> 支付</a>
+              <a href="/tags/%E6%94%AF%E4%BB%98%E7%B3%BB%E7%BB%9F/" rel="tag"><i class="fa fa-tag"></i> 支付系统</a>
           </div>
 
         

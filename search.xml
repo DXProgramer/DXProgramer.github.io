@@ -4,11 +4,36 @@
   
     
     <entry>
+      <title>MQ</title>
+      <link href="/2024/12/01/%E4%B8%AD%E9%97%B4%E4%BB%B6/MQ/"/>
+      <url>/2024/12/01/%E4%B8%AD%E9%97%B4%E4%BB%B6/MQ/</url>
+      
+        <content type="html"><![CDATA[<p>MQ常见面试题</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/i_csMg5BCNqXGw08Isw2gQ">RocketMQ发送的三种策略</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 中间件 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> MQ </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>面试</title>
       <link href="/2024/12/01/WEB%E7%BC%96%E7%A8%8B/%E9%9D%A2%E8%AF%95/"/>
       <url>/2024/12/01/WEB%E7%BC%96%E7%A8%8B/%E9%9D%A2%E8%AF%95/</url>
       
-        <content type="html"><![CDATA[<p>WEB常见面试题</p><p>JAVA WEB常见面试题</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/7I57JHSyM7VRDqlKTUxlxA">京东一面：post为什么会发送两次请求？</a></p>]]></content>
+        <content type="html"><![CDATA[<p>WEB常见面试题</p><p>JAVA WEB常见面试题</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/7I57JHSyM7VRDqlKTUxlxA">京东一面：post为什么会发送两次请求？</a></p><p><a href="https://mp.weixin.qq.com/s/xfrKJrqJT7PysqQfwRpq0g">Spring Boot Starter 设计：实现统一返回与异常处理</a></p>]]></content>
       
       
       <categories>

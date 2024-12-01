@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>面试</title>
+      <link href="/2024/12/01/WEB%E7%BC%96%E7%A8%8B/%E9%9D%A2%E8%AF%95/"/>
+      <url>/2024/12/01/WEB%E7%BC%96%E7%A8%8B/%E9%9D%A2%E8%AF%95/</url>
+      
+        <content type="html"><![CDATA[<p>WEB常见面试题</p><p>JAVA WEB常见面试题</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/7I57JHSyM7VRDqlKTUxlxA">京东一面：post为什么会发送两次请求？</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> WEB编程 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 面试 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Feed 流系统</title>
       <link href="/2024/11/24/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/Feed%20%E6%B5%81%E7%B3%BB%E7%BB%9F/"/>
       <url>/2024/11/24/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/Feed%20%E6%B5%81%E7%B3%BB%E7%BB%9F/</url>
@@ -332,9 +357,9 @@
       
         <tags>
             
-            <tag> 缓存 </tag>
-            
             <tag> 中间件 </tag>
+            
+            <tag> 缓存 </tag>
             
         </tags>
       
@@ -386,9 +411,9 @@
       
         <tags>
             
-            <tag> 缓存 </tag>
-            
             <tag> 高并发 </tag>
+            
+            <tag> 缓存 </tag>
             
             <tag> 系统设计 </tag>
             
@@ -879,9 +904,9 @@
       
         <tags>
             
-            <tag> 事务 </tag>
-            
             <tag> mysql </tag>
+            
+            <tag> 事务 </tag>
             
         </tags>
       
@@ -906,9 +931,9 @@
       
         <tags>
             
-            <tag> 事务 </tag>
-            
             <tag> mysql </tag>
+            
+            <tag> 事务 </tag>
             
         </tags>
       

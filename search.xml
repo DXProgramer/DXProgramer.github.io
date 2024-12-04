@@ -382,9 +382,9 @@
       
         <tags>
             
-            <tag> 缓存 </tag>
-            
             <tag> 中间件 </tag>
+            
+            <tag> 缓存 </tag>
             
         </tags>
       
@@ -436,9 +436,9 @@
       
         <tags>
             
-            <tag> 缓存 </tag>
-            
             <tag> 高并发 </tag>
+            
+            <tag> 缓存 </tag>
             
             <tag> 系统设计 </tag>
             
@@ -813,7 +813,7 @@
       <link href="/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E6%94%AF%E4%BB%98%E7%B3%BB%E7%BB%9F/"/>
       <url>/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E6%94%AF%E4%BB%98%E7%B3%BB%E7%BB%9F/</url>
       
-        <content type="html"><![CDATA[<p>支付系统相关业务说明与系统架构。</p><span id="more"></span><p>支付业务：</p><p><a href="https://mp.weixin.qq.com/s/JfeNT9EnTeIpwMbA7HWaeA">支付与清结算的区别</a></p><p><a href="https://mp.weixin.qq.com/s/5hZX6CwWAn2Kz-Zb63chuw">直连与间连的区别</a></p><p><a href="https://mp.weixin.qq.com/s/4SlgVwSM9z9Kpm7_3HB7Vw">详解快捷支付</a></p><br><br><p>陈天宇宙：</p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2MTg1NTM4NA==&action=getalbum&album_id=2671511412426670080&scene=126&sessionid=887105303#wechat_redirect">陈天宇宙：账户与钱包</a></p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2MTg1NTM4NA==&action=getalbum&album_id=3238280778946576386&scene=126&sessionid=887105303#wechat_redirect">陈天宇宙：支付核心</a></p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2MTg1NTM4NA==&action=getalbum&album_id=2671508268393168897&scene=126&sessionid=887105303#wechat_redirect">陈天宇宙：支付方法论</a></p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2MTg1NTM4NA==&action=getalbum&album_id=3338332513697660928&scene=173&subscene=&sessionid=svr_19ded7a30d9&enterid=1732635140&from_msgid=2247497521&from_itemidx=1&count=3&nolastread=1#wechat_redirect">#退款中心</a></p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2MTg1NTM4NA==&action=getalbum&album_id=3265622599338950657&subscene=159&subscene=&scenenote=https://mp.weixin.qq.com/s/lKd0EwbRcOV-tJwgOQ0YEA&nolastread=1#wechat_redirect">#信贷</a></p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzkwOTYyODA4Nw==&action=getalbum&album_id=3250352738602024961&scene=173&subscene=&sessionid=undefined&enterid=0&from_msgid=2247486262&from_itemidx=1&count=3&nolastread=1#wechat_redirect">隐没星辰：百图解码支付系统设计与实现</a></p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MjM5MDIwNjAxMA==&action=getalbum&album_id=3342638180210098178&scene=173&subscene=&sessionid=undefined&enterid=0&from_msgid=2247485198&from_itemidx=1&count=3&nolastread=1#wechat_redirect">刚哥白话：支付设计</a></p><hr><p>系统设计：</p><p><a href="https://mp.weixin.qq.com/s/NvG9wR_GwEnKTHMfkTJWng">订单视角看支付｜得物技术</a></p><p><a href="https://mp.weixin.qq.com/s/gkIgj0Dp2b9X28owEGziiA">Spring Boot 集成支付宝支付</a></p><p><a href="https://mp.weixin.qq.com/s/X7aIBNdOm7NUr8gP4HZxcA">如何对接第三方支付通道</a></p><p><a href="https://mp.weixin.qq.com/s/z1me9clFSARX7jlJR1YwRQ">优雅的支付系统设计</a></p>]]></content>
+        <content type="html"><![CDATA[<p>支付系统相关业务说明与系统架构。</p><span id="more"></span><p>支付业务：</p><p><a href="https://mp.weixin.qq.com/s/JfeNT9EnTeIpwMbA7HWaeA">支付与清结算的区别</a></p><p><a href="https://mp.weixin.qq.com/s/5hZX6CwWAn2Kz-Zb63chuw">直连与间连的区别</a></p><p><a href="https://mp.weixin.qq.com/s/4SlgVwSM9z9Kpm7_3HB7Vw">详解快捷支付</a></p><br><br><p>陈天宇宙：</p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzkwOTYyODA4Nw==&action=getalbum&album_id=3250352738602024961&scene=173&subscene=&sessionid=undefined&enterid=0&from_msgid=2247486262&from_itemidx=1&count=3&nolastread=1#wechat_redirect">隐没星辰：百图解码支付系统设计与实现</a></p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MjM5MDIwNjAxMA==&action=getalbum&album_id=3342638180210098178&scene=173&subscene=&sessionid=undefined&enterid=0&from_msgid=2247485198&from_itemidx=1&count=3&nolastread=1#wechat_redirect">刚哥白话：支付设计</a></p><hr><p>系统设计：</p><p><a href="https://mp.weixin.qq.com/s/NvG9wR_GwEnKTHMfkTJWng">订单视角看支付｜得物技术</a></p><p><a href="https://mp.weixin.qq.com/s/gkIgj0Dp2b9X28owEGziiA">Spring Boot 集成支付宝支付</a></p><p><a href="https://mp.weixin.qq.com/s/X7aIBNdOm7NUr8gP4HZxcA">如何对接第三方支付通道</a></p><p><a href="https://mp.weixin.qq.com/s/z1me9clFSARX7jlJR1YwRQ">优雅的支付系统设计</a></p>]]></content>
       
       
       <categories>
@@ -929,9 +929,9 @@
       
         <tags>
             
-            <tag> mysql </tag>
-            
             <tag> 事务 </tag>
+            
+            <tag> mysql </tag>
             
         </tags>
       
@@ -956,9 +956,9 @@
       
         <tags>
             
-            <tag> mysql </tag>
-            
             <tag> 事务 </tag>
+            
+            <tag> mysql </tag>
             
         </tags>
       
@@ -2066,9 +2066,9 @@
       
         <tags>
             
-            <tag> 多线程 </tag>
-            
             <tag> 锁 </tag>
+            
+            <tag> 多线程 </tag>
             
         </tags>
       

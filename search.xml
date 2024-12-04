@@ -382,9 +382,9 @@
       
         <tags>
             
-            <tag> 缓存 </tag>
-            
             <tag> 中间件 </tag>
+            
+            <tag> 缓存 </tag>
             
         </tags>
       
@@ -1328,8 +1328,8 @@
     
     <entry>
       <title>java集合对象排序</title>
-      <link href="/2023/11/12/java%E9%9B%86%E5%90%88%E5%AF%B9%E8%B1%A1%E6%8E%92%E5%BA%8F/"/>
-      <url>/2023/11/12/java%E9%9B%86%E5%90%88%E5%AF%B9%E8%B1%A1%E6%8E%92%E5%BA%8F/</url>
+      <link href="/2023/11/12/java%E5%9F%BA%E7%A1%80/java%E9%9B%86%E5%90%88%E5%AF%B9%E8%B1%A1%E6%8E%92%E5%BA%8F/"/>
+      <url>/2023/11/12/java%E5%9F%BA%E7%A1%80/java%E9%9B%86%E5%90%88%E5%AF%B9%E8%B1%A1%E6%8E%92%E5%BA%8F/</url>
       
         <content type="html"><![CDATA[<p>总结下JDK中常用排序的方法，包括JDK8中强大的lambda表达式及函数式接口运用。</p><span id="more"></span><p>初始化集合</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> List&lt;User&gt; <span class="title function_">initList</span><span class="params">()</span> &#123;</span><br><span class="line">    List&lt;User&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">    list.add(<span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;lisa&quot;</span>, <span class="number">23</span>));</span><br><span class="line">    list.add(<span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;tom&quot;</span>, <span class="number">11</span>));</span><br><span class="line">    list.add(<span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;john&quot;</span>, <span class="number">16</span>));</span><br><span class="line">    list.add(<span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;jennis&quot;</span>, <span class="number">26</span>));</span><br><span class="line">    list.add(<span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;tin&quot;</span>, <span class="number">26</span>));</span><br><span class="line">    list.add(<span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;army&quot;</span>, <span class="number">26</span>));</span><br><span class="line">    list.add(<span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;mack&quot;</span>, <span class="number">19</span>));</span><br><span class="line">    list.add(<span class="keyword">new</span> <span class="title class_">User</span>(<span class="string">&quot;jobs&quot;</span>, <span class="number">65</span>));</span><br><span class="line">    <span class="keyword">return</span> list;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>Collections.sort</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Collections.sort(list, <span class="keyword">new</span> <span class="title class_">Comparator</span>&lt;User&gt;() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">compare</span><span class="params">(User o1, User o2)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> o1.getAge().compareTo(o2.getAge());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure><p>lambda排序</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">list.sort((User u1, User u2) -&gt; u1.getAge().compareTo(u2.getAge()));</span><br><span class="line"></span><br><span class="line">list.sort((u1, u2) -&gt; u1.getAge().compareTo(u2.getAge()));</span><br></pre></td></tr></table></figure><p>jdk8 排序，User类静态方法引用</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">list.sort(User::compareAge);</span><br></pre></td></tr></table></figure><p>jdk8 升序排序，Comparator提供的静态方法</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Collections.sort(list, Comparator.comparing(User::getAge));</span><br></pre></td></tr></table></figure><p> jdk8 降序排序，Comparator提供的静态方法</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Collections.sort(list, Comparator.comparing(User::getAge).reversed());</span><br></pre></td></tr></table></figure><p> jdk8 组合排序，Comparator提供的静态方法，先按年纪排序，年纪相同的按名称排序</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Collections.sort(list, Comparator.comparing(User::getAge).thenComparing(User::getName));</span><br></pre></td></tr></table></figure>]]></content>
       
@@ -2039,9 +2039,9 @@
       
         <tags>
             
-            <tag> 多线程 </tag>
-            
             <tag> 锁 </tag>
+            
+            <tag> 多线程 </tag>
             
         </tags>
       

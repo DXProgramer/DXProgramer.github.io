@@ -26,23 +26,23 @@
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="算法原理计数排序（Counting Sort）是一种针对于特定范围之间的整数进行排序的算法。它通过统计给定数组中不同元素的数量（类似于哈希映射），然后对映射后的数组进行排序输出即可。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/1.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/2.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/3.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/4.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/5.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/6.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/7.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/8.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/9.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/10.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/11.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/1.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/2.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/3.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/4.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/5.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/6.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/7.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/8.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/9.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/10.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/11.png">
 <meta property="article:published_time" content="2023-11-08T15:22:48.000Z">
 <meta property="article:modified_time" content="2023-11-12T08:54:43.047Z">
 <meta property="article:author" content="Xiangger">
 <meta property="article:tag" content="排序">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://dxprogramer.github.io/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/1.png">
+<meta name="twitter:image" content="https://dxprogramer.github.io/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/1.png">
 
 
 <link rel="canonical" href="https://dxprogramer.github.io/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/">
@@ -303,27 +303,27 @@
 <span id="more"></span>
 
 <p>我们以数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 为例进行说明。</p>
-<p><img src="/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/1.png" alt="图片"></p>
+<p><img src="/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/1.png" alt="图片"></p>
 <p>第一步：建立一个初始化为 <strong>0</strong> ，长度为 <strong>9</strong> (原始数组中的最大值 <strong>8</strong> 加 <strong>1</strong>) 的数组 <strong><code>count[]</code></strong> :</p>
-<p><img src="/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/2.png" alt="图片"></p>
+<p><img src="/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/2.png" alt="图片"></p>
 <p>第二步：遍历数组  <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> ，访问第一个元素 <strong>1</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>1</strong> 的元素加 1，表示当前 <strong>1</strong> 出现了一次，即 <strong><code>count[1] = 1</code></strong> ;</p>
-<p><img src="/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/3.png" alt="图片"></p>
+<p><img src="/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/3.png" alt="图片"></p>
 <p>第三步：访问数组  <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第二个元素 <strong>4</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>4</strong> 的元素加 <strong>1</strong> ，表示当前访问的元素 <strong>4</strong> 当前出现了 <strong>1</strong> 次，即  <strong><code>count[4] = 1</code></strong> ;</p>
-<p><img src="/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/4.png" alt="图片"></p>
+<p><img src="/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/4.png" alt="图片"></p>
 <p>第四步：访问数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第三个元素 <strong>1</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>1</strong> 的元素加 1，即 <strong><code>count[1] = 2</code></strong> ，表示当前 <strong>1</strong> 出现了 <strong>2</strong> 次：</p>
-<p><img src="/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/5.png" alt="图片"></p>
+<p><img src="/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/5.png" alt="图片"></p>
 <p>第五步：访问数组  <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第四个元素 <strong>2</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>2</strong> 的元素加 1，即 <strong><code>count[2] = 1</code></strong> ，表示当前 <strong>2</strong> 出现了 <strong>1</strong> 次：</p>
-<p><img src="/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/6.png" alt="图片"></p>
+<p><img src="/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/6.png" alt="图片"></p>
 <p>第六步：访问数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第五个元素 <strong>5</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>5</strong> 的元素加 1，即 <strong><code>count[5] = 1</code></strong> ，表示当前 <strong>5</strong> 出现了 <strong>1</strong> 次：</p>
-<p><img src="/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/7.png" alt="图片"></p>
+<p><img src="/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/7.png" alt="图片"></p>
 <p>第七步：访问数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第六个元素 <strong>2</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>2</strong> 的元素加 1，即 <strong><code>count[2] = 2</code></strong> ，表示当前 <strong>2</strong> 出现了 <strong>2</strong> 次：</p>
-<p><img src="/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/8.png" alt="图片"></p>
+<p><img src="/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/8.png" alt="图片"></p>
 <p>第八步：访问数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第七个元素 <strong>4</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>4</strong> 的元素加 1，即 <strong><code>count[4] = 2</code></strong> ，表示当前 <strong>4</strong> 出现了 <strong>2</strong> 次：</p>
-<p><img src="/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/9.png" alt="图片"></p>
+<p><img src="/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/9.png" alt="图片"></p>
 <p>第九步：访问数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第八个元素 <strong>1</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>1</strong> 的元素加 1，即 <strong><code>count[1] = 3</code></strong> ，表示当前 <strong>1</strong> 出现了 <strong>3</strong> 次：</p>
-<p><img src="/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/10.png" alt="图片"></p>
+<p><img src="/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/10.png" alt="图片"></p>
 <p>第十步：访问数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 的第九个元素 <strong>8</strong> ，然后将数组 <strong><code>count[]</code></strong> 中下标为 <strong>8</strong> 的元素加 1，即 <strong><code>count[8] = 1</code></strong> ，表示当前 <strong>8</strong> 出现了 <strong>1</strong> 次：</p>
-<p><img src="/.io//11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/11.png" alt="图片"></p>
+<p><img src="/2023/11/08/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/%E6%8E%92%E5%BA%8F/%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F/11.png" alt="图片"></p>
 <p>此时遍历数组 <strong><code>[1,4,1,2,5,2,4,1,8]</code></strong> 结束，我们得到了一个 <strong><code>count[]</code></strong> 数组，而只要得到了这个**<code>count[] </code>**数组，我们的排序算法就相当于结束了，接下来的就只是输出了。</p>
 <h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><p>如果不考虑计数排序的稳定性，我们按照数组 <strong><code>count[]</code></strong> 中对应下标的出现次数直接输出即可：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; count.length; i++)&#123;</span><br><span class="line">    <span class="keyword">if</span> (count[i] != <span class="number">0</span>)&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; count[i]; j++)&#123;</span><br><span class="line">            System.out.print(i + <span class="string">&quot; &quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>

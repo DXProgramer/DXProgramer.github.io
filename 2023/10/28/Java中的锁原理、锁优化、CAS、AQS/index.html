@@ -22,44 +22,44 @@
     <meta name="description" content="为什么要用锁？锁-是为了解决并发操作引起的脏读、数据不一致的问题。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java中的锁原理、锁优化、CAS、AQS">
-<meta property="og:url" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/index.html">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/index.html">
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="为什么要用锁？锁-是为了解决并发操作引起的脏读、数据不一致的问题。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/1.jpg">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/2.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/3.jpg">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/4.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/5.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/6.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/7.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/8.jpg">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/9.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/10.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/11.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/12.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/13.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/14.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/15.jpg">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//16.jpg">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//17.jpg">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/18.jpg">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/19.png">
+<meta property="og:image" content="https://dxprogramer.github.io/1.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/2.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/3.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/4.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/5.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/6.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/7.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/8.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/9.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/10.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/11.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/12.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/13.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/14.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/15.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/16.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/17.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/18.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/19.png">
 <meta property="article:published_time" content="2023-10-28T12:35:05.000Z">
-<meta property="article:modified_time" content="2024-12-04T14:16:58.406Z">
+<meta property="article:modified_time" content="2024-12-04T14:19:58.622Z">
 <meta property="article:author" content="Xiangger">
 <meta property="article:tag" content="锁">
 <meta property="article:tag" content="CAS">
 <meta property="article:tag" content="AQS">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://dxprogramer.github.io/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/1.jpg">
+<meta name="twitter:image" content="https://dxprogramer.github.io/1.jpg">
 
 
-<link rel="canonical" href="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/">
+<link rel="canonical" href="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/","path":"2023/10/28/Java中的锁-原理、锁优化、CAS、AQS/","title":"Java中的锁原理、锁优化、CAS、AQS"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/","path":"2023/10/28/Java中的锁原理、锁优化、CAS、AQS/","title":"Java中的锁原理、锁优化、CAS、AQS"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>Java中的锁原理、锁优化、CAS、AQS | Xiangger</title>
@@ -230,7 +230,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -266,7 +266,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-12-04 22:16:58" itemprop="dateModified" datetime="2024-12-04T22:16:58+08:00">2024-12-04</time>
+      <time title="修改时间：2024-12-04 22:19:58" itemprop="dateModified" datetime="2024-12-04T22:19:58+08:00">2024-12-04</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -313,7 +313,7 @@
 <span id="more"></span>
 
 <h1 id="锁实现基本原理"><a href="#锁实现基本原理" class="headerlink" title="锁实现基本原理"></a>锁实现基本原理</h1><h2 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h2><p>Java编程语言允许线程访问共享变量， 为了确保共享变量能被准确和一致地更新，线程应该确保通过排他锁单独获得这个变量。Java语言提供了volatile，在某些情况下比锁要更加方便。volatile在多处理器开发中保证了共享变量的“ 可见性”。可见性的意思是当一个线程修改一个共享变量时，另外一个线程能读到这个修改的值。</p>
-<p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/1.jpg" alt="图片"></p>
+<p><img src="/../1.jpg" alt="图片"></p>
 <p>结论：如果volatile变量修饰符使用恰当的话，它比synchronized的使用和执行成本更低，因为它不会引起线程上下文的切换和调度。</p>
 <h2 id="synchronized"><a href="#synchronized" class="headerlink" title="synchronized"></a><strong>synchronized</strong></h2><p>synchronized通过锁机制实现同步。</p>
 <p>利用synchronized实现同步的基础：Java中的每一个对象都可以作为锁。</p>
@@ -333,7 +333,7 @@
 <p>1、Java 使用对象锁 ( 使用 synchronized 获得对象锁 ) 保证工作在共享的数据集上的线程互斥执行。</p>
 <p>2、使用 notify&#x2F;notifyAll&#x2F;wait 方法来协同不同线程之间的工作。</p>
 <p>3、Class和Object都关联了一个Monitor。</p>
-<p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/2.png" alt="图片"></p>
+<p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/2.png" alt="图片"></p>
 <p>Monitor 的工作机理</p>
 <ul>
 <li>线程进入同步方法中。</li>
@@ -348,7 +348,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public class SynchronizedTest &#123;</span><br><span class="line">    public synchronized void method1()&#123;</span><br><span class="line">        System.out.println(&quot;Hello World!&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public  void method2()&#123;</span><br><span class="line">        synchronized (this)&#123;</span><br><span class="line">            System.out.println(&quot;Hello World!&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>javap编译后的字节码如下：</p>
-<p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/3.jpg" alt="图片"></p>
+<p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/3.jpg" alt="图片"></p>
 <p><strong>monitorenter</strong></p>
 <p>每一个对象都有一个monitor，一个monitor只能被一个线程拥有。当一个线程执行到monitorenter指令时会尝试获取相应对象的monitor，获取规则如下：</p>
 <ul>
@@ -359,23 +359,23 @@
 <p><strong>monitorexit</strong></p>
 <p>只有拥有相应对象的monitor的线程才能执行monitorexit指令。每执行一次该指令monitor进入数减1，当进入数为0时当前线程释放monitor，此时其他阻塞的线程将可以尝试获取该monitor。</p>
 <h3 id="锁存放的位置"><a href="#锁存放的位置" class="headerlink" title="锁存放的位置"></a>锁存放的位置</h3><p>锁标记存放在Java对象头的Mark Word中。</p>
-<p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/4.png" alt="图片"></p>
+<p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/4.png" alt="图片"></p>
 <p>Java对象头长度</p>
-<p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/5.png" alt="图片"></p>
+<p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/5.png" alt="图片"></p>
 <p>32位JVM Mark Word 结构</p>
-<p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/6.png" alt="图片"></p>
+<p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/6.png" alt="图片"></p>
 <p>32位JVM Mark Word 状态变化</p>
-<p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/7.png" alt="图片"></p>
+<p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/7.png" alt="图片"></p>
 <p>64位JVM Mark Word 结构</p>
 <h3 id="synchronized的锁优化"><a href="#synchronized的锁优化" class="headerlink" title="synchronized的锁优化"></a>synchronized的锁优化</h3><p>JavaSE1.6为了减少获得锁和释放锁带来的性能消耗，引入了“偏向锁”和“轻量级锁”。</p>
 <p>在JavaSE1.6中，锁一共有4种状态，级别从低到高依次是：无锁状态、偏向锁状态、轻量级锁状态和重量级锁状态，这几个状态会随着竞争情况逐渐升级。</p>
 <p>锁可以升级但不能降级，意味着偏向锁升级成轻量级锁后不能降级成偏向锁。这种锁升级却不能降级的策略，目的是为了提高获得锁和释放锁的效率。</p>
 <h4 id="偏向锁："><a href="#偏向锁：" class="headerlink" title="偏向锁："></a>偏向锁：</h4><p>无锁竞争的情况下为了减少锁竞争的资源开销，引入偏向锁。</p>
-<p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/8.jpg" alt="图片"></p>
+<p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/8.jpg" alt="图片"></p>
 <p><strong>锁粗化（Lock Coarsening）：</strong>也就是减少不必要的紧连在一起的unlock，lock操作，将多个连续的锁扩展成一个范围更大的锁。</p>
 <p><strong>锁消除（Lock Elimination）：</strong>锁削除是指虚拟机即时编译器在运行时，对一些代码上要求同步，但是被检测到不可能存在共享数据竞争的锁进行削除。</p>
 <p><strong>适应性自旋（Adaptive Spinning）：</strong>自适应意味着自旋的时间不再固定了，而是由前一次在同一个锁上的自旋时间及锁的拥有者的状态来决定。如果在同一个锁对象上，自旋等待刚刚成功获得过锁，并且持有锁的线程正在运行中，那么虚拟机就会认为这次自旋也很有可能再次成功，进而它将允许自旋等待持续相对更长的时间，比如100个循环。另一方面，如果对于某个锁，自旋很少成功获得过，那在以后要获取这个锁时将可能省略掉自旋过程，以避免浪费处理器资源。</p>
-<h3 id="锁的优缺点对比"><a href="#锁的优缺点对比" class="headerlink" title="锁的优缺点对比"></a>锁的优缺点对比</h3><p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/9.png" alt="图片"></p>
+<h3 id="锁的优缺点对比"><a href="#锁的优缺点对比" class="headerlink" title="锁的优缺点对比"></a>锁的优缺点对比</h3><p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/9.png" alt="图片"></p>
 <h2 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a><strong>CAS</strong></h2><p>CAS，在Java并发应用中通常指CompareAndSwap或CompareAndSet，即比较并交换。</p>
 <p>1、CAS是一个原子操作，它比较一个内存位置的值并且只有相等时修改这个内存位置的值为新的值，保证了新的值总是基于最新的信息计算的，如果有其他线程在这期间修改了这个值则CAS失败。CAS返回是否成功或者内存位置原来的值用于判断是否CAS成功。</p>
 <p>2、JVM中的CAS操作是利用了处理器提供的CMPXCHG指令实现的。</p>
@@ -390,34 +390,34 @@
 <li>只能保证一个共享变量的原子操作。</li>
 </ul>
 <h1 id="Java中的锁实现"><a href="#Java中的锁实现" class="headerlink" title="Java中的锁实现"></a>Java中的锁实现</h1><h2 id="队列同步器（AQS）"><a href="#队列同步器（AQS）" class="headerlink" title="队列同步器（AQS）"></a><strong>队列同步器（AQS）</strong></h2><p>队列同步器AbstractQueuedSynchronizer（以下简称同步器），是用来构建锁或者其他同步组件的基础框架。</p>
-<h3 id="它使用了一个int成员变量表示同步状态。"><a href="#它使用了一个int成员变量表示同步状态。" class="headerlink" title="它使用了一个int成员变量表示同步状态。"></a>它使用了一个int成员变量表示同步状态。</h3><p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/10.png" alt="图片"></p>
+<h3 id="它使用了一个int成员变量表示同步状态。"><a href="#它使用了一个int成员变量表示同步状态。" class="headerlink" title="它使用了一个int成员变量表示同步状态。"></a>它使用了一个int成员变量表示同步状态。</h3><p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/10.png" alt="图片"></p>
 <h3 id="通过内置的FIFO双向队列来完成获取锁线程的排队工作。"><a href="#通过内置的FIFO双向队列来完成获取锁线程的排队工作。" class="headerlink" title="通过内置的FIFO双向队列来完成获取锁线程的排队工作。"></a>通过内置的FIFO双向队列来完成获取锁线程的排队工作。</h3><p>同步器包含两个节点类型的应用，一个指向头节点，一个指向尾节点，未获取到锁的线程会创建节点线程安全（compareAndSetTail）的加入队列尾部。同步队列遵循FIFO，首节点是获取同步状态成功的节点。</p>
-<p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/11.png" alt="图片"></p>
+<p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/11.png" alt="图片"></p>
 <p>未获取到锁的线程将创建一个节点，设置到尾节点。如下图所示：</p>
-<p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/12.png" alt="图片"></p>
+<p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/12.png" alt="图片"></p>
 <p>首节点的线程在释放锁时，将会唤醒后继节点。而后继节点将会在获取锁成功时将自己设置为首节点。如下图所示：</p>
-<p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/13.png" alt="图片"></p>
+<p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/13.png" alt="图片"></p>
 <h3 id="独占式-共享式锁获取"><a href="#独占式-共享式锁获取" class="headerlink" title="独占式&#x2F;共享式锁获取"></a>独占式&#x2F;共享式锁获取</h3><p>独占式：有且只有一个线程能获取到锁，如：ReentrantLock。</p>
 <p>共享式：可以多个线程同时获取到锁，如：CountDownLatch</p>
 <h4 id="独占式"><a href="#独占式" class="headerlink" title="独占式"></a>独占式</h4><ul>
 <li><p>每个节点自旋观察自己的前一节点是不是Header节点，如果是，就去尝试获取锁。</p>
-<p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/14.png" alt="图片"></p>
+<p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/14.png" alt="图片"></p>
 </li>
 <li><p>独占式锁获取流程：</p>
-<p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/15.jpg" alt="图片"></p>
+<p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/15.jpg" alt="图片"></p>
 </li>
 </ul>
 <h4 id="共享式："><a href="#共享式：" class="headerlink" title="共享式："></a>共享式：</h4><ul>
 <li><p>共享式与独占式的区别：</p>
-<p><img src="/.io//16.jpg" alt="图片"></p>
+<p><img src="/./16.jpg" alt="图片"></p>
 </li>
 <li><p>共享锁获取流程：</p>
-<p><img src="/.io//17.jpg" alt="图片"></p>
+<p><img src="/./17.jpg" alt="图片"></p>
 </li>
 </ul>
-<h1 id="锁的使用用例"><a href="#锁的使用用例" class="headerlink" title="锁的使用用例"></a>锁的使用用例</h1><h2 id="ConcurrentHashMap的实现原理及使用"><a href="#ConcurrentHashMap的实现原理及使用" class="headerlink" title="ConcurrentHashMap的实现原理及使用"></a><strong>ConcurrentHashMap的实现原理及使用</strong></h2><p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/18.jpg" alt="图片"></p>
+<h1 id="锁的使用用例"><a href="#锁的使用用例" class="headerlink" title="锁的使用用例"></a>锁的使用用例</h1><h2 id="ConcurrentHashMap的实现原理及使用"><a href="#ConcurrentHashMap的实现原理及使用" class="headerlink" title="ConcurrentHashMap的实现原理及使用"></a><strong>ConcurrentHashMap的实现原理及使用</strong></h2><p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/18.jpg" alt="图片"></p>
 <p>ConcurrentHashMap类图</p>
-<p><img src="/.io//10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/19.png" alt="图片"></p>
+<p><img src="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/19.png" alt="图片"></p>
 <p>结论：ConcurrentHashMap使用的锁分段技术。首先将数据分成一段一段地存储，然后给每一段数据配一把锁，当一个线程占用锁访问其中一个段数据的时候，其他段的数据也能被其他线程访问。</p>
 <p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/hvku5GPxkfQ5GffLjiUAYw">阅读原文</a></p>
 

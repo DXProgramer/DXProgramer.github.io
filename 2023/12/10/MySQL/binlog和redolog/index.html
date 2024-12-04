@@ -26,15 +26,15 @@
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="继续聊一下binlog和redo log。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//12/10/MySQL/binlog%E5%92%8Credolog/1.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//12/10/MySQL/binlog%E5%92%8Credolog/2.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/12/10/MySQL/binlog%E5%92%8Credolog/1.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/12/10/MySQL/binlog%E5%92%8Credolog/2.png">
 <meta property="article:published_time" content="2023-12-10T13:02:25.000Z">
 <meta property="article:modified_time" content="2023-12-10T13:30:46.227Z">
 <meta property="article:author" content="Xiangger">
 <meta property="article:tag" content="mysql">
 <meta property="article:tag" content="事务">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://dxprogramer.github.io/.io//12/10/MySQL/binlog%E5%92%8Credolog/1.png">
+<meta name="twitter:image" content="https://dxprogramer.github.io/2023/12/10/MySQL/binlog%E5%92%8Credolog/1.png">
 
 
 <link rel="canonical" href="https://dxprogramer.github.io/2023/12/10/MySQL/binlog%E5%92%8Credolog/">
@@ -288,7 +288,7 @@
     <div class="post-body" itemprop="articleBody"><p>继续聊一下binlog和redo log。</p>
 <span id="more"></span>
 
-<h3 id="两阶段提交不同时刻异常重启分析"><a href="#两阶段提交不同时刻异常重启分析" class="headerlink" title="两阶段提交不同时刻异常重启分析"></a><strong>两阶段提交不同时刻异常重启分析</strong></h3><p><img src="/.io//12/10/MySQL/binlog%E5%92%8Credolog/1.png" alt="图片"></p>
+<h3 id="两阶段提交不同时刻异常重启分析"><a href="#两阶段提交不同时刻异常重启分析" class="headerlink" title="两阶段提交不同时刻异常重启分析"></a><strong>两阶段提交不同时刻异常重启分析</strong></h3><p><img src="/2023/12/10/MySQL/binlog%E5%92%8Credolog/1.png" alt="图片"></p>
 <p>在图中时刻A崩溃crash，此时redo log处于prepare状态，binlog还没有写，redo log也没有提交，所以崩溃恢复时，事务会回滚。由于Binlog也没有写，所以不会传到备库。</p>
 <p>在时刻B崩溃，binlog已经写完，redo log没有commit。根据3.2.3两阶段提交的实现逻辑，这时候B属于redo log已经处于prepare状态，并且binlog完整的情况，因此，事务会提交。</p>
 <p><strong>实际上这就是两阶段提交算法的一种业务使用，如果接受者接受建议失败，则事务失败。</strong></p>
@@ -312,7 +312,7 @@
 </ul>
 <h3 id="是否可以只使用binlog"><a href="#是否可以只使用binlog" class="headerlink" title="是否可以只使用binlog"></a><strong>是否可以只使用binlog</strong></h3><p>如果只使用binlog，过程可能是：数据更新到内存 -&gt; 写binlog -&gt;提交事务</p>
 <p>但是这种方式无法支持事务，因为binlog没有崩溃恢复的能力。binlog由于WAL技术，有些修改是还没有落盘但是事务已经提交，这时候如果crash，重启后根据binlog可能认为这些修改已经落盘，从而导致丢失修改。</p>
-<p><img src="/.io//12/10/MySQL/binlog%E5%92%8Credolog/2.png" alt="图片"></p>
+<p><img src="/2023/12/10/MySQL/binlog%E5%92%8Credolog/2.png" alt="图片"></p>
 <p>如图所示，一旦发生crash，那么事务2会回滚，然后应用binlog2可以补回来。但是对于事务1，系统已经提交完成，不会再应用一次binlog1。</p>
 <p>InnoDB使用的是WAL技术，执行事务的时候，写完内存和日志，事务就算完成。crash之后，依赖日志恢复数据页。即：图中的事务1可能已经丢失，而且是数据页级的丢失，无法找回。</p>
 <h4 id="binlog不具备checkpoint"><a href="#binlog不具备checkpoint" class="headerlink" title="binlog不具备checkpoint"></a><strong>binlog不具备checkpoint</strong></h4><p>从理论上分析就是：InnoDB设计思路是数据写入时，写到内存、redo log和binlog就算是写入成功，内存中的数据是否落盘主要看redo log有没有日志数据，只要redo log日志数据没有被checkpoint擦除，就代表数据还在内存中，crash恢复时，就会把redo log的数据先恢复到内存的数据页中，执行一次重放就可以恢复数据了。当然也存在说，可能落盘的redo log也还没有被checkpoint擦除，但是这种场景，可以通过redo log的LSN和数据页的LSN对比判定，如果相同，就会跳过这个checkpoint进行下一个数据页的恢复。</p>

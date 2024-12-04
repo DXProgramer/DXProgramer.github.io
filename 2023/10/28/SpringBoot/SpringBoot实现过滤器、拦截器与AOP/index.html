@@ -26,9 +26,9 @@
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="使用过滤器、拦截器与切片实现每个请求耗时的统计，并比较三者的区别与联系">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/SpringBoot/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/1.jpg">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/SpringBoot/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/2.jpg">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/28/SpringBoot/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/3.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/SpringBoot/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/1.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/SpringBoot/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/2.jpg">
+<meta property="og:image" content="https://dxprogramer.github.io/2023/10/28/SpringBoot/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/3.jpg">
 <meta property="article:published_time" content="2023-10-28T13:15:30.000Z">
 <meta property="article:modified_time" content="2023-10-28T13:32:32.937Z">
 <meta property="article:author" content="Xiangger">
@@ -36,7 +36,7 @@
 <meta property="article:tag" content="拦截器">
 <meta property="article:tag" content="AOP">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://dxprogramer.github.io/.io//10/28/SpringBoot/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/1.jpg">
+<meta name="twitter:image" content="https://dxprogramer.github.io/2023/10/28/SpringBoot/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/1.jpg">
 
 
 <link rel="canonical" href="https://dxprogramer.github.io/2023/10/28/SpringBoot/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/">
@@ -360,11 +360,11 @@
 
 <h2 id="过滤器、拦截器以及切片的调用顺序"><a href="#过滤器、拦截器以及切片的调用顺序" class="headerlink" title="过滤器、拦截器以及切片的调用顺序"></a>过滤器、拦截器以及切片的调用顺序</h2><p>如下图，展示了三者的调用顺序Filter-&gt;Intercepto-&gt;Aspect-&gt;Controller。相反的是，当Controller抛出的异常的处理顺序则是从内到外的。因此我们总是定义一个注解@ControllerAdvice去统一处理控制器抛出的异常。</p>
 <p>如果一旦异常被@ControllerAdvice处理了，则调用拦截器的afterCompletion方法的参数Exception ex就为空了。</p>
-<p><img src="/.io//10/28/SpringBoot/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/1.jpg" alt="图片"></p>
+<p><img src="/2023/10/28/SpringBoot/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/1.jpg" alt="图片"></p>
 <p>实际执行的调用栈也说明了这一点：</p>
-<p><img src="/.io//10/28/SpringBoot/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/2.jpg" alt="图片"></p>
+<p><img src="/2023/10/28/SpringBoot/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/2.jpg" alt="图片"></p>
 <p>而对于过滤器和拦截器详细的调用顺序如下图：</p>
-<p><img src="/.io//10/28/SpringBoot/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/3.jpg" alt="图片"></p>
+<p><img src="/2023/10/28/SpringBoot/SpringBoot%E5%AE%9E%E7%8E%B0%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E4%B8%8EAOP/3.jpg" alt="图片"></p>
 <h2 id="过滤器和拦截器的区别"><a href="#过滤器和拦截器的区别" class="headerlink" title="过滤器和拦截器的区别"></a>过滤器和拦截器的区别</h2><p>最后有必要再说说过滤器和拦截器二者之间的区别：</p>
 <table>
 <thead>
@@ -409,7 +409,7 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81-%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/" rel="prev" title="Java中的锁原理、锁优化、CAS、AQS">
+                <a href="/2023/10/28/Java%E4%B8%AD%E7%9A%84%E9%94%81%E5%8E%9F%E7%90%86%E3%80%81%E9%94%81%E4%BC%98%E5%8C%96%E3%80%81CAS%E3%80%81AQS/" rel="prev" title="Java中的锁原理、锁优化、CAS、AQS">
                   <i class="fa fa-angle-left"></i> Java中的锁原理、锁优化、CAS、AQS
                 </a>
             </div>

@@ -26,18 +26,18 @@
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="​        一般来说，缓存的容量是小于数据总量的，所以，当缓存数据越来越多，Redis 不可避免的会被写满，这时候就涉及到 Redis 的内存淘汰机制了。我们需要选定某种策略将“不重要”的数据从 Redis 中清除，为新的数据腾出空间。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/1.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/2.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/3.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/5.png">
-<meta property="og:image" content="https://dxprogramer.github.io/.io//10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/4.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/1.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/2.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/3.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/5.png">
+<meta property="og:image" content="https://dxprogramer.github.io/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/4.png">
 <meta property="article:published_time" content="2024-10-26T12:49:07.000Z">
 <meta property="article:modified_time" content="2024-10-26T13:12:17.402Z">
 <meta property="article:author" content="Xiangger">
-<meta property="article:tag" content="中间件">
 <meta property="article:tag" content="缓存">
+<meta property="article:tag" content="中间件">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://dxprogramer.github.io/.io//10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/1.png">
+<meta name="twitter:image" content="https://dxprogramer.github.io/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/1.png">
 
 
 <link rel="canonical" href="https://dxprogramer.github.io/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/">
@@ -297,17 +297,17 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config set maxmemory 5gb</span><br></pre></td></tr></table></figure>
 
 <p>配置文件：</p>
-<p><img src="/.io//10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/1.png"></p>
+<p><img src="/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/1.png"></p>
 <p>查看 maxmemory 命令：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config get maxmemory</span><br></pre></td></tr></table></figure>
 
 <h3 id="Redis内存淘汰策略"><a href="#Redis内存淘汰策略" class="headerlink" title="Redis内存淘汰策略"></a>Redis内存淘汰策略</h3><p>在 Redis 4.0 版本之前有 6 种策略，4.0 增加了 2种，主要新增了 LFU 算法。</p>
 <p>下图为 Redis 6.2.0 版本的配置文件：</p>
-<p><img src="/.io//10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/2.png"></p>
+<p><img src="/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/2.png"></p>
 <p>其中，默认的淘汰策略是 noevition，也就是不淘汰。</p>
 <p>我们可以对 8 种淘汰策略可以分为两大类：</p>
 <h4 id="不进行淘汰的策略"><a href="#不进行淘汰的策略" class="headerlink" title="不进行淘汰的策略"></a><strong>不进行淘汰的策略</strong></h4><p>noevition，此策略不会对缓存的数据进行淘汰，当内存不够了就会报错，因此，如果真实数据集大小大于缓存容量，就不要使用此策略了。</p>
-<p><img src="/.io//10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/3.png"></p>
+<p><img src="/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/3.png"></p>
 <h4 id="会进行淘汰的策略"><a href="#会进行淘汰的策略" class="headerlink" title="会进行淘汰的策略"></a><strong>会进行淘汰的策略</strong></h4><ul>
 <li>allkeys-random：随机删除</li>
 <li>allkeys-lru：使用 LRU 算法进行筛选删除</li>
@@ -320,7 +320,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1) 以 volatile 开头的策略只针对设置了过期时间的数据，即使缓存没有被写满，如果数据过期也会被删除。</span><br><span class="line"></span><br><span class="line">2)以 allkeys 开头的策略是针对所有数据的，如果数据被选中了，即使过期时间没到，也会被删除。当然，如果它的过期时间到了但未被策略选中，同样会被删除。</span><br></pre></td></tr></table></figure>
 
 <h5 id="LRU算法"><a href="#LRU算法" class="headerlink" title="LRU算法"></a>LRU算法</h5><p>​         LRU 全称是 Least Recently Used，即最近最少使用，会将最不常用的数据筛选出来，保留最近频繁使用的数据。LRU 会把所有数据组成一个链表，链表头部称为 MRU，代表最近最常使用的数据；尾部称为 LRU代表最近最不常使用的数据；下图是一个简单的例子：</p>
-<p><img src="/.io//10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/5.png"></p>
+<p><img src="/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/5.png"></p>
 <p><strong>但是，如果直接在 Redis 中使用 LRU 算法也会有一些问题：</strong></p>
 <p>LRU 算法在实现过程中使用链表管理所有缓存的数据，这会给 Redis 带来额外的开销，而且，当有数据访问时就会有链表移动操作，进而降低 Redis 的性能。</p>
 <p>于是，Redis 对 LRU 的实现进行了一些改变：</p>
@@ -343,7 +343,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">config set maxmemory-policy allkeys-lru</span><br></pre></td></tr></table></figure>
 
 <p>配置文件：</p>
-<p><img src="/.io//10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/4.png"></p>
+<p><img src="/2024/10/26/redis/Redis%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/4.png"></p>
 
     </div>
 
@@ -353,8 +353,8 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="tag"><i class="fa fa-tag"></i> 中间件</a>
               <a href="/tags/%E7%BC%93%E5%AD%98/" rel="tag"><i class="fa fa-tag"></i> 缓存</a>
+              <a href="/tags/%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="tag"><i class="fa fa-tag"></i> 中间件</a>
           </div>
 
         

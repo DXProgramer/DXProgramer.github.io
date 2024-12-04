@@ -22,7 +22,7 @@
     <meta name="description" content="分段锁借鉴concurrentHashMap的分段思想，提前生成一定数量的锁，具体使用的时候再根据key来返回对应的lock。这是几个实现里最简单，性能最高，也是最终被采用的锁策略，代码如下：">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java细粒度锁实现的3种方式">
-<meta property="og:url" content="https://dxprogramer.github.io/2023/10/22/Java%E7%BB%86%E7%B2%92%E5%BA%A6%E9%94%81%E5%AE%9E%E7%8E%B0%E7%9A%843%E7%A7%8D%E6%96%B9%E5%BC%8F/index.html">
+<meta property="og:url" content="https://dxprogramer.github.io/2023/10/22/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80/Java%E7%BB%86%E7%B2%92%E5%BA%A6%E9%94%81%E5%AE%9E%E7%8E%B0%E7%9A%843%E7%A7%8D%E6%96%B9%E5%BC%8F/index.html">
 <meta property="og:site_name" content="Xiangger">
 <meta property="og:description" content="分段锁借鉴concurrentHashMap的分段思想，提前生成一定数量的锁，具体使用的时候再根据key来返回对应的lock。这是几个实现里最简单，性能最高，也是最终被采用的锁策略，代码如下：">
 <meta property="og:locale" content="zh_CN">
@@ -34,11 +34,11 @@
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://dxprogramer.github.io/2023/10/22/Java%E7%BB%86%E7%B2%92%E5%BA%A6%E9%94%81%E5%AE%9E%E7%8E%B0%E7%9A%843%E7%A7%8D%E6%96%B9%E5%BC%8F/">
+<link rel="canonical" href="https://dxprogramer.github.io/2023/10/22/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80/Java%E7%BB%86%E7%B2%92%E5%BA%A6%E9%94%81%E5%AE%9E%E7%8E%B0%E7%9A%843%E7%A7%8D%E6%96%B9%E5%BC%8F/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/10/22/Java%E7%BB%86%E7%B2%92%E5%BA%A6%E9%94%81%E5%AE%9E%E7%8E%B0%E7%9A%843%E7%A7%8D%E6%96%B9%E5%BC%8F/","path":"2023/10/22/Java细粒度锁实现的3种方式/","title":"Java细粒度锁实现的3种方式"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://dxprogramer.github.io/2023/10/22/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80/Java%E7%BB%86%E7%B2%92%E5%BA%A6%E9%94%81%E5%AE%9E%E7%8E%B0%E7%9A%843%E7%A7%8D%E6%96%B9%E5%BC%8F/","path":"2023/10/22/并发编程/线程基础/Java细粒度锁实现的3种方式/","title":"Java细粒度锁实现的3种方式"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>Java细粒度锁实现的3种方式 | Xiangger</title>
@@ -209,7 +209,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/10/22/Java%E7%BB%86%E7%B2%92%E5%BA%A6%E9%94%81%E5%AE%9E%E7%8E%B0%E7%9A%843%E7%A7%8D%E6%96%B9%E5%BC%8F/">
+    <link itemprop="mainEntityOfPage" href="https://dxprogramer.github.io/2023/10/22/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/%E7%BA%BF%E7%A8%8B%E5%9F%BA%E7%A1%80/Java%E7%BB%86%E7%B2%92%E5%BA%A6%E9%94%81%E5%AE%9E%E7%8E%B0%E7%9A%843%E7%A7%8D%E6%96%B9%E5%BC%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">

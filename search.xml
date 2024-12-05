@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>BeanPostProcessor</title>
+      <link href="/2024/12/05/Spring/%E6%89%A9%E5%B1%95%E7%82%B9%E5%BA%94%E7%94%A8/BeanPostProcessor/"/>
+      <url>/2024/12/05/Spring/%E6%89%A9%E5%B1%95%E7%82%B9%E5%BA%94%E7%94%A8/BeanPostProcessor/</url>
+      
+        <content type="html"><![CDATA[<p>在 Spring 中，BeanPostProcessor 是一个强大的扩展点，允许开发者在 Spring 容器实例化和初始化 Bean 时插入自定义逻辑。通过实现 BeanPostProcessor 接口，可以在 Bean 的生命周期中进行额外的处理，例如动态代理、属性设置或校验等操作。</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/DlSFOPUT89PxydSrUwjGOQ">基于 BeanPostProcessor 扩展点应用</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> spring </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> spring </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>MQ</title>
       <link href="/2024/12/01/%E4%B8%AD%E9%97%B4%E4%BB%B6/MQ/"/>
       <url>/2024/12/01/%E4%B8%AD%E9%97%B4%E4%BB%B6/MQ/</url>
@@ -382,9 +407,9 @@
       
         <tags>
             
-            <tag> 缓存 </tag>
-            
             <tag> 中间件 </tag>
+            
+            <tag> 缓存 </tag>
             
         </tags>
       

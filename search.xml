@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>物流系统</title>
+      <link href="/2024/12/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E7%89%A9%E6%B5%81%E7%B3%BB%E7%BB%9F/"/>
+      <url>/2024/12/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E7%89%A9%E6%B5%81%E7%B3%BB%E7%BB%9F/</url>
+      
+        <content type="html"><![CDATA[<p>美团外卖的即时物流分布式高并发系统是如何建设的？</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/gXSMv8OtZ-4g6gxsO5G30Q">美团即时物流的分布式系统架构设计</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 系统设计 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 物流系统 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>MyBatis的执行流程</title>
       <link href="/2024/12/05/mybatis/MyBatis%E7%9A%84%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/"/>
       <url>/2024/12/05/mybatis/MyBatis%E7%9A%84%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/</url>
@@ -58,7 +83,7 @@
       <link href="/2024/12/05/%E4%B8%AD%E9%97%B4%E4%BB%B6/redis/redis/"/>
       <url>/2024/12/05/%E4%B8%AD%E9%97%B4%E4%BB%B6/redis/redis/</url>
       
-        <content type="html"><![CDATA[<p>redis基础原理与应用</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/2_wgTf_ikDqnZrACj_nD8w">基于Redis实现点赞及排行榜功能</a></p><p><a href="https://mp.weixin.qq.com/s/PULSBdokYYa7b26ffO1H9Q">数据埋点之redis版本</a></p>]]></content>
+        <content type="html"><![CDATA[<p>redis基础原理与应用</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/2_wgTf_ikDqnZrACj_nD8w">基于Redis实现点赞及排行榜功能</a></p><p><a href="https://mp.weixin.qq.com/s/PULSBdokYYa7b26ffO1H9Q">数据埋点之redis版本</a></p><p><a href="https://mp.weixin.qq.com/s/UMzNWhWfvesWcBfPqwLeDg">SpringBoot+Redis 搞定搜索栏热搜、不雅文字过滤功能</a></p>]]></content>
       
       
       <categories>
@@ -582,9 +607,9 @@
       
         <tags>
             
-            <tag> 中间件 </tag>
-            
             <tag> 缓存 </tag>
+            
+            <tag> 中间件 </tag>
             
         </tags>
       
@@ -636,9 +661,9 @@
       
         <tags>
             
-            <tag> 高并发 </tag>
-            
             <tag> 缓存 </tag>
+            
+            <tag> 高并发 </tag>
             
             <tag> 系统设计 </tag>
             
@@ -869,9 +894,9 @@
       
         <tags>
             
-            <tag> 注解 </tag>
-            
             <tag> conditional </tag>
+            
+            <tag> 注解 </tag>
             
         </tags>
       

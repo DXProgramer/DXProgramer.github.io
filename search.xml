@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>系统设计</title>
+      <link href="/2024/12/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/"/>
+      <url>/2024/12/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/</url>
+      
+        <content type="html"><![CDATA[<p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg5MzIxNjEzOQ==&action=getalbum&album_id=3727139115100241923&scene=173&subscene=&sessionid=undefined&enterid=0&from_msgid=2247488275&from_itemidx=1&count=3&nolastread=1#wechat_redirect">服务端技术精选：后台架构设计实战</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 系统设计 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 系统设计 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>物流系统</title>
       <link href="/2024/12/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E7%89%A9%E6%B5%81%E7%B3%BB%E7%BB%9F/"/>
       <url>/2024/12/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E7%89%A9%E6%B5%81%E7%B3%BB%E7%BB%9F/</url>
@@ -607,9 +632,9 @@
       
         <tags>
             
-            <tag> 缓存 </tag>
-            
             <tag> 中间件 </tag>
+            
+            <tag> 缓存 </tag>
             
         </tags>
       
@@ -661,9 +686,9 @@
       
         <tags>
             
-            <tag> 缓存 </tag>
-            
             <tag> 高并发 </tag>
+            
+            <tag> 缓存 </tag>
             
             <tag> 系统设计 </tag>
             
@@ -894,9 +919,9 @@
       
         <tags>
             
-            <tag> conditional </tag>
-            
             <tag> 注解 </tag>
+            
+            <tag> conditional </tag>
             
         </tags>
       

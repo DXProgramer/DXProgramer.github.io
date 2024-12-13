@@ -4,6 +4,131 @@
   
     
     <entry>
+      <title>权限系统</title>
+      <link href="/2024/12/13/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E6%9D%83%E9%99%90%E7%B3%BB%E7%BB%9F/"/>
+      <url>/2024/12/13/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E6%9D%83%E9%99%90%E7%B3%BB%E7%BB%9F/</url>
+      
+        <content type="html"><![CDATA[<p>权限管控可以通俗的理解为权力限制，即不同的人由于拥有不同权力，他所看到的、能使用的可能不一样。对应到一个应用系统，其实就是一个用户可能拥有不同的数据权限（看到的）和操作权限（使用的）。</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/T856Oghpk3PPY1tKaalHQg">https://mp.weixin.qq.com/s/T856Oghpk3PPY1tKaalHQg</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 系统设计 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 权限系统 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>适配器模式</title>
+      <link href="/2024/12/13/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F/"/>
+      <url>/2024/12/13/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F/</url>
+      
+        <content type="html"><![CDATA[<p>适配器模式用于协调不同接口的兼容性问题。</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/1kxstdLibDHk0ZFPjq8Xzw">适配器模式统一处理数据源</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 设计模式 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 适配器模式 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>搜索系统</title>
+      <link href="/2024/12/13/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F/"/>
+      <url>/2024/12/13/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E6%90%9C%E7%B4%A2%E7%B3%BB%E7%BB%9F/</url>
+      
+        <content type="html"><![CDATA[<p>如今，我们几乎在每个网站上都看到一个搜索栏。搜索栏使我们能够快速找到我们需要的内容。</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/ldKMzTxwzIEVGsHPk1DnVw">分布式搜索系统的设计</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 系统设计 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 搜索系统 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>分布式事务</title>
+      <link href="/2024/12/13/%E9%AB%98%E6%80%A7%E8%83%BD%E5%B9%B6%E5%8F%91%E6%9E%B6%E6%9E%84/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/"/>
+      <url>/2024/12/13/%E9%AB%98%E6%80%A7%E8%83%BD%E5%B9%B6%E5%8F%91%E6%9E%B6%E6%9E%84/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/</url>
+      
+        <content type="html"><![CDATA[<p>怎么解决分布式场景下数据一致性问题。</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/d-wtNSr-YOYSNgZTEL8l7Q">看一遍就理解：分布式事务详解</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 分布式 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 分布式事务 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>访问者模式</title>
+      <link href="/2024/12/08/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E8%AE%BF%E9%97%AE%E8%80%85%E6%A8%A1%E5%BC%8F/"/>
+      <url>/2024/12/08/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E8%AE%BF%E9%97%AE%E8%80%85%E6%A8%A1%E5%BC%8F/</url>
+      
+        <content type="html"><![CDATA[<p>访问者模式是一种行为型设计模式，它用于处理对象结构中不同类型的元素，而不需要修改这些元素的类。</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/7YseLCVGtOW44S7v5L-cQw">https://mp.weixin.qq.com/s/7YseLCVGtOW44S7v5L-cQw</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 设计模式 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 访问者模式 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>系统设计</title>
       <link href="/2024/12/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/"/>
       <url>/2024/12/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/</url>
@@ -108,7 +233,7 @@
       <link href="/2024/12/05/%E4%B8%AD%E9%97%B4%E4%BB%B6/redis/redis/"/>
       <url>/2024/12/05/%E4%B8%AD%E9%97%B4%E4%BB%B6/redis/redis/</url>
       
-        <content type="html"><![CDATA[<p>redis基础原理与应用</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/2_wgTf_ikDqnZrACj_nD8w">基于Redis实现点赞及排行榜功能</a></p><p><a href="https://mp.weixin.qq.com/s/PULSBdokYYa7b26ffO1H9Q">数据埋点之redis版本</a></p><p><a href="https://mp.weixin.qq.com/s/UMzNWhWfvesWcBfPqwLeDg">SpringBoot+Redis 搞定搜索栏热搜、不雅文字过滤功能</a></p>]]></content>
+        <content type="html"><![CDATA[<p>redis基础原理与应用</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/2_wgTf_ikDqnZrACj_nD8w">基于Redis实现点赞及排行榜功能</a></p><p><a href="https://mp.weixin.qq.com/s/PULSBdokYYa7b26ffO1H9Q">数据埋点之redis版本</a></p><p><a href="https://mp.weixin.qq.com/s/UMzNWhWfvesWcBfPqwLeDg">SpringBoot+Redis 搞定搜索栏热搜、不雅文字过滤功能</a></p><p><a href="https://mp.weixin.qq.com/s/154EeSjrE_2AjnO-LANNzw">Redis大Key问题：排查与解决方案</a></p>]]></content>
       
       
       <categories>
@@ -208,7 +333,7 @@
       <link href="/2024/12/05/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/"/>
       <url>/2024/12/05/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F/</url>
       
-        <content type="html"><![CDATA[<p>工厂设计模式是一种创建对象的设计模式，它的主要目的是通过定义一个接口来创建对象，使得子类决定实例化哪个类。</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/JPu0_bGsUERfVYMb8qX3dQ">https://mp.weixin.qq.com/s/JPu0_bGsUERfVYMb8qX3dQ</a></p>]]></content>
+        <content type="html"><![CDATA[<p>工厂设计模式是一种创建对象的设计模式，它的主要目的是通过定义一个接口来创建对象，使得子类决定实例化哪个类。</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/JPu0_bGsUERfVYMb8qX3dQ">https://mp.weixin.qq.com/s/JPu0_bGsUERfVYMb8qX3dQ</a></p><p><a href="https://mp.weixin.qq.com/s/zM60SPtuHa1cVTPNHnNvLw">https://mp.weixin.qq.com/s/zM60SPtuHa1cVTPNHnNvLw</a></p>]]></content>
       
       
       <categories>
@@ -258,7 +383,7 @@
       <link href="/2024/12/01/%E4%B8%AD%E9%97%B4%E4%BB%B6/MQ/"/>
       <url>/2024/12/01/%E4%B8%AD%E9%97%B4%E4%BB%B6/MQ/</url>
       
-        <content type="html"><![CDATA[<p>MQ常见面试题</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/i_csMg5BCNqXGw08Isw2gQ">RocketMQ发送的三种策略</a></p><p><a href="https://mp.weixin.qq.com/s/6YU8AcoGf7Kz2sQPOkLDxgs">RocketMQ延时消息</a></p>]]></content>
+        <content type="html"><![CDATA[<p>MQ常见面试题</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/i_csMg5BCNqXGw08Isw2gQ">RocketMQ发送的三种策略</a></p><p><a href="https://mp.weixin.qq.com/s/6YU8AcoGf7Kz2sQPOkLDxgs">RocketMQ延时消息</a></p><p>RabbitMQ:</p><p><a href="https://mp.weixin.qq.com/s/MvMVt_mQNmGbusNSm41bIA">RabbitMQ详细安装步骤</a></p><p><a href="https://mp.weixin.qq.com/s/fk8NCw3-YiCLx-yoJclVVA">RabbitMQ消息堆积问题解决</a></p><p><a href="https://mp.weixin.qq.com/s/KWrTZXeVAK8PV9oaihop8w">消息队列背后的黑科技：零拷贝如何让MQ性能提升300%</a></p><p><a href="https://mp.weixin.qq.com/s/q5lhG-_aB0bAIDIfzZBiZQ">深入理解堆外内存：MQ为什么不会引起频繁GC?</a></p>]]></content>
       
       
       <categories>
@@ -412,7 +537,7 @@
       <link href="/2024/11/16/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E5%B7%A5%E4%BD%9C%E5%BC%95%E6%93%8E/"/>
       <url>/2024/11/16/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E5%B7%A5%E4%BD%9C%E5%BC%95%E6%93%8E/</url>
       
-        <content type="html"><![CDATA[<p>流程从业务中剥离出来，就形成了工作流技术。工作流技术将业务过程中的任务、事件、条件等抽象为一个独立的模型，使得业务逻辑可以按照工作流模型的定义进行自动化地执行和管理。这种解耦方式提高了业务过程的可视化、可配置化和可监控性，同时也降低了业务逻辑的复杂性。而工作流技术中最核心的正是流程引擎。</p><span id="more"></span><p><a href="https://workflow-engine-book.shuwoom.com/">流程引擎原理与实践</a></p>]]></content>
+        <content type="html"><![CDATA[<p>流程从业务中剥离出来，就形成了工作流技术。工作流技术将业务过程中的任务、事件、条件等抽象为一个独立的模型，使得业务逻辑可以按照工作流模型的定义进行自动化地执行和管理。这种解耦方式提高了业务过程的可视化、可配置化和可监控性，同时也降低了业务逻辑的复杂性。而工作流技术中最核心的正是流程引擎。</p><span id="more"></span><p><a href="https://workflow-engine-book.shuwoom.com/">流程引擎原理与实践</a></p><p><a href="https://mp.weixin.qq.com/s/7wf7oI7vyh5XitU7ZqRd1w">流程引擎的架构设计</a></p>]]></content>
       
       
       <categories>
@@ -437,7 +562,7 @@
       <link href="/2024/11/16/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E8%AE%A1%E6%95%B0%E7%B3%BB%E7%BB%9F/"/>
       <url>/2024/11/16/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E8%AE%A1%E6%95%B0%E7%B3%BB%E7%BB%9F/</url>
       
-        <content type="html"><![CDATA[<p>在信息爆炸的时代，计数系统几乎无处不在，从社交平台上的点赞量、评论数，到电商平台的浏览量、订单数量，再到内容网站的访问量统计，计数系统为各种业务提供了实时、准确的数据支持。这些数据不仅是简单的数字，它们可以反映出用户对内容的兴趣、商品的受欢迎程度、市场的需求变化，甚至可以用于预测未来趋势。对于企业和平台而言，计数系统能够提供一个有效的量化依据，帮助优化产品、制定营销策略、提升用户体验，因此它成为了数据统计和用户分析的核心工具。</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/ZHOk7zIAZxv4fNi7INGIDA">原文：空间换时间-将查询数据性能提升100倍的计数系统实践</a></p>]]></content>
+        <content type="html"><![CDATA[<p>在信息爆炸的时代，计数系统几乎无处不在，从社交平台上的点赞量、评论数，到电商平台的浏览量、订单数量，再到内容网站的访问量统计，计数系统为各种业务提供了实时、准确的数据支持。这些数据不仅是简单的数字，它们可以反映出用户对内容的兴趣、商品的受欢迎程度、市场的需求变化，甚至可以用于预测未来趋势。对于企业和平台而言，计数系统能够提供一个有效的量化依据，帮助优化产品、制定营销策略、提升用户体验，因此它成为了数据统计和用户分析的核心工具。</p><span id="more"></span><p><a href="https://mp.weixin.qq.com/s/ZHOk7zIAZxv4fNi7INGIDA">原文：空间换时间-将查询数据性能提升100倍的计数系统实践</a></p><p><a href="https://mp.weixin.qq.com/s/XCWM1OFDKXBGxa7TebrrzA">哔哩哔哩直播通用榜单系统</a></p>]]></content>
       
       
       <categories>
@@ -632,9 +757,9 @@
       
         <tags>
             
-            <tag> 中间件 </tag>
-            
             <tag> 缓存 </tag>
+            
+            <tag> 中间件 </tag>
             
         </tags>
       
@@ -686,9 +811,9 @@
       
         <tags>
             
-            <tag> 高并发 </tag>
-            
             <tag> 缓存 </tag>
+            
+            <tag> 高并发 </tag>
             
             <tag> 系统设计 </tag>
             
@@ -1036,7 +1161,7 @@
       <link href="/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E6%94%AF%E4%BB%98%E7%B3%BB%E7%BB%9F/"/>
       <url>/2024/01/08/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84/%E7%B3%BB%E7%BB%9F%E8%AE%BE%E8%AE%A1/%E6%94%AF%E4%BB%98%E7%B3%BB%E7%BB%9F/</url>
       
-        <content type="html"><![CDATA[<p>支付系统相关业务说明与系统架构。</p><span id="more"></span><p>支付业务：</p><p><a href="https://mp.weixin.qq.com/s/JfeNT9EnTeIpwMbA7HWaeA">支付与清结算的区别</a></p><p><a href="https://mp.weixin.qq.com/s/5hZX6CwWAn2Kz-Zb63chuw">直连与间连的区别</a></p><p><a href="https://mp.weixin.qq.com/s/4SlgVwSM9z9Kpm7_3HB7Vw">详解快捷支付</a></p><br/><br/><p>陈天宇宙：</p><p><a href="https://mp.weixin.qq.com/s/MiSsqFVzGnxYim4NP6drvQ">3.5万字：一文搞懂“支付系统”</a></p><p><a href="https://mp.weixin.qq.com/s/Ader32GWLIfHfI_rjfMOAA">对账系统，从入门到精通</a></p><p><a href="https://mp.weixin.qq.com/s/Df9ei0UR-2J-wFQNJx-tbg">支付清算生态</a></p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2MTg1NTM4NA==&action=getalbum&album_id=3758700141679607815&scene=173&subscene=&sessionid=undefined&enterid=0&from_msgid=2247502180&from_itemidx=1&count=3&nolastread=1#wechat_redirect">跨境支付</a></p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzkwOTYyODA4Nw==&action=getalbum&album_id=3250352738602024961&scene=173&subscene=&sessionid=undefined&enterid=0&from_msgid=2247486262&from_itemidx=1&count=3&nolastread=1#wechat_redirect">隐没星辰：百图解码支付系统设计与实现</a></p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MjM5MDIwNjAxMA==&action=getalbum&album_id=3342638180210098178&scene=173&subscene=&sessionid=undefined&enterid=0&from_msgid=2247485198&from_itemidx=1&count=3&nolastread=1#wechat_redirect">刚哥白话：支付设计</a></p><hr><p>系统设计：</p><p><a href="https://mp.weixin.qq.com/s/NvG9wR_GwEnKTHMfkTJWng">订单视角看支付｜得物技术</a></p><p><a href="https://mp.weixin.qq.com/s/gkIgj0Dp2b9X28owEGziiA">Spring Boot 集成支付宝支付</a></p><p><a href="https://mp.weixin.qq.com/s/X7aIBNdOm7NUr8gP4HZxcA">如何对接第三方支付通道</a></p><p><a href="https://mp.weixin.qq.com/s/z1me9clFSARX7jlJR1YwRQ">优雅的支付系统设计</a></p><p><a href="https://mp.weixin.qq.com/s/dkftGKb8QOWdHmYyLWqTNA">一文搞懂第三方支付系统架构设计</a></p><p><a href="https://mp.weixin.qq.com/s/powqEKSsoNCwIdLP4ZGXAw">支付系统就该这么设计，稳的一批！！</a></p>]]></content>
+        <content type="html"><![CDATA[<p>支付系统相关业务说明与系统架构。</p><span id="more"></span><p>支付业务：</p><p><a href="https://mp.weixin.qq.com/s/JfeNT9EnTeIpwMbA7HWaeA">支付与清结算的区别</a></p><p><a href="https://mp.weixin.qq.com/s/5hZX6CwWAn2Kz-Zb63chuw">直连与间连的区别</a></p><p><a href="https://mp.weixin.qq.com/s/4SlgVwSM9z9Kpm7_3HB7Vw">详解快捷支付</a></p><br/><br/><p>陈天宇宙：</p><p><a href="https://mp.weixin.qq.com/s/MiSsqFVzGnxYim4NP6drvQ">3.5万字：一文搞懂“支付系统”</a></p><p><a href="https://mp.weixin.qq.com/s/Ader32GWLIfHfI_rjfMOAA">对账系统，从入门到精通</a></p><p><a href="https://mp.weixin.qq.com/s/Df9ei0UR-2J-wFQNJx-tbg">支付清算生态</a></p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2MTg1NTM4NA==&action=getalbum&album_id=3758700141679607815&scene=173&subscene=&sessionid=undefined&enterid=0&from_msgid=2247502180&from_itemidx=1&count=3&nolastread=1#wechat_redirect">跨境支付</a></p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzkwOTYyODA4Nw==&action=getalbum&album_id=3757976785753571337&scene=173&subscene=&sessionid=undefined&enterid=0&from_msgid=2247486359&from_itemidx=1&count=3&nolastread=1#wechat_redirect">隐没星辰：支付系统实现</a></p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzkwOTYyODA4Nw==&action=getalbum&album_id=3250352738602024961&scene=173&subscene=&sessionid=undefined&enterid=0&from_msgid=2247486262&from_itemidx=1&count=3&nolastread=1#wechat_redirect">隐没星辰：百图解码支付系统设计与实现</a></p><p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MjM5MDIwNjAxMA==&action=getalbum&album_id=3342638180210098178&scene=173&subscene=&sessionid=undefined&enterid=0&from_msgid=2247485198&from_itemidx=1&count=3&nolastread=1#wechat_redirect">刚哥白话：支付设计</a></p><hr><p>系统设计：</p><p><a href="https://mp.weixin.qq.com/s/NvG9wR_GwEnKTHMfkTJWng">订单视角看支付｜得物技术</a></p><p><a href="https://mp.weixin.qq.com/s/gkIgj0Dp2b9X28owEGziiA">Spring Boot 集成支付宝支付</a></p><p><a href="https://mp.weixin.qq.com/s/X7aIBNdOm7NUr8gP4HZxcA">如何对接第三方支付通道</a></p><p><a href="https://mp.weixin.qq.com/s/z1me9clFSARX7jlJR1YwRQ">优雅的支付系统设计</a></p><p><a href="https://mp.weixin.qq.com/s/dkftGKb8QOWdHmYyLWqTNA">一文搞懂第三方支付系统架构设计</a></p><p><a href="https://mp.weixin.qq.com/s/powqEKSsoNCwIdLP4ZGXAw">支付系统就该这么设计，稳的一批！！</a></p><p><a href="https://mp.weixin.qq.com/s/ceMKpO_5b0DAJyu-DUDC0g">资金视角看支付系统架构设计</a></p>]]></content>
       
       
       <categories>
